@@ -15,8 +15,8 @@ public class Field //The field in which the pieces can be placed
     
     //Visual variables
     private const int blockSize = 16; //How large a block is
-    private readonly int fieldWidth; //How many pixels wide
-    private readonly int fieldHeight; //How many pixels high
+    private readonly int fieldPixelWidth; //How many pixels wide
+    private readonly int fieldPixelHeight; //How many pixels high
     private readonly int fieldX; //X value of top left of field
     private readonly int fieldY; //Y value of top left of field
     private bool drawGrid;
@@ -46,8 +46,8 @@ public class Field //The field in which the pieces can be placed
         }
         
         //Visual setup
-        fieldWidth = blockSize * width;
-        fieldHeight = blockSize * height;
+        fieldPixelWidth = blockSize * width;
+        fieldPixelHeight = blockSize * height;
         fieldX = 50; //Adjust in settings later
         fieldY = 20; //Adjust in settings later
         drawGrid = false; //Adjust in settings later
@@ -86,7 +86,7 @@ public class Field //The field in which the pieces can be placed
     public void Draw(SpriteBatch spriteBatch)
     {
         //Draw field
-        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldWidth, fieldHeight), Color.LightGray); //Temp values
+        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, fieldPixelHeight), Color.LightGray); //Temp values
         
         //Draw blocks
         //For loops for getting blocks in sequence
@@ -100,11 +100,11 @@ public class Field //The field in which the pieces can be placed
                 {
                     //TODO Assign colors correctly
                     case 0:
-                        blockColor = Color.Green;
+                        blockColor = Color.Transparent;
                         break;
                     
                     default:
-                        blockColor = Color.White;
+                        blockColor = Color.Green;
                         break;
                 }
 
@@ -121,6 +121,23 @@ public class Field //The field in which the pieces can be placed
                 spriteBatch.Draw(tetrisGame.blockTexture, blockRectangle, blockColor);
             }
         }
+        
+        
+    }
+    
+    public void DrawPiece(Piece piece, SpriteBatch spriteBatch)
+    {
+        for (int y = 0; y < Piece.HitboxSize; y++)
+        {
+            for (int x =  0; x < Piece.HitboxSize; x++)
+            {
+                if (!piece.Hitbox[x, y])
+                    continue;
+                Rectangle blockRectangle =
+                    new Rectangle(fieldX + blockSize * x, fieldY + blockSize * (height - y), blockSize, blockSize);
+                spriteBatch.Draw(tetrisGame.blockTexture, blockRectangle, Color.DarkGray);
+            }
+        }
     }
 
     //Used to get a block in a more intuitive manner
@@ -133,5 +150,20 @@ public class Field //The field in which the pieces can be placed
     public void SetBlock(int x, int y, byte value)
     {
         blockArray[y][x] = value;
+    }
+    
+    public bool Collides(bool[,] hitbox, Vector2int position)
+    {
+        for (int y = 0; y < hitbox.GetLength(1); y++)
+        {
+            for (int x = 0; x < hitbox.GetLength(0); x++)
+            {
+                if (x >= Width || y >= Height || (hitbox[x, y] && GetBlock(x + position.X, y + position.X) != 0))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
