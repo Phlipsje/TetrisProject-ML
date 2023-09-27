@@ -1,3 +1,3 @@
 ﻿
-using var game = new TetrisProject.Game1();
+using var game = new TetrisProject.Main();
 game.Run();

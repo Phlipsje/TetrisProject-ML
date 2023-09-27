@@ -1,31 +1,39 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject
 {
-    public class Game1 : Game
+    public class Main : Game
     {
-        private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
+        private TetrisGame tetrisGame;
 
-        public Game1()
+        public Main()
         {
-            _graphics = new GraphicsDeviceManager(this);
+            graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
+            //TODO Change screen resolution to be bigger
+            tetrisGame = new TetrisGame();
+            
+            tetrisGame.Instantiate();
+            
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            
+            tetrisGame.LoadContent(this.Content);
 
             // TODO: use this.Content to load your game content here
         }
@@ -44,7 +52,9 @@ namespace TetrisProject
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+            tetrisGame.Draw(spriteBatch);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
