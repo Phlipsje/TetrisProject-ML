@@ -11,9 +11,11 @@ public class TetrisGame
     
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
+    public Texture2D squareTexture; //Used for drawing rectangles with a single color
     
     //File locations
     private const string blockTextureFileName = "BaseBlock";
+    private const string squareTextureFileName = "Square";
 
     public void Instantiate()
     {
@@ -23,6 +25,7 @@ public class TetrisGame
     public void LoadContent(ContentManager content)
     {
         blockTexture = content.Load<Texture2D>(blockTextureFileName);
+        squareTexture = content.Load<Texture2D>(squareTextureFileName);
     }
     
     public void Draw(SpriteBatch spriteBatch)

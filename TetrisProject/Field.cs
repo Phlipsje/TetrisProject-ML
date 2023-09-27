@@ -86,7 +86,7 @@ public class Field //The field in which the pieces can be placed
     public void Draw(SpriteBatch spriteBatch)
     {
         //Draw field
-        spriteBatch.Draw(tetrisGame.blockTexture, new Rectangle(fieldX, fieldY, fieldWidth, fieldHeight), Color.LightGray); //Temp values
+        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldWidth, fieldHeight), Color.LightGray); //Temp values
         
         //Draw blocks
         //For loops for getting blocks in sequence
