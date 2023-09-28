@@ -34,8 +34,6 @@ namespace TetrisProject
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
             tetrisGame.LoadContent(this.Content);
-
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
@@ -43,7 +41,9 @@ namespace TetrisProject
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            Util.Update();
+            
+            tetrisGame.Update();
 
             base.Update(gameTime);
         }

@@ -127,12 +127,15 @@ public class Field //The field in which the pieces can be placed
     
     public void DrawPiece(Piece piece, SpriteBatch spriteBatch)
     {
-        for (int y = 0; y < Piece.HitboxSize; y++)
+        for (int y = 0; y < Piece.hitboxSize; y++)
         {
-            for (int x =  0; x < Piece.HitboxSize; x++)
+            for (int x =  0; x < Piece.hitboxSize; x++)
             {
+                //Check if the is a block in that part of the piece (in the 4x4 matrix of possible hitbox points)
                 if (!piece.Hitbox[x, y])
                     continue;
+                
+                //Draw individual block of a piece
                 Rectangle blockRectangle =
                     new Rectangle(fieldX + blockSize * x, fieldY + blockSize * (height - y), blockSize, blockSize);
                 spriteBatch.Draw(tetrisGame.blockTexture, blockRectangle, Color.DarkGray);
@@ -152,7 +155,7 @@ public class Field //The field in which the pieces can be placed
         blockArray[y][x] = value;
     }
     
-    public bool Collides(bool[,] hitbox, Vector2int position)
+    public bool Collides(bool[,] hitbox, Vector2Int position)
     {
         for (int y = 0; y < hitbox.GetLength(1); y++)
         {

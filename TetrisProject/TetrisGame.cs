@@ -2,6 +2,7 @@ using System.Net.NetworkInformation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject;
 
@@ -22,13 +23,22 @@ public class TetrisGame
     public void Instantiate()
     {
         field = new Field(this);
-        testPiece = new BlockPiece(field);
+        testPiece = new LinePiece(field);
     }
 
     public void LoadContent(ContentManager content)
     {
         blockTexture = content.Load<Texture2D>(blockTextureFileName);
         squareTexture = content.Load<Texture2D>(squareTextureFileName);
+    }
+
+    public void Update()
+    {
+        //Testing rotation
+        if (Util.GetKeyPressed(Keys.R))
+        {
+            testPiece.Rotate();
+        }
     }
     
     public void Draw(SpriteBatch spriteBatch)
