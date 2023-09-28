@@ -1,4 +1,5 @@
-using System.Net.NetworkInformation;
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,8 +10,9 @@ namespace TetrisProject;
 public class TetrisGame
 {
     //The in-match game logic
-    private Field field;
-    private Piece testPiece;
+    private Field field; //The field in which the game is being played
+    private Piece activePiece; //The currently being controlled piece
+    private List<byte> pieceQueue = new List<byte>(); //Which pieces come next
     
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -23,7 +25,8 @@ public class TetrisGame
     public void Instantiate()
     {
         field = new Field(this);
-        testPiece = new LinePiece(field);
+        activePiece = new LinePiece(field);
+        FillQueue(); //Test
     }
 
     public void LoadContent(ContentManager content)
@@ -37,15 +40,26 @@ public class TetrisGame
         //Testing rotation
         if (Util.GetKeyPressed(Keys.R))
         {
-            testPiece.Rotate();
+            activePiece.Rotate();
         }
     }
     
     public void Draw(SpriteBatch spriteBatch)
     {
         field.Draw(spriteBatch);
-        field.DrawPiece(testPiece, spriteBatch);
+        field.DrawPiece(activePiece, spriteBatch);
     }
 
+    //Adds new pieces to the list of pieces the player has to use
+    private void FillQueue() //TODO Get an error of "CreateAppHost" failed, debug later
+    {
+        byte[] pieceOrder = { 0, 1, 2, 3, 4, 5, 6 };
+        Util.ShuffleArray(ref pieceOrder); //Shuffles the array
+        Console.WriteLine(pieceOrder);
 
+        foreach (var pieceByteValue in pieceOrder)
+        {
+            pieceQueue.Add(pieceByteValue);
+        }
+    }
 }

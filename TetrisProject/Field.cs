@@ -137,7 +137,7 @@ public class Field //The field in which the pieces can be placed
                 
                 //Draw individual block of a piece
                 Rectangle blockRectangle =
-                    new Rectangle(fieldX + blockSize * x, fieldY + blockSize * (height - y), blockSize, blockSize);
+                    new Rectangle(fieldX + blockSize * (x + piece.Position.X), fieldY + blockSize * (height - y - piece.Position.Y), blockSize, blockSize);
                 spriteBatch.Draw(tetrisGame.blockTexture, blockRectangle, Color.DarkGray);
             }
         }
