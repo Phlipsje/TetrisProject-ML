@@ -22,7 +22,7 @@ public static class Util
     }
 
     //Shuffles the order of an array
-    public static void ShuffleArray(ref byte[] array)
+    public static byte[] ShuffleArray(byte[] array)
     {
         Random random = new Random();
         for (int i = 0; i < array.Length; i++) //Shuffle amount
@@ -30,5 +30,7 @@ public static class Util
             int randomIndex = random.Next(array.Length); //Get random number
             (array[0], array[randomIndex]) = (array[randomIndex], array[0]); //Swap indices of 2 values in array
         }
+
+        return array;
     }
 }

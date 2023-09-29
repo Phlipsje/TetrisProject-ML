@@ -1,4 +1,6 @@
+using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject;
 
@@ -27,8 +29,12 @@ public abstract class Piece
     private Color color; //The color of the piece
     
     public const int hitboxSize = 4;
+
+    private double nextDropTime; //The time it takes until a piece moves down one line
+    private double dropTimer; //The timer counting up checked by nextDropTime
     
-    private Field _fieldReference;
+    private Field fieldReference;
+    private TetrisGame tetrisGameReference;
 
     public bool[,] Hitbox
     {
@@ -59,31 +65,59 @@ public abstract class Piece
         protected set => color = value;
     }
 
-    public Piece(Field fieldReference)
+    public Piece(Field fieldReference, TetrisGame tetrisGameReference)
     {
-        _fieldReference = fieldReference;
-        position = new Vector2Int(4, 4);
+        this.fieldReference = fieldReference;
+        this.tetrisGameReference = tetrisGameReference;
+        position = new Vector2Int(4, 0);
         hitboxes = new bool[4][,];
+        nextDropTime = 0.5; //Test value
     }
 
+    public void Update(GameTime gameTime)
+    {
+        if (Util.GetKeyPressed(Keys.R))
+        {
+            Rotate();
+        }
+
+        if (dropTimer > nextDropTime) //Piece drops down 1 line
+        {
+            dropTimer = 0;
+            MoveDown();
+        }
+
+        if (fieldReference.Collides(Hitbox, position))
+        {
+            LockPiece(); //Change to give wiggle room later
+        }
+
+        dropTimer += gameTime.ElapsedGameTime.TotalSeconds;
+    }
+
+    private void LockPiece()
+    {
+        tetrisGameReference.NextPiece();
+    }
+    
     public void MoveDown()
     {
         position.Y++;
-        if (_fieldReference.Collides(hitbox, position))
+        if (fieldReference.Collides(hitbox, position))
             position.Y--;
     }
 
     public void MoveLeft()
     {
         position.X--;
-        if (_fieldReference.Collides(hitbox, position))
+        if (fieldReference.Collides(hitbox, position))
             position.X++;
     }
 
     public void MoveRight()
     {
         position.X++;
-        if (_fieldReference.Collides(hitbox, position))
+        if (fieldReference.Collides(hitbox, position))
             position.X--;
     }
 
@@ -128,29 +162,32 @@ public abstract class Piece
         switch (pieceInQueue)
         {
             case (byte)Pieces.Block:
-                blockType = new BlockPiece(_fieldReference);
+                blockType = new BlockPiece(fieldReference, tetrisGameReference);
                 break;
             case (byte)Pieces.Line:
-                blockType = new LinePiece(_fieldReference);
+                blockType = new LinePiece(fieldReference, tetrisGameReference);
                 break;
             case (byte)Pieces.T:
-                blockType = new TPiece(_fieldReference);
+                blockType = new TPiece(fieldReference, tetrisGameReference);
                 break;
             case (byte)Pieces.S:
-                blockType = new SPiece(_fieldReference);
+                blockType = new SPiece(fieldReference, tetrisGameReference);
                 break;
             case (byte)Pieces.Z:
-                blockType = new ZPiece(_fieldReference);
+                blockType = new ZPiece(fieldReference, tetrisGameReference);
                 break;
             case (byte)Pieces.L:
-                blockType = new LPiece(_fieldReference);
+                blockType = new LPiece(fieldReference, tetrisGameReference);
                 break;
             case (byte)Pieces.J:
-                blockType = new JPiece(_fieldReference);
+                blockType = new JPiece(fieldReference, tetrisGameReference);
+                break;
+            default:
+                throw new Exception("blockType not specified");
                 break;
         }
-        
-        return new BlockPiece(_fieldReference);
+
+        return blockType;
     }
 }
 
@@ -169,7 +206,7 @@ public enum Pieces
 public class BlockPiece : Piece
 {
     //All hitbox points for every rotation
-    public BlockPiece(Field fieldReference) : base(fieldReference)
+    public BlockPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         bool[,] hitbox =
         {
@@ -188,7 +225,7 @@ public class BlockPiece : Piece
 
 public class LinePiece : Piece
 {
-    public LinePiece(Field fieldReference) : base(fieldReference)
+    public LinePiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
         bool[,] hitbox0 =
@@ -229,7 +266,7 @@ public class LinePiece : Piece
 
 public class TPiece : Piece
 {
-    public TPiece(Field fieldReference) : base(fieldReference)
+    public TPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
         bool[,] hitbox0 =
@@ -270,7 +307,7 @@ public class TPiece : Piece
 
 public class SPiece : Piece
 {
-    public SPiece(Field fieldReference) : base(fieldReference)
+    public SPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
         bool[,] hitbox0 =
@@ -311,7 +348,7 @@ public class SPiece : Piece
 
 public class ZPiece : Piece
 {
-    public ZPiece(Field fieldReference) : base(fieldReference)
+    public ZPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
         bool[,] hitbox0 =
@@ -352,7 +389,7 @@ public class ZPiece : Piece
 
 public class LPiece : Piece
 {
-    public LPiece(Field fieldReference) : base(fieldReference)
+    public LPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
         bool[,] hitbox0 =
@@ -393,7 +430,7 @@ public class LPiece : Piece
 
 public class JPiece : Piece
 {
-    public JPiece(Field fieldReference) : base(fieldReference)
+    public JPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
         bool[,] hitbox0 =

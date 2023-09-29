@@ -43,7 +43,7 @@ namespace TetrisProject
 
             Util.Update();
             
-            tetrisGame.Update();
+            tetrisGame.Update(gameTime);
 
             base.Update(gameTime);
         }

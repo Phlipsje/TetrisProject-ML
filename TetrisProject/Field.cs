@@ -137,8 +137,8 @@ public class Field //The field in which the pieces can be placed
                 
                 //Draw individual block of a piece
                 Rectangle blockRectangle =
-                    new Rectangle(fieldX + blockSize * (x + piece.Position.X), fieldY + blockSize * (height - y - piece.Position.Y), blockSize, blockSize);
-                spriteBatch.Draw(tetrisGame.blockTexture, blockRectangle, Color.DarkGray);
+                    new Rectangle(fieldX + blockSize * (x + piece.Position.X), fieldY + blockSize * (y + piece.Position.Y), blockSize, blockSize);
+                spriteBatch.Draw(tetrisGame.blockTexture, blockRectangle, piece.Color);
             }
         }
     }
@@ -161,7 +161,7 @@ public class Field //The field in which the pieces can be placed
         {
             for (int x = 0; x < hitbox.GetLength(0); x++)
             {
-                if (x >= Width || y >= Height || (hitbox[x, y] && GetBlock(x + position.X, y + position.X) != 0))
+                if (x >= Width || x < 0 || y >= Height || (hitbox[x, y] && GetBlock(x + position.X, y + position.X) != 0))
                 {
                     return true;
                 }

@@ -13,6 +13,7 @@ public class TetrisGame
     private Field field; //The field in which the game is being played
     private Piece activePiece; //The currently being controlled piece
     private List<byte> pieceQueue = new List<byte>(); //Which pieces come next
+    private int nextPieceLength = 5; //The amount of pieces shown in the next piece line
     
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -25,7 +26,7 @@ public class TetrisGame
     public void Instantiate()
     {
         field = new Field(this);
-        activePiece = new LinePiece(field);
+        activePiece = new LinePiece(field, this);
         FillQueue(); //Test
     }
 
@@ -35,13 +36,9 @@ public class TetrisGame
         squareTexture = content.Load<Texture2D>(squareTextureFileName);
     }
 
-    public void Update()
+    public void Update(GameTime gameTime)
     {
-        //Testing rotation
-        if (Util.GetKeyPressed(Keys.R))
-        {
-            activePiece.Rotate();
-        }
+        activePiece.Update(gameTime);
     }
     
     public void Draw(SpriteBatch spriteBatch)
@@ -51,15 +48,25 @@ public class TetrisGame
     }
 
     //Adds new pieces to the list of pieces the player has to use
-    private void FillQueue() //TODO Get an error of "CreateAppHost" failed, debug later
+    private void FillQueue()
     {
         byte[] pieceOrder = { 0, 1, 2, 3, 4, 5, 6 };
-        Util.ShuffleArray(ref pieceOrder); //Shuffles the array
-        Console.WriteLine(pieceOrder);
+        pieceOrder = Util.ShuffleArray(pieceOrder); //Shuffles the array
 
         foreach (var pieceByteValue in pieceOrder)
         {
             pieceQueue.Add(pieceByteValue);
+        }
+    }
+
+    public void NextPiece()
+    {
+        activePiece = activePiece.GetNextPiece(pieceQueue[0]);
+        pieceQueue.Remove(0);
+
+        if (pieceQueue.Count < nextPieceLength+1)
+        {
+            FillQueue();
         }
     }
 }
