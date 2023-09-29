@@ -31,8 +31,11 @@ public abstract class Piece
     
     public const int hitboxSize = 4;
 
-    private double nextDropTime; //The time it takes until a piece moves down one line
-    private double dropTimer; //The timer counting up checked by nextDropTime
+    private double nextDropMaxTime; //The time it takes until a piece moves down one line
+    private double dropTimer; //The timer counting down checked by nextDropTime
+    private double lockDownMaxTime; //The time before a piece is locked into place
+    private double lockDownTimer; //The timer counting down checked by lockDownTime
+    private bool lockDownTimerSet;
     
     private Field fieldReference;
     private TetrisGame tetrisGameReference;
@@ -72,7 +75,8 @@ public abstract class Piece
         this.tetrisGameReference = tetrisGameReference;
         position = new Vector2Int(4, 0);
         hitboxes = new bool[4][,];
-        nextDropTime = 0.5; //Test value
+        nextDropMaxTime = 0.5; //Test value
+        lockDownMaxTime = 0.5;
     }
 
     public void Update(GameTime gameTime)
@@ -82,18 +86,13 @@ public abstract class Piece
             Rotate();
         }
 
-        if (dropTimer > nextDropTime) //Piece drops down 1 line
+        if (dropTimer <= 0) //Piece drops down 1 line
         {
-            dropTimer = 0;
+            dropTimer = nextDropMaxTime;
             MoveDown();
         }
 
-        if (fieldReference.Collides(Hitbox, position))
-        {
-            LockPiece(); //Change to give wiggle room later
-        }
-
-        dropTimer += gameTime.ElapsedGameTime.TotalSeconds;
+        dropTimer -= gameTime.ElapsedGameTime.TotalSeconds;
     }
 
     private void LockPiece()
@@ -104,7 +103,7 @@ public abstract class Piece
             {
                 if (Hitbox[x, y])
                 {
-                    fieldReference.SetBlock(position.X + x,position.Y + y,(byte)((int)pieceType + 1));
+                    fieldReference.SetBlock(position.X + x,position.Y + y - 1,(byte)((int)pieceType + 1));
                 }
             }
         }
@@ -115,21 +114,35 @@ public abstract class Piece
     public void MoveDown()
     {
         position.Y++;
-        //if (fieldReference.Collides(hitbox, position))
-          //  position.Y--;
+        if (fieldReference.CollidesVertical(hitbox, position))
+        {
+            if (lockDownTimer <= 0) //Wiggle timer is over
+            {
+                lockDownTimerSet = false;
+                LockPiece();
+                return;
+            }
+
+            position.Y--;
+            if (lockDownTimer <= 0 && !lockDownTimerSet)
+            {
+                lockDownTimer = lockDownMaxTime;
+                lockDownTimerSet = true;
+            }
+        }
     }
 
     public void MoveLeft()
     {
         position.X--;
-        if (fieldReference.Collides(hitbox, position))
+        if (fieldReference.CollidesHorizontal(hitbox, position))
             position.X++;
     }
 
     public void MoveRight()
     {
         position.X++;
-        if (fieldReference.Collides(hitbox, position))
+        if (fieldReference.CollidesHorizontal(hitbox, position))
             position.X--;
     }
 

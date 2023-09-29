@@ -181,13 +181,28 @@ public class Field //The field in which the pieces can be placed
         blockArray[y][x] = value;
     }
     
-    public bool Collides(bool[,] hitbox, Vector2Int position)
+    public bool CollidesVertical(bool[,] hitbox, Vector2Int position)
     {
         for (int y = 0; y < hitbox.GetLength(1); y++)
         {
             for (int x = 0; x < hitbox.GetLength(0); x++)
             {
-                if (x >= Width || x < 0 || y + position.Y >= Height || (hitbox[x, y] && GetBlock(x + position.X, y + position.X) != 0))
+                if (hitbox[x, y] && (y + position.Y >= Height || GetBlock(x + position.X, y + position.Y) != 0))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public bool CollidesHorizontal(bool[,] hitbox, Vector2Int position)
+    {
+        for (int y = 0; y < hitbox.GetLength(1); y++)
+        {
+            for (int x = 0; x < hitbox.GetLength(0); x++)
+            {
+                if (hitbox[x, y] && (x >= Width || x < 0 || GetBlock(x + position.X, y + position.Y) != 0))
                 {
                     return true;
                 }
