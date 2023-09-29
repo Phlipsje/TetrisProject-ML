@@ -8,7 +8,7 @@ namespace TetrisProject
 {
     public class Main : Game
     {
-        private GraphicsDeviceManager graphics;
+        public GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private TetrisGame tetrisGame;
 
@@ -22,7 +22,7 @@ namespace TetrisProject
         protected override void Initialize()
         {
             //TODO Change screen resolution to be bigger
-            tetrisGame = new TetrisGame();
+            tetrisGame = new TetrisGame(this);
             
             tetrisGame.Instantiate();
             

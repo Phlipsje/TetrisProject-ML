@@ -22,7 +22,18 @@ public class TetrisGame
     //File locations
     private const string blockTextureFileName = "BaseBlock";
     private const string squareTextureFileName = "Square";
+    
+    public Vector2Int WindowSize
+    {
+        get { return new Vector2Int(main.graphics.PreferredBackBufferWidth, main.graphics.PreferredBackBufferHeight); }
+    }
+    
+    private Main main;
 
+    public TetrisGame(Main main)
+    {
+        this.main = main;
+    }
     public void Instantiate()
     {
         field = new Field(this);

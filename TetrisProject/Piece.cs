@@ -184,7 +184,7 @@ public abstract class Piece
                 break;
             default:
                 throw new Exception("blockType not specified");
-                break;
+
         }
 
         return blockType;

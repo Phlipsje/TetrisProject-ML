@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -9,16 +10,16 @@ public class Field //The field in which the pieces can be placed
     private TetrisGame tetrisGame;
     
     //Data variables
-    private byte width;
-    private byte height;
+    private const byte width = 10;
+    private const byte height = 16;
     public byte[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
     
     //Visual variables
-    private const int blockSize = 16; //How large a block is
-    private readonly int fieldPixelWidth; //How many pixels wide
-    private readonly int fieldPixelHeight; //How many pixels high
-    private readonly int fieldX; //X value of top left of field
-    private readonly int fieldY; //Y value of top left of field
+    private int blockSize; //How large a block is 
+    private int fieldPixelWidth; //How many pixels wide
+    private int fieldPixelHeight; //How many pixels high
+    private int fieldX; //X value of top left of field
+    private int fieldY; //Y value of top left of field
     private bool drawGrid;
 
     public byte Width
@@ -37,8 +38,6 @@ public class Field //The field in which the pieces can be placed
         tetrisGame = tetrisGameReference;
         
         //Data setup
-        width = 10; //Adjust in settings later
-        height = 16; //Adjust in settings later
         blockArray = new byte[height][];
         for (int i = 0; i < height; i++)
         {
@@ -46,13 +45,19 @@ public class Field //The field in which the pieces can be placed
         }
         
         //Visual setup
-        fieldPixelWidth = blockSize * width;
-        fieldPixelHeight = blockSize * height;
-        fieldX = 50; //Adjust in settings later
-        fieldY = 20; //Adjust in settings later
+        SetFieldPixelSizeByWindowHeight(80);
         drawGrid = false; //Adjust in settings later
     }
 
+    private void SetFieldPixelSizeByWindowHeight(int percentage)
+    {
+        fieldPixelHeight = (int)Math.Round(tetrisGame.WindowSize.Y * (percentage / 100.0));
+        fieldPixelWidth = (int)Math.Round((double)fieldPixelHeight / height * width);
+        blockSize = (int)Math.Round((double)fieldPixelHeight / Height);
+        fieldX = (tetrisGame.WindowSize.X - fieldPixelWidth) / 2;
+        fieldY = (tetrisGame.WindowSize.Y - fieldPixelHeight) / 2;
+    }
+    
     //Handles clearing multiple lines at once
     public void ClearLines(byte[] lines)
     {
@@ -86,8 +91,9 @@ public class Field //The field in which the pieces can be placed
     public void Draw(SpriteBatch spriteBatch)
     {
         //Draw field
-        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, fieldPixelHeight), Color.LightGray); //Temp values
         
+        
+        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, fieldPixelHeight), Color.LightGray); //Temp values
         //Draw blocks
         //For loops for getting blocks in sequence
         for (int i = 0; i < height; i++)
