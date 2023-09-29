@@ -11,6 +11,9 @@ namespace TetrisProject
         public GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private TetrisGame tetrisGame;
+        private const int WindowWidth = 800;
+        private const int WindowHeight = 450;
+        
 
         public Main()
         {
@@ -21,12 +24,41 @@ namespace TetrisProject
 
         protected override void Initialize()
         {
-            //TODO Change screen resolution to be bigger
+            graphics.PreferredBackBufferWidth = WindowWidth;
+            graphics.PreferredBackBufferHeight = WindowHeight;
+            graphics.ApplyChanges();
             tetrisGame = new TetrisGame(this);
+            
             
             tetrisGame.Instantiate();
             
             base.Initialize();
+        }
+
+        public void EnterFullScreen()
+        {
+            graphics.PreferredBackBufferWidth = 1920;
+            graphics.PreferredBackBufferHeight = 1080;
+            graphics.ApplyChanges();
+            graphics.IsFullScreen = true;
+            graphics.ApplyChanges();
+        }
+        
+        public void ExitFullScreen()
+        {
+            graphics.IsFullScreen = false;
+            graphics.ApplyChanges();
+            graphics.PreferredBackBufferWidth = WindowWidth;
+            graphics.PreferredBackBufferHeight = WindowHeight;
+            graphics.ApplyChanges();
+        }
+
+        public void ToggleFullScreen()
+        {
+            if(graphics.IsFullScreen)
+                ExitFullScreen();
+            else
+                EnterFullScreen();
         }
 
         protected override void LoadContent()
@@ -41,6 +73,9 @@ namespace TetrisProject
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            if (Util.GetKeyPressed(Keys.F11))
+                ToggleFullScreen();
+            
             Util.Update();
             
             tetrisGame.Update(gameTime);
