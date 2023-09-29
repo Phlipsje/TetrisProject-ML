@@ -14,6 +14,8 @@ public class TetrisGame
     private Piece activePiece; //The currently being controlled piece
     private List<byte> pieceQueue = new List<byte>(); //Which pieces come next
     private int nextPieceLength = 5; //The amount of pieces shown in the next piece line
+    private double softDropMaxTime;
+    private double softDropTimer;
     
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -40,7 +42,8 @@ public class TetrisGame
         FillQueue();
         activePiece = new LinePiece(field, this); //Only called to avoid error, not actual first piece
         NextPiece();
-        
+
+        softDropMaxTime = activePiece.NextDropMaxTime / 20;
     }
 
     public void LoadContent(ContentManager content)
@@ -51,7 +54,25 @@ public class TetrisGame
 
     public void Update(GameTime gameTime)
     {
+        if (Util.GetKeyPressed(Keys.A) || Util.GetKeyPressed(Keys.Left))
+        {
+            activePiece.MoveLeft();
+        }
+        if (Util.GetKeyPressed(Keys.D) || Util.GetKeyPressed(Keys.Right))
+        {
+            activePiece.MoveRight();
+        }
+        if (Keyboard.GetState().IsKeyDown(Keys.S) || Keyboard.GetState().IsKeyDown(Keys.Down))
+        {
+            if (softDropTimer <= 0)
+            {
+                activePiece.MoveDown();
+                softDropTimer = softDropMaxTime;
+            }
+        }
+        
         activePiece.Update(gameTime);
+        softDropTimer -= gameTime.ElapsedGameTime.TotalSeconds;
     }
     
     public void Draw(SpriteBatch spriteBatch)

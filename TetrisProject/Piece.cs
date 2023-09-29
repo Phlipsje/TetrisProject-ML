@@ -40,6 +40,11 @@ public abstract class Piece
     private Field fieldReference;
     private TetrisGame tetrisGameReference;
 
+    public double NextDropMaxTime
+    {
+        get => nextDropMaxTime;
+    }
+    
     public bool[,] Hitbox
     {
         get => hitbox;
