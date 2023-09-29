@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject;
@@ -32,5 +33,11 @@ public static class Util
         }
 
         return array;
+    }
+
+    public static Vector2Int GetPixelPositionFromPercentage(Vector2 position, TetrisGame tetrisGame)
+    {
+        return new Vector2Int((int)MathF.Round(position.X * tetrisGame.WindowSize.X / 100), 
+            (int)MathF.Round(position.X * tetrisGame.WindowSize.X / 100));
     }
 }
