@@ -92,8 +92,8 @@ public class Field //The field in which the pieces can be placed
     {
         //Draw field
         
-        
-        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, fieldPixelHeight), Color.LightGray); //Temp values
+        SetFieldPixelSizeByWindowHeight(80);
+        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, fieldPixelHeight), Color.LightGray * 0.5f); //Temp values
         //Draw blocks
         //For loops for getting blocks in sequence
         for (int i = 0; i < height; i++)
