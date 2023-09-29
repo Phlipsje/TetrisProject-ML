@@ -27,6 +27,7 @@ public abstract class Piece
     private byte rotationIndex; //What rotation the piece is currently on (from 0 to 3 for every piece, meaning some pieces have duplicate values)
     private Vector2Int position; //Position of top-left of hitbox position
     private Color color; //The color of the piece
+    protected Pieces pieceType; //Used for setting block color when piece is locked in
     
     public const int hitboxSize = 4;
 
@@ -97,14 +98,25 @@ public abstract class Piece
 
     private void LockPiece()
     {
+        for (int x = 0; x < 4; x++)
+        {
+            for (int y = 0; y < 4; y++)
+            {
+                if (Hitbox[x, y])
+                {
+                    fieldReference.SetBlock(position.X + x,position.Y + y,(byte)((int)pieceType + 1));
+                }
+            }
+        }
+        
         tetrisGameReference.NextPiece();
     }
     
     public void MoveDown()
     {
         position.Y++;
-        if (fieldReference.Collides(hitbox, position))
-            position.Y--;
+        //if (fieldReference.Collides(hitbox, position))
+          //  position.Y--;
     }
 
     public void MoveLeft()
@@ -219,6 +231,7 @@ public class BlockPiece : Piece
         Hitboxes = new []{hitbox, hitbox, hitbox, hitbox};
 
         this.Color = Color.Yellow;
+        pieceType = Pieces.Block;
         Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
@@ -260,6 +273,7 @@ public class LinePiece : Piece
         Hitboxes = new[] { hitbox0, hitbox1, hitbox2, hitbox3 };
 
         this.Color = Color.LightBlue;
+        pieceType = Pieces.Line;
         Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
@@ -301,6 +315,7 @@ public class TPiece : Piece
         Hitboxes = new[] { hitbox0, hitbox1, hitbox2, hitbox3 };
 
         this.Color = Color.Purple;
+        pieceType = Pieces.T;
         Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
@@ -341,7 +356,8 @@ public class SPiece : Piece
 
         Hitboxes = new[] { hitbox0, hitbox1, hitbox2, hitbox3 };
 
-        this.Color = Color.Green;
+        this.Color = Color.LightGreen;
+        pieceType = Pieces.S;
         Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
@@ -383,6 +399,7 @@ public class ZPiece : Piece
         Hitboxes = new[] { hitbox0, hitbox1, hitbox2, hitbox3 };
 
         this.Color = Color.Red;
+        pieceType = Pieces.Z;
         Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
@@ -417,13 +434,14 @@ public class LPiece : Piece
         {
             { false, false, true, false },
             { true, true, true, false },
-            { true, false, false, false },
+            { false, false, false, false },
             { false, false, false, false }
         };
 
         Hitboxes = new[] { hitbox0, hitbox1, hitbox2, hitbox3 };
 
         this.Color = Color.Orange;
+        pieceType = Pieces.L;
         Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
@@ -465,6 +483,7 @@ public class JPiece : Piece
         Hitboxes = new[] { hitbox0, hitbox1, hitbox2, hitbox3 };
 
         this.Color = Color.Blue;
+        pieceType = Pieces.J;
         Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }

@@ -108,14 +108,34 @@ public class Field //The field in which the pieces can be placed
                     case 0:
                         blockColor = Color.Transparent;
                         break;
-                    
+                    case (byte)Pieces.Block+1:
+                        blockColor = Color.Yellow;
+                        break;
+                    case (byte)Pieces.Line+1:
+                        blockColor = Color.LightBlue;
+                        break;
+                    case (byte)Pieces.T+1:
+                        blockColor = Color.Purple;
+                        break;
+                    case (byte)Pieces.S+1:
+                        blockColor = Color.LightGreen;
+                        break;
+                    case (byte)Pieces.Z+1:
+                        blockColor = Color.Red;
+                        break;
+                    case (byte)Pieces.L+1:
+                        blockColor = Color.Orange;
+                        break;
+                    case (byte)Pieces.J+1:
+                        blockColor = Color.Blue;
+                        break;
                     default:
                         blockColor = Color.Green;
                         break;
                 }
 
                 Rectangle blockRectangle =
-                    new Rectangle(fieldX + blockSize * j, fieldY + blockSize * (height - i), blockSize, blockSize);
+                    new Rectangle(fieldX + blockSize * j, fieldY + blockSize * i, blockSize, blockSize);
                 
                 if (drawGrid)
                 {
@@ -167,7 +187,7 @@ public class Field //The field in which the pieces can be placed
         {
             for (int x = 0; x < hitbox.GetLength(0); x++)
             {
-                if (x >= Width || x < 0 || y >= Height || (hitbox[x, y] && GetBlock(x + position.X, y + position.X) != 0))
+                if (x >= Width || x < 0 || y + position.Y >= Height || (hitbox[x, y] && GetBlock(x + position.X, y + position.X) != 0))
                 {
                     return true;
                 }

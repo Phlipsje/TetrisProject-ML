@@ -37,8 +37,10 @@ public class TetrisGame
     public void Instantiate()
     {
         field = new Field(this);
-        activePiece = new LinePiece(field, this);
-        FillQueue(); //Test
+        FillQueue();
+        activePiece = new LinePiece(field, this); //Only called to avoid error, not actual first piece
+        NextPiece();
+        
     }
 
     public void LoadContent(ContentManager content)
@@ -73,7 +75,7 @@ public class TetrisGame
     public void NextPiece()
     {
         activePiece = activePiece.GetNextPiece(pieceQueue[0]);
-        pieceQueue.Remove(0);
+        pieceQueue.RemoveAt(0);
 
         if (pieceQueue.Count < nextPieceLength+1)
         {
