@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -9,17 +11,34 @@ public static class Util
     //A class with extra utility functions shared with shared use cases among multiple classes
     private static KeyboardState currentKeyboardState;
     private static KeyboardState previousKeyboardState;
+    private static Keys[] leftRightKeys = { Keys.Left, Keys.Right };
+
+    private static Keys lastMovementKeyPressed;
+    public static Keys LastMovementKeyPressed
+    {
+        get => lastMovementKeyPressed;
+    }
 
     public static void Update()
     {
         previousKeyboardState = currentKeyboardState;
         currentKeyboardState = Keyboard.GetState();
+        foreach (Keys key in currentKeyboardState.GetPressedKeys())
+        {
+            if (leftRightKeys.Contains(key) && GetKeyPressed(key))
+                lastMovementKeyPressed = key;
+        }
     }
     
     //Check if key is only pressed on the current frame
     public static bool GetKeyPressed(Keys key)
     {
         return currentKeyboardState.IsKeyDown(key) && !previousKeyboardState.IsKeyDown(key);
+    }
+
+    public static bool GetKeyHeld(Keys key)
+    {
+        return currentKeyboardState.IsKeyDown(key);
     }
 
     //Shuffles the order of an array
