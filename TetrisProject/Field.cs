@@ -11,8 +11,8 @@ public class Field //The field in which the pieces can be placed
     
     //Data variables
     private const byte width = 10;
-    private const byte height = 16;
-    public byte[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
+    private const byte height = 20;
+    private Pieces[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
     
     //Visual variables
     private int blockSize; //How large a block is 
@@ -38,10 +38,10 @@ public class Field //The field in which the pieces can be placed
         tetrisGame = tetrisGameReference;
         
         //Data setup
-        blockArray = new byte[height][];
-        for (int i = 0; i < height; i++)
+        blockArray = new Pieces[height*2][]; //Height of array is double of play height because modern Tetris has a buffer above the playfield
+        for (int i = 0; i < blockArray.GetLength(0); i++)
         {
-            blockArray[i] = new byte[width];
+            blockArray[i] = new Pieces[width];
         }
         
         //Visual setup
@@ -73,12 +73,12 @@ public class Field //The field in which the pieces can be placed
     public void ClearSingleLine(byte line)
     {
         //Move all rows down one
-        for (int i = line; i < height; i++)
+        for (int i = line; i < blockArray.GetLength(0); i++)
         {
-            if (i == height)
+            if (i >= height)
             {
                 //If at max height no row can fall down
-                blockArray[i] = new byte[width];
+                blockArray[i] = new Pieces[width];
                 continue;
             }
                 
@@ -96,7 +96,7 @@ public class Field //The field in which the pieces can be placed
         spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, fieldPixelHeight), Color.LightGray * 0.5f); //Temp values
         //Draw blocks
         //For loops for getting blocks in sequence
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < blockArray.GetLength(0); i++)
         {
             for (int j = 0; j < width; j++)
             {
@@ -104,28 +104,28 @@ public class Field //The field in which the pieces can be placed
                 Color blockColor;
                 switch (blockArray[i][j])
                 {
-                    case 0:
+                    case Pieces.None:
                         blockColor = Color.Transparent;
                         break;
-                    case (byte)Pieces.Block+1:
+                    case Pieces.Block:
                         blockColor = Color.Yellow;
                         break;
-                    case (byte)Pieces.Line+1:
+                    case Pieces.Line:
                         blockColor = Color.LightBlue;
                         break;
-                    case (byte)Pieces.T+1:
+                    case Pieces.T:
                         blockColor = Color.Purple;
                         break;
-                    case (byte)Pieces.S+1:
+                    case Pieces.S:
                         blockColor = Color.LightGreen;
                         break;
-                    case (byte)Pieces.Z+1:
+                    case Pieces.Z:
                         blockColor = Color.Red;
                         break;
-                    case (byte)Pieces.L+1:
+                    case Pieces.L:
                         blockColor = Color.Orange;
                         break;
-                    case (byte)Pieces.J+1:
+                    case Pieces.J:
                         blockColor = Color.Blue;
                         break;
                     default:
@@ -134,9 +134,9 @@ public class Field //The field in which the pieces can be placed
                 }
 
                 Rectangle blockRectangle =
-                    new Rectangle(fieldX + blockSize * j, fieldY + blockSize * i, blockSize, blockSize);
+                    new Rectangle(fieldX + blockSize * j, fieldY + blockSize * (i-height), blockSize, blockSize);
                 
-                if (drawGrid)
+                if (drawGrid && i < height)
                 {
                     //Draws grid cells to make movement and position more clear
                     spriteBatch.Draw(tetrisGame.blockTexture, blockRectangle, Color.DarkGray); //TODO Change texture
@@ -167,15 +167,15 @@ public class Field //The field in which the pieces can be placed
     }
 
     //Used to get a block in a more intuitive manner
-    public byte GetBlock(int x, int y)
+    public Pieces GetBlock(int x, int y)
     {
-        return blockArray[y][x];
+        return blockArray[y+height][x];
     }
 
     //Used to set a block in a more intuitive manner
-    public void SetBlock(int x, int y, byte value)
+    public void SetBlock(int x, int y, Pieces value)
     {
-        blockArray[y][x] = value;
+        blockArray[y+height][x] = value;
     }
     
     public bool CollidesVertical(bool[,] hitbox, Vector2Int position)

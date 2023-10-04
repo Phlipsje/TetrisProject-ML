@@ -53,17 +53,13 @@ public class TetrisGame
 
     public void Update(GameTime gameTime)
     {
-        if (activePiece != null) //Check if there is an active piece
+        if(activePiece == null)
         {
-            activePiece.Update(gameTime);
-        }
-        else if (nextPieceWaitTime > 0) //Check if the next piece should be spawned in
-        {
-            nextPieceWaitTime -= gameTime.ElapsedGameTime.TotalSeconds;
+            GenerationPhase(gameTime.ElapsedGameTime.TotalSeconds);
         }
         else
         {
-            NextPiece();
+            activePiece.Update(gameTime);
         }
     }
     
@@ -75,7 +71,23 @@ public class TetrisGame
             field.DrawPiece(activePiece, spriteBatch); 
         }
     }
+    
+    #region Phases
 
+    private void GenerationPhase(double timeElapsed)
+    {
+        if (nextPieceWaitTime > 0) //Check if the next piece should be spawned in
+        {
+            nextPieceWaitTime -= timeElapsed;
+        }
+        else
+        {
+            NextPiece();
+        }
+    }
+    #endregion
+
+    //Called by Piece.cs to start the process of creating the next piece
     public void RequestPiece()
     {
         nextPieceWaitTime = nextPieceWaitTimeMax;
@@ -96,6 +108,7 @@ public class TetrisGame
 
     private void NextPiece()
     {
+        //TODO place the active piece in the correct orientation and position, do this in Piece.cs Constructor
         activePiece = GetNextPiece(pieceQueue[0]);
         pieceQueue.RemoveAt(0);
 

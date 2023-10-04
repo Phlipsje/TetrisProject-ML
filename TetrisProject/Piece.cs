@@ -81,7 +81,7 @@ public abstract class Piece
     {
         this.fieldReference = fieldReference;
         this.tetrisGameReference = tetrisGameReference;
-        position = new Vector2Int(4, 0);
+        position = new Vector2Int(4, -2);
         hitboxes = new bool[4][,];
         nextDropMaxTime = 0.5; //Test value
         lockDownMaxTime = 0.5;
@@ -138,7 +138,7 @@ public abstract class Piece
             {
                 if (Hitbox[x, y])
                 {
-                    fieldReference.SetBlock(position.X + x,position.Y + y - 1,(byte)((int)pieceType + 1));
+                    fieldReference.SetBlock(position.X + x,position.Y + y - 1,pieceType);
                 }
             }
         }
@@ -218,6 +218,7 @@ public abstract class Piece
 
 public enum Pieces
 {
+    None,
     Block,
     Line,
     T,
