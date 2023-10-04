@@ -50,19 +50,13 @@ public abstract class Piece
     
     public bool[,] Hitbox
     {
-        get => hitbox;
-        set => hitbox = value;
+        get => hitboxes[rotationIndex];
     }
 
     public bool[][,] Hitboxes
     {
         get => hitboxes;
         set => hitboxes = value;
-    }
-
-    public byte RotationIndex
-    {
-        get => rotationIndex;
     }
 
     public Vector2Int Position
@@ -81,10 +75,12 @@ public abstract class Piece
     {
         this.fieldReference = fieldReference;
         this.tetrisGameReference = tetrisGameReference;
-        position = new Vector2Int(4, -2);
+        position = new Vector2Int(3, 0);
         hitboxes = new bool[4][,];
+        rotationIndex = 0;
         nextDropMaxTime = 0.5; //Test value
         lockDownMaxTime = 0.5;
+        dropTimer = nextDropMaxTime;
         
         softDropMaxTime = NextDropMaxTime / 20;
     }
@@ -138,7 +134,7 @@ public abstract class Piece
             {
                 if (Hitbox[x, y])
                 {
-                    fieldReference.SetBlock(position.X + x,position.Y + y - 1,pieceType);
+                    fieldReference.SetBlock(position.X + x,position.Y - y - 1,pieceType);
                 }
             }
         }
@@ -149,7 +145,7 @@ public abstract class Piece
     public void MoveDown()
     {
         position.Y++;
-        if (fieldReference.CollidesVertical(hitbox, position))
+        if (fieldReference.CollidesVertical(Hitbox, position))
         {
             if (lockDownTimer <= 0) //Wiggle timer is over
             {
@@ -170,14 +166,14 @@ public abstract class Piece
     public void MoveLeft()
     {
         position.X--;
-        if (fieldReference.CollidesHorizontal(hitbox, position))
+        if (fieldReference.CollidesHorizontal(Hitbox, position))
             position.X++;
     }
 
     public void MoveRight()
     {
         position.X++;
-        if (fieldReference.CollidesHorizontal(hitbox, position))
+        if (fieldReference.CollidesHorizontal(Hitbox, position))
             position.X--;
     }
 
@@ -195,7 +191,6 @@ public abstract class Piece
         {
             rotationIndex = 0;
         }
-        Hitbox = Hitboxes[rotationIndex];
         
         //TODO Check if rotation is valid
     }
@@ -209,8 +204,6 @@ public abstract class Piece
             rotationIndex = 4;
         }
         rotationIndex--;
-        
-        Hitbox = Hitboxes[rotationIndex];
         
         //TODO Check if rotation is valid
     }
@@ -246,7 +239,6 @@ public class BlockPiece : Piece
 
         this.Color = Color.Yellow;
         pieceType = Pieces.Block;
-        Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
 
@@ -255,32 +247,33 @@ public class LinePiece : Piece
     public LinePiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
+        //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
         bool[,] hitbox0 =
-        {
-            { false, false, true, false },
-            { false, false, true, false },
-            { false, false, true, false },
-            { false, false, true, false }
-        };
-        bool[,] hitbox1 =
-        {
-            { false, false, false, false },
-            { false, false, false, false },
-            { true, true, true, true },
-            { false, false, false, false }
-        };
-        bool[,] hitbox2 =
         {
             { false, true, false, false },
             { false, true, false, false },
             { false, true, false, false },
             { false, true, false, false }
         };
-        bool[,] hitbox3 =
+        bool[,] hitbox1 =
         {
             { false, false, false, false },
             { true, true, true, true },
             { false, false, false, false },
+            { false, false, false, false }
+        };
+        bool[,] hitbox2 =
+        {
+            { false, false, true, false },
+            { false, false, true, false },
+            { false, false, true, false },
+            { false, false, true, false }
+        };
+        bool[,] hitbox3 =
+        {
+            { false, false, false, false },
+            { false, false, false, false },
+            { true, true, true, true },
             { false, false, false, false }
         };
 
@@ -288,7 +281,6 @@ public class LinePiece : Piece
 
         this.Color = Color.LightBlue;
         pieceType = Pieces.Line;
-        Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
 
@@ -297,32 +289,33 @@ public class TPiece : Piece
     public TPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
+        //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
         bool[,] hitbox0 =
-        {
-            { false, true, false, false },
-            { true, true, true, false },
-            { false, false, false, false },
-            { false, false, false, false }
-        };
-        bool[,] hitbox1 =
         {
             { false, true, false, false },
             { false, true, true, false },
             { false, true, false, false },
             { false, false, false, false }
         };
-        bool[,] hitbox2 =
+        bool[,] hitbox1 =
         {
             { false, false, false, false },
             { true, true, true, false },
             { false, true, false, false },
             { false, false, false, false }
         };
-        bool[,] hitbox3 =
+        bool[,] hitbox2 =
         {
             { false, true, false, false },
             { true, true, false, false },
             { false, true, false, false },
+            { false, false, false, false }
+        };
+        bool[,] hitbox3 =
+        {
+            { false, true, false, false },
+            { true, true, true, false },
+            { false, false, false, false },
             { false, false, false, false }
         };
 
@@ -330,7 +323,6 @@ public class TPiece : Piece
 
         this.Color = Color.Purple;
         pieceType = Pieces.T;
-        Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
 
@@ -339,32 +331,33 @@ public class SPiece : Piece
     public SPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
+        //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
         bool[,] hitbox0 =
-        {
-            { false, true, true, false },
-            { true, true, false, false },
-            { false, false, false, false },
-            { false, false, false, false }
-        };
-        bool[,] hitbox1 =
         {
             { false, true, false, false },
             { false, true, true, false },
             { false, false, true, false },
             { false, false, false, false }
         };
-        bool[,] hitbox2 =
+        bool[,] hitbox1 =
         {
             { false, false, false, false },
             { false, true, true, false },
             { true, true, false, false },
             { false, false, false, false }
         };
-        bool[,] hitbox3 =
+        bool[,] hitbox2 =
         {
             { true, false, false, false },
             { true, true, false, false },
             { false, true, false, false },
+            { false, false, false, false }
+        };
+        bool[,] hitbox3 =
+        {
+            { false, true, true, false },
+            { true, true, false, false },
+            { false, false, false, false },
             { false, false, false, false }
         };
 
@@ -372,7 +365,6 @@ public class SPiece : Piece
 
         this.Color = Color.LightGreen;
         pieceType = Pieces.S;
-        Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
 
@@ -381,32 +373,33 @@ public class ZPiece : Piece
     public ZPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
+        //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
         bool[,] hitbox0 =
-        {
-            { true, true, false, false },
-            { false, true, true, false },
-            { false, false, false, false },
-            { false, false, false, false }
-        };
-        bool[,] hitbox1 =
         {
             { false, false, true, false },
             { false, true, true, false },
             { false, true, false, false },
             { false, false, false, false }
         };
-        bool[,] hitbox2 =
+        bool[,] hitbox1 =
         {
             { false, false, false, false },
             { true, true, false, false },
             { false, true, true, false },
             { false, false, false, false }
         };
-        bool[,] hitbox3 =
+        bool[,] hitbox2 =
         {
             { false, true, false, false },
             { true, true, false, false },
             { true, false, false, false },
+            { false, false, false, false }
+        };
+        bool[,] hitbox3 =
+        {
+            { true, true, false, false },
+            { false, true, true, false },
+            { false, false, false, false },
             { false, false, false, false }
         };
 
@@ -414,7 +407,6 @@ public class ZPiece : Piece
 
         this.Color = Color.Red;
         pieceType = Pieces.Z;
-        Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
 
@@ -423,6 +415,7 @@ public class LPiece : Piece
     public LPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
+        //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
         bool[,] hitbox0 =
         {
             { false, true, false, false },
@@ -456,7 +449,6 @@ public class LPiece : Piece
 
         this.Color = Color.Orange;
         pieceType = Pieces.L;
-        Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
 
@@ -465,32 +457,33 @@ public class JPiece : Piece
     public JPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
     {
         //All hitbox points for every rotation
+        //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
         bool[,] hitbox0 =
-        {
-            { false, true, false, false },
-            { false, true, false, false },
-            { true, true, false, false },
-            { false, false, false, false }
-        };
-        bool[,] hitbox1 =
-        {
-            { true, false, false, false },
-            { true, true, true, false },
-            { false, false, false, false },
-            { false, false, false, false }
-        };
-        bool[,] hitbox2 =
         {
             { false, true, true, false },
             { false, true, false, false },
             { false, true, false, false },
             { false, false, false, false }
         };
-        bool[,] hitbox3 =
+        bool[,] hitbox1 =
         {
             { false, false, false, false },
             { true, true, true, false },
             { false, false, true, false },
+            { false, false, false, false }
+        };
+        bool[,] hitbox2 =
+        {
+            { false, true, false, false },
+            { false, true, false, false },
+            { true, true, false, false },
+            { false, false, false, false }
+        };
+        bool[,] hitbox3 =
+        {
+            { true, false, false, false },
+            { true, true, true, false },
+            { false, false, false, false },
             { false, false, false, false }
         };
 
@@ -498,7 +491,6 @@ public class JPiece : Piece
 
         this.Color = Color.Blue;
         pieceType = Pieces.J;
-        Hitbox = Hitboxes[0]; //Always start at rotationIndex = 0
     }
 }
 #endregion
