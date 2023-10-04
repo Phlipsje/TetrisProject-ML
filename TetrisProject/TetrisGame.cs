@@ -13,7 +13,7 @@ public class TetrisGame
     //The in-match game logic
     private Field field; //The field in which the game is being played
     private Piece activePiece; //The currently being controlled piece
-    private List<byte> pieceQueue = new(); //Which pieces come next
+    private List<Pieces> pieceQueue = new(); //Which pieces come next
     private int nextPieceLength = 5; //The amount of pieces shown in the next piece line
     private double nextPieceWaitTime;
     private readonly double nextPieceWaitTimeMax = 0.2; //When the next piece appears after the previous one is locked in place
@@ -97,7 +97,7 @@ public class TetrisGame
     //Adds new pieces to the list of pieces the player has to use
     private void FillQueue()
     {
-        byte[] pieceOrder = { 0, 1, 2, 3, 4, 5, 6 };
+        Pieces[] pieceOrder = { Pieces.Block, Pieces.Line, Pieces.T, Pieces.S, Pieces.Z, Pieces.L, Pieces.J };
         pieceOrder = Util.ShuffleArray(pieceOrder); //Shuffles the array
 
         foreach (var pieceByteValue in pieceOrder)
@@ -119,30 +119,30 @@ public class TetrisGame
     }
     
     //Gets the value of the next piece and creates the corresponding object
-    private Piece GetNextPiece(byte pieceInQueue)
+    private Piece GetNextPiece(Pieces pieceInQueue)
     {
         Piece blockType;
         switch (pieceInQueue)
         {
-            case (byte)Pieces.Block:
+            case Pieces.Block:
                 blockType = new BlockPiece(field, this);
                 break;
-            case (byte)Pieces.Line:
+            case Pieces.Line:
                 blockType = new LinePiece(field, this);
                 break;
-            case (byte)Pieces.T:
+            case Pieces.T:
                 blockType = new TPiece(field, this);
                 break;
-            case (byte)Pieces.S:
+            case Pieces.S:
                 blockType = new SPiece(field, this);
                 break;
-            case (byte)Pieces.Z:
+            case Pieces.Z:
                 blockType = new ZPiece(field, this);
                 break;
-            case (byte)Pieces.L:
+            case Pieces.L:
                 blockType = new LPiece(field, this);
                 break;
-            case (byte)Pieces.J:
+            case Pieces.J:
                 blockType = new JPiece(field, this);
                 break;
             default:

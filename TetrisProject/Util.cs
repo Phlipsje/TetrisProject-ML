@@ -23,7 +23,7 @@ public static class Util
     }
 
     //Shuffles the order of an array
-    public static byte[] ShuffleArray(byte[] array)
+    public static Pieces[] ShuffleArray(Pieces[] array)
     {
         Random random = new Random();
         for (int i = 0; i < array.Length; i++) //Shuffle amount
