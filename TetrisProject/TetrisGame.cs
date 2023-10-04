@@ -26,9 +26,9 @@ public class TetrisGame
     private const string blockTextureFileName = "BaseBlock";
     private const string squareTextureFileName = "Square";
     
-    public Vector2Int WindowSize
+    public Point WindowSize
     {
-        get { return new Vector2Int(main.graphics.PreferredBackBufferWidth, main.graphics.PreferredBackBufferHeight); }
+        get { return new Point(main.graphics.PreferredBackBufferWidth, main.graphics.PreferredBackBufferHeight); }
     }
     
     private Main main;

@@ -4,18 +4,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject;
 
-public struct Vector2Int
-{
-    public Vector2Int(int x, int y)
-    {
-        X = x;
-        Y = y;
-    }
-
-    public int X;
-    public int Y;
-    public override string ToString() => $"({X}, {Y})";
-}
 public abstract class Piece
 {
     //A piece that can be placed
@@ -24,7 +12,7 @@ public abstract class Piece
     
     private bool[][,] hitboxes; //Contains the hitbox for every rotation
     private byte rotationIndex; //What rotation the piece is currently on (from 0 to 3 for every piece, meaning some pieces have duplicate values)
-    private Vector2Int position; //Position of top-left of hitbox position
+    private Point position; //Position of top-left of hitbox position
     private Color color; //The color of the piece
     protected Pieces pieceType; //Used for setting block color when piece is locked in
     
@@ -33,13 +21,16 @@ public abstract class Piece
     private double nextDropMaxTime; //The time it takes until a piece moves down one line
     private double dropTimer; //The timer counting down checked by nextDropTime
     private double lockDownMaxTime; //The time before a piece is locked into place
-    private double lockDownTimer; //The timer counting down checked by lockDownTime
+    private double lockDownTimer;
+    private double softDropMaxTime; //The time for a piece to move down by one cell when holding down
+    private double softDropTimer;
     private bool lockDownTimerSet;
+    private int maxMovementCounter;
+    private int remainingMovementCounter; //Counts the amount of actions you can perform to extend the timer of the lock down phase
+    private int highestHeight; //Check to see if remainingMovementCounter needs to be reset (when reaching new highest height (higher is lower on field))
+    private Point previousPosition; //Checks if position of piece changed to decide if timer should actually be reset
     
     private Field fieldReference;
-    
-    private double softDropMaxTime;
-    private double softDropTimer;
 
     public double NextDropMaxTime
     {
@@ -57,7 +48,7 @@ public abstract class Piece
         set => hitboxes = value;
     }
 
-    public Vector2Int Position
+    public Point Position
     {
         get => position;
         set => position = value;
@@ -72,28 +63,55 @@ public abstract class Piece
     public Piece(Field fieldReference)
     {
         this.fieldReference = fieldReference;
-        position = new Vector2Int(3, 0);
+        position = new Point(3, 0);
         hitboxes = new bool[4][,];
         rotationIndex = 0;
         nextDropMaxTime = 0.5; //Test value
         lockDownMaxTime = 0.5;
+        maxMovementCounter = 15;
+        remainingMovementCounter = maxMovementCounter;
         dropTimer = nextDropMaxTime;
+        highestHeight = position.Y;
         
         softDropMaxTime = NextDropMaxTime / 20;
     }
 
     public void Update(GameTime gameTime)
     {
-        CheckInput();
+        double deltaTime = gameTime.ElapsedGameTime.TotalSeconds;
+        
+        //All the piece logic
+        PieceControlFlow();
 
+        //Update timers and checks
+        previousPosition = position;
+        dropTimer -= deltaTime;
+        softDropTimer -= deltaTime;
+        lockDownTimer -= deltaTime;
+    }
+
+    private void PieceControlFlow()
+    {
+        //Falling Phase
+        CheckInput();
+        
+        //Check for hard drop
+        if (Util.GetKeyPressed(Keys.Space))
+        {
+            HardDrop();
+            return;
+        }
+        
+        //Lock Phase (That half a second before piece is fully in place)
         if (dropTimer <= 0) //Piece drops down 1 line
         {
             dropTimer = nextDropMaxTime;
             MoveDown();
         }
-
-        dropTimer -= gameTime.ElapsedGameTime.TotalSeconds;
-        softDropTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+        
+        //Possibly reset fall down timer (and adjust count)
+        
+        //Truly lock in and go to Pattern Phase
     }
 
     private void CheckInput()
@@ -101,10 +119,12 @@ public abstract class Piece
         if (Util.GetKeyPressed(Keys.A) || Util.GetKeyPressed(Keys.Left))
         {
             MoveLeft();
+            ResetLockDownTimer();
         }
         if (Util.GetKeyPressed(Keys.D) || Util.GetKeyPressed(Keys.Right))
         {
             MoveRight();
+            ResetLockDownTimer();
         }
         
         //Soft drop
@@ -120,6 +140,16 @@ public abstract class Piece
         if (Util.GetKeyPressed(Keys.R))
         {
             Rotate();
+            ResetLockDownTimer();
+        }
+    }
+
+    private void HardDrop()
+    {
+        //Iterate down until the place to place the piece is found
+        while (!fieldReference.CollidesVertical(Hitbox, position))
+        {
+            MoveDown();
         }
     }
 
@@ -136,27 +166,42 @@ public abstract class Piece
             }
         }
         
-        fieldReference.FieldControlFlow();
+        fieldReference.FieldControlFlow(); //Pattern Phase
+    }
+
+    private void ResetLockDownTimer()
+    {
+        if (remainingMovementCounter > 0 && previousPosition != position)
+        {
+            remainingMovementCounter--;
+            lockDownTimer = lockDownMaxTime;
+            
+            if(remainingMovementCounter == 0) //Lock piece if counter can't be lowered anymore
+            {
+                LockPiece();
+            }
+        }
     }
     
     public void MoveDown()
     {
         position.Y++;
+        
+        if (position.Y > highestHeight) //Check if new highest position to reset remaining movement counter
+        {
+            highestHeight = position.Y;
+            remainingMovementCounter = maxMovementCounter;
+        }
+        
         if (fieldReference.CollidesVertical(Hitbox, position))
         {
-            if (lockDownTimer <= 0) //Wiggle timer is over
+            if (lockDownTimer <= 0) //Lock Phase has ended
             {
-                lockDownTimerSet = false;
                 LockPiece();
                 return;
             }
 
             position.Y--;
-            if (lockDownTimer <= 0 && !lockDownTimerSet)
-            {
-                lockDownTimer = lockDownMaxTime;
-                lockDownTimerSet = true;
-            }
         }
     }
 

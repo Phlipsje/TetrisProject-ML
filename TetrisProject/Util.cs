@@ -54,9 +54,9 @@ public static class Util
         return array;
     }
 
-    public static Vector2Int GetPixelPositionFromPercentage(Vector2 position, TetrisGame tetrisGame)
+    public static Point GetPixelPositionFromPercentage(Vector2 position, TetrisGame tetrisGame)
     {
-        return new Vector2Int((int)MathF.Round(position.X * tetrisGame.WindowSize.X / 100), 
+        return new Point((int)MathF.Round(position.X * tetrisGame.WindowSize.X / 100), 
             (int)MathF.Round(position.X * tetrisGame.WindowSize.X / 100));
     }
 }
