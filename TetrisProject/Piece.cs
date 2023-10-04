@@ -39,6 +39,9 @@ public abstract class Piece
     
     private Field fieldReference;
     private TetrisGame tetrisGameReference;
+    
+    private double softDropMaxTime;
+    private double softDropTimer;
 
     public double NextDropMaxTime
     {
@@ -82,14 +85,13 @@ public abstract class Piece
         hitboxes = new bool[4][,];
         nextDropMaxTime = 0.5; //Test value
         lockDownMaxTime = 0.5;
+        
+        softDropMaxTime = NextDropMaxTime / 20;
     }
 
     public void Update(GameTime gameTime)
     {
-        if (Util.GetKeyPressed(Keys.R))
-        {
-            Rotate();
-        }
+        CheckInput();
 
         if (dropTimer <= 0) //Piece drops down 1 line
         {
@@ -98,6 +100,34 @@ public abstract class Piece
         }
 
         dropTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+        softDropTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+    }
+
+    private void CheckInput()
+    {
+        if (Util.GetKeyPressed(Keys.A) || Util.GetKeyPressed(Keys.Left))
+        {
+            MoveLeft();
+        }
+        if (Util.GetKeyPressed(Keys.D) || Util.GetKeyPressed(Keys.Right))
+        {
+            MoveRight();
+        }
+        
+        //Soft drop
+        if (Keyboard.GetState().IsKeyDown(Keys.S) || Keyboard.GetState().IsKeyDown(Keys.Down))
+        {
+            if (softDropTimer <= 0)
+            {
+                MoveDown();
+                softDropTimer = softDropMaxTime;
+            }
+        }
+        
+        if (Util.GetKeyPressed(Keys.R))
+        {
+            Rotate();
+        }
     }
 
     private void LockPiece()
@@ -113,7 +143,7 @@ public abstract class Piece
             }
         }
         
-        tetrisGameReference.NextPiece();
+        tetrisGameReference.RequestPiece();
     }
     
     public void MoveDown()
@@ -183,41 +213,6 @@ public abstract class Piece
         Hitbox = Hitboxes[rotationIndex];
         
         //TODO Check if rotation is valid
-    }
-
-    //Gets the value of the next piece and creates the corresponding object
-    public Piece GetNextPiece(byte pieceInQueue)
-    {
-        Piece blockType;
-        switch (pieceInQueue)
-        {
-            case (byte)Pieces.Block:
-                blockType = new BlockPiece(fieldReference, tetrisGameReference);
-                break;
-            case (byte)Pieces.Line:
-                blockType = new LinePiece(fieldReference, tetrisGameReference);
-                break;
-            case (byte)Pieces.T:
-                blockType = new TPiece(fieldReference, tetrisGameReference);
-                break;
-            case (byte)Pieces.S:
-                blockType = new SPiece(fieldReference, tetrisGameReference);
-                break;
-            case (byte)Pieces.Z:
-                blockType = new ZPiece(fieldReference, tetrisGameReference);
-                break;
-            case (byte)Pieces.L:
-                blockType = new LPiece(fieldReference, tetrisGameReference);
-                break;
-            case (byte)Pieces.J:
-                blockType = new JPiece(fieldReference, tetrisGameReference);
-                break;
-            default:
-                throw new Exception("blockType not specified");
-
-        }
-
-        return blockType;
     }
 }
 

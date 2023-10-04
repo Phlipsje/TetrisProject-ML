@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,10 +13,10 @@ public class TetrisGame
     //The in-match game logic
     private Field field; //The field in which the game is being played
     private Piece activePiece; //The currently being controlled piece
-    private List<byte> pieceQueue = new List<byte>(); //Which pieces come next
+    private List<byte> pieceQueue = new(); //Which pieces come next
     private int nextPieceLength = 5; //The amount of pieces shown in the next piece line
-    private double softDropMaxTime;
-    private double softDropTimer;
+    private double nextPieceWaitTime;
+    private readonly double nextPieceWaitTimeMax = 0.2; //When the next piece appears after the previous one is locked in place
     
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -42,8 +43,6 @@ public class TetrisGame
         FillQueue();
         activePiece = new LinePiece(field, this); //Only called to avoid error, not actual first piece
         NextPiece();
-
-        softDropMaxTime = activePiece.NextDropMaxTime / 20;
     }
 
     public void LoadContent(ContentManager content)
@@ -54,33 +53,35 @@ public class TetrisGame
 
     public void Update(GameTime gameTime)
     {
-        if (Util.GetKeyPressed(Keys.A) || Util.GetKeyPressed(Keys.Left))
+        if (activePiece != null) //Check if there is an active piece
         {
-            activePiece.MoveLeft();
+            activePiece.Update(gameTime);
         }
-        if (Util.GetKeyPressed(Keys.D) || Util.GetKeyPressed(Keys.Right))
+        else if (nextPieceWaitTime > 0) //Check if the next piece should be spawned in
         {
-            activePiece.MoveRight();
+            nextPieceWaitTime -= gameTime.ElapsedGameTime.TotalSeconds;
         }
-        if (Keyboard.GetState().IsKeyDown(Keys.S) || Keyboard.GetState().IsKeyDown(Keys.Down))
+        else
         {
-            if (softDropTimer <= 0)
-            {
-                activePiece.MoveDown();
-                softDropTimer = softDropMaxTime;
-            }
+            NextPiece();
         }
-        
-        activePiece.Update(gameTime);
-        softDropTimer -= gameTime.ElapsedGameTime.TotalSeconds;
     }
     
     public void Draw(SpriteBatch spriteBatch)
     {
         field.Draw(spriteBatch);
-        field.DrawPiece(activePiece, spriteBatch);
+        if (activePiece != null)
+        {
+            field.DrawPiece(activePiece, spriteBatch); 
+        }
     }
 
+    public void RequestPiece()
+    {
+        nextPieceWaitTime = nextPieceWaitTimeMax;
+        activePiece = null;
+    }
+    
     //Adds new pieces to the list of pieces the player has to use
     private void FillQueue()
     {
@@ -93,14 +94,48 @@ public class TetrisGame
         }
     }
 
-    public void NextPiece()
+    private void NextPiece()
     {
-        activePiece = activePiece.GetNextPiece(pieceQueue[0]);
+        activePiece = GetNextPiece(pieceQueue[0]);
         pieceQueue.RemoveAt(0);
 
         if (pieceQueue.Count < nextPieceLength+1)
         {
             FillQueue();
         }
+    }
+    
+    //Gets the value of the next piece and creates the corresponding object
+    private Piece GetNextPiece(byte pieceInQueue)
+    {
+        Piece blockType;
+        switch (pieceInQueue)
+        {
+            case (byte)Pieces.Block:
+                blockType = new BlockPiece(field, this);
+                break;
+            case (byte)Pieces.Line:
+                blockType = new LinePiece(field, this);
+                break;
+            case (byte)Pieces.T:
+                blockType = new TPiece(field, this);
+                break;
+            case (byte)Pieces.S:
+                blockType = new SPiece(field, this);
+                break;
+            case (byte)Pieces.Z:
+                blockType = new ZPiece(field, this);
+                break;
+            case (byte)Pieces.L:
+                blockType = new LPiece(field, this);
+                break;
+            case (byte)Pieces.J:
+                blockType = new JPiece(field, this);
+                break;
+            default:
+                throw new Exception("blockType not specified");
+        }
+
+        return blockType;
     }
 }
