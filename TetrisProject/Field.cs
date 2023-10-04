@@ -49,6 +49,25 @@ public class Field //The field in which the pieces can be placed
         drawGrid = false; //Adjust in settings later
     }
 
+    //All the methods that are called when a piece is locked into place (in the form of a flowchart check list)
+    public void FieldControlFlow()
+    {
+        //Pattern Phase
+        
+        //Mark block for destruction
+        
+        //Iterate Phase
+        
+        //Animate Phase
+        
+        //Eliminate Phase
+        
+        //Completion Phase
+        
+        //Generation Phase
+        tetrisGame.RequestPiece();
+    }
+    
     private void SetFieldPixelSizeByWindowHeight(int percentage)
     {
         fieldPixelHeight = (int)Math.Round(tetrisGame.WindowSize.Y * (percentage / 100.0));

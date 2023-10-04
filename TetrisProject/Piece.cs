@@ -21,8 +21,7 @@ public abstract class Piece
     //A piece that can be placed
     //All pieces are 4 blocks
     //Types: l-, r-, s-, z-, t-, block and line
-
-    private bool[,] hitbox; //Current hitbox so you don't need to keep accessing arrays with indexes
+    
     private bool[][,] hitboxes; //Contains the hitbox for every rotation
     private byte rotationIndex; //What rotation the piece is currently on (from 0 to 3 for every piece, meaning some pieces have duplicate values)
     private Vector2Int position; //Position of top-left of hitbox position
@@ -38,7 +37,6 @@ public abstract class Piece
     private bool lockDownTimerSet;
     
     private Field fieldReference;
-    private TetrisGame tetrisGameReference;
     
     private double softDropMaxTime;
     private double softDropTimer;
@@ -71,10 +69,9 @@ public abstract class Piece
         protected set => color = value;
     }
 
-    public Piece(Field fieldReference, TetrisGame tetrisGameReference)
+    public Piece(Field fieldReference)
     {
         this.fieldReference = fieldReference;
-        this.tetrisGameReference = tetrisGameReference;
         position = new Vector2Int(3, 0);
         hitboxes = new bool[4][,];
         rotationIndex = 0;
@@ -139,7 +136,7 @@ public abstract class Piece
             }
         }
         
-        tetrisGameReference.RequestPiece();
+        fieldReference.FieldControlFlow();
     }
     
     public void MoveDown()
@@ -225,7 +222,7 @@ public enum Pieces
 public class BlockPiece : Piece
 {
     //All hitbox points for every rotation
-    public BlockPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
+    public BlockPiece(Field fieldReference) : base(fieldReference)
     {
         bool[,] hitbox =
         {
@@ -244,7 +241,7 @@ public class BlockPiece : Piece
 
 public class LinePiece : Piece
 {
-    public LinePiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
+    public LinePiece(Field fieldReference) : base(fieldReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -286,7 +283,7 @@ public class LinePiece : Piece
 
 public class TPiece : Piece
 {
-    public TPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
+    public TPiece(Field fieldReference) : base(fieldReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -328,7 +325,7 @@ public class TPiece : Piece
 
 public class SPiece : Piece
 {
-    public SPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
+    public SPiece(Field fieldReference) : base(fieldReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -370,7 +367,7 @@ public class SPiece : Piece
 
 public class ZPiece : Piece
 {
-    public ZPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
+    public ZPiece(Field fieldReference) : base(fieldReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -412,7 +409,7 @@ public class ZPiece : Piece
 
 public class LPiece : Piece
 {
-    public LPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
+    public LPiece(Field fieldReference) : base(fieldReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -454,7 +451,7 @@ public class LPiece : Piece
 
 public class JPiece : Piece
 {
-    public JPiece(Field fieldReference, TetrisGame tetrisGame) : base(fieldReference, tetrisGame)
+    public JPiece(Field fieldReference) : base(fieldReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)

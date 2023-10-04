@@ -41,7 +41,6 @@ public class TetrisGame
     {
         field = new Field(this);
         FillQueue();
-        activePiece = new LinePiece(field, this); //Only called to avoid error, not actual first piece
         NextPiece();
     }
 
@@ -125,25 +124,25 @@ public class TetrisGame
         switch (pieceInQueue)
         {
             case Pieces.Block:
-                blockType = new BlockPiece(field, this);
+                blockType = new BlockPiece(field);
                 break;
             case Pieces.Line:
-                blockType = new LinePiece(field, this);
+                blockType = new LinePiece(field);
                 break;
             case Pieces.T:
-                blockType = new TPiece(field, this);
+                blockType = new TPiece(field);
                 break;
             case Pieces.S:
-                blockType = new SPiece(field, this);
+                blockType = new SPiece(field);
                 break;
             case Pieces.Z:
-                blockType = new ZPiece(field, this);
+                blockType = new ZPiece(field);
                 break;
             case Pieces.L:
-                blockType = new LPiece(field, this);
+                blockType = new LPiece(field);
                 break;
             case Pieces.J:
-                blockType = new JPiece(field, this);
+                blockType = new JPiece(field);
                 break;
             default:
                 throw new Exception("blockType not specified");
