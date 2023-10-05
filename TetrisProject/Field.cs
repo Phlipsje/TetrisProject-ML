@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -52,20 +55,38 @@ public class Field //The field in which the pieces can be placed
     //All the methods that are called when a piece is locked into place (in the form of a flowchart check list)
     public void FieldControlFlow()
     {
-        //Pattern Phase
+        // Pattern Phase
+        byte[] rowsMarkedForDestruction = PatternPhase();
+        string debugString = "d: ";
+        foreach (byte b in rowsMarkedForDestruction)
+            debugString += $"{b.ToString()}, ";
+        Debug.WriteLine(debugString);
         
-        //Mark block for destruction
+        // Iterate Phase
+        // This may be used for alternative game modes and such
         
-        //Iterate Phase
+        //TODO Animate Phase
         
-        //Animate Phase
+        // Eliminate Phase
+        ClearLines(rowsMarkedForDestruction);
         
-        //Eliminate Phase
+        // TODO Completion Phase
         
-        //Completion Phase
-        
-        //Generation Phase
+        // Generation Phase
         tetrisGame.RequestPiece();
+    }
+
+    private byte[] PatternPhase()
+    {// note that this function uses the index in the entire array, not just the normal matrix.
+     // GetBlock won't work with these
+        // creates an array of empty blocks to compare against
+        List<byte> result = new List<byte>();
+        for (byte i = 0; i < height * 2; i++)
+        {
+            if (!blockArray[i].Contains(Pieces.None))
+                result.Add(i);
+        }
+        return result.ToArray();
     }
     
     private void SetFieldPixelSizeByWindowHeight(int percentage)
@@ -91,19 +112,19 @@ public class Field //The field in which the pieces can be placed
     //Handles clearing a line
     public void ClearSingleLine(byte line)
     {
-        //Move all rows down one
-        for (int i = line; i < blockArray.GetLength(0); i++)
+        //Move all rows above the cleared row down one
+        //Because the lowest rows get the higher indices, this loop is a little unorthodox
+        //
+        for (int i = line; i > 0 * 2; i--)
         {
-            if (i >= height)
-            {
-                //If at max height no row can fall down
-                blockArray[i] = new Pieces[width];
-                continue;
-            }
-                
             //Replace row with row above it
-            blockArray[i] = blockArray[i++];
+            blockArray[i] = blockArray[i - 1];
         }
+        //After a line is cleared, the top row will always be emty
+        blockArray[0] = new Pieces[width];
+        for (int j = 0; j < width; j++)
+            blockArray[0][j] = Pieces.None;
+
     }
 
     //Draw all the already placed pieces
