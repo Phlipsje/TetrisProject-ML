@@ -24,6 +24,7 @@ public abstract class Piece
     private double lockDownTimer;
     private double softDropMaxTime; //The time for a piece to move down by one cell when holding down
     private double softDropTimer;
+    private bool softDropped; //Check if soft dropped this frame
     private bool lockDownTimerSet;
     private int maxMovementCounter;
     private int remainingMovementCounter; //Counts the amount of actions you can perform to extend the timer of the lock down phase
@@ -85,6 +86,7 @@ public abstract class Piece
 
         //Update timers and checks
         previousPosition = position;
+        softDropped = false;
         dropTimer -= deltaTime;
         softDropTimer -= deltaTime;
         lockDownTimer -= deltaTime;
@@ -103,15 +105,13 @@ public abstract class Piece
         }
         
         //Lock Phase (That half a second before piece is fully in place)
-        if (dropTimer <= 0) //Piece drops down 1 line
+        if (dropTimer <= 0 && !softDropped) //Piece drops down 1 line
         {
             dropTimer = nextDropMaxTime;
             MoveDown();
         }
         
-        //Possibly reset fall down timer (and adjust count)
-        
-        //Truly lock in and go to Pattern Phase
+        //Checking timer resets and going to Pattern Phase done in MoveDown method
     }
 
     private void CheckInput()
@@ -134,6 +134,7 @@ public abstract class Piece
             {
                 MoveDown();
                 softDropTimer = softDropMaxTime;
+                softDropped = true;
             }
         }
         
