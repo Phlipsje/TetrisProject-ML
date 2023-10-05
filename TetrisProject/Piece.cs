@@ -18,6 +18,10 @@ public abstract class Piece
     
     public const int hitboxSize = 4;
 
+    private double autoRepeatStartDelay; //The wait time before auto repeat starts
+    private double autoRepeatStartTimer;
+    private double autoRepeatDelay; //The wait time between the piece moving one grid cell while holding down left/right
+    private double autoRepeatTimer;
     private double nextDropMaxTime; //The time it takes until a piece moves down one line
     private double dropTimer; //The timer counting down checked by nextDropTime
     private double lockDownMaxTime; //The time before a piece is locked into place
@@ -67,8 +71,10 @@ public abstract class Piece
         position = new Point(3, 0);
         hitboxes = new bool[4][,];
         rotationIndex = 0;
-        nextDropMaxTime = 0.5; //Test value
+        nextDropMaxTime = 0.5;
         lockDownMaxTime = 0.5;
+        autoRepeatDelay = 0.5/fieldReference.Width;
+        autoRepeatStartDelay = 0.25;
         maxMovementCounter = 15;
         remainingMovementCounter = maxMovementCounter;
         dropTimer = nextDropMaxTime;
@@ -90,6 +96,11 @@ public abstract class Piece
         dropTimer -= deltaTime;
         softDropTimer -= deltaTime;
         lockDownTimer -= deltaTime;
+        autoRepeatStartTimer -= deltaTime;
+        if (autoRepeatStartTimer <= 0)
+        {
+            autoRepeatTimer -= deltaTime;
+        }
     }
 
     private void PieceControlFlow()
@@ -116,19 +127,28 @@ public abstract class Piece
 
     private void CheckInput()
     {
-        if (Util.GetKeyPressed(Keys.A) || Util.GetKeyPressed(Keys.Left))
+        if (Keyboard.GetState().IsKeyDown(Keys.Left))
         {
-            MoveLeft();
-            ResetLockDownTimer();
+            if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0)  || Util.GetKeyPressed(Keys.Left))
+            {
+                MoveLeft();
+                ResetLockDownTimer();
+                autoRepeatTimer = autoRepeatDelay;
+            }
+            
         }
-        if (Util.GetKeyPressed(Keys.D) || Util.GetKeyPressed(Keys.Right))
+        if (Keyboard.GetState().IsKeyDown(Keys.Right))
         {
-            MoveRight();
-            ResetLockDownTimer();
+            if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0) || Util.GetKeyPressed(Keys.Right))
+            {
+                MoveRight();
+                ResetLockDownTimer();
+                autoRepeatTimer = autoRepeatDelay;
+            }
         }
         
         //Soft drop
-        if (Keyboard.GetState().IsKeyDown(Keys.S) || Keyboard.GetState().IsKeyDown(Keys.Down))
+        if (Keyboard.GetState().IsKeyDown(Keys.Down))
         {
             if (softDropTimer <= 0)
             {
@@ -138,10 +158,20 @@ public abstract class Piece
             }
         }
         
-        if (Util.GetKeyPressed(Keys.R))
+        if (Util.GetKeyPressed(Keys.Up))
         {
             Rotate();
             ResetLockDownTimer();
+        }
+
+        if ((Util.GetKeyLetGo(Keys.Left) && !Util.GetKeyHeld(Keys.Right)) || (Util.GetKeyLetGo(Keys.Right) && !Util.GetKeyHeld(Keys.Left)))
+        {
+            autoRepeatStartTimer = autoRepeatStartDelay;
+        }
+
+        if (Util.GetKeyPressed(Keys.Left) || Util.GetKeyPressed(Keys.Right))
+        {
+            autoRepeatStartTimer = autoRepeatStartDelay;
         }
     }
 

@@ -36,6 +36,11 @@ public static class Util
         return currentKeyboardState.IsKeyDown(key) && !previousKeyboardState.IsKeyDown(key);
     }
 
+    public static bool GetKeyLetGo(Keys key)
+    {
+        return !currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
+    }
+
     public static bool GetKeyHeld(Keys key)
     {
         return currentKeyboardState.IsKeyDown(key);
