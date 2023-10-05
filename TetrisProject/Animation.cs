@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -43,7 +42,7 @@ public static class AnimationManager
 
 public abstract class Animation
 {
-    public bool CanBeDestroyed = false;
+    public bool CanBeDestroyed;
     protected Vector2 position;
     public Vector2 Position => position;
     protected TetrisGame tetrisGame;
