@@ -65,9 +65,11 @@ public class FallingBlockAnimation : Animation
     private Vector2 size;
     private Texture2D texture;
     private Color color;
+    private float rotation;
+    private float rotationSpeed;
     
-    public FallingBlockAnimation(Vector2 startPosition, TetrisGame tetrisGame, Vector2 startVelocity, Texture2D texture, 
-        Color? color = null, Vector2? size = null, float gravity = 2000) : base(startPosition, tetrisGame)
+    public FallingBlockAnimation(Vector2 startPosition, TetrisGame tetrisGame, Vector2 startVelocity, Texture2D texture,
+        float rotationSpeed, Color? color = null, Vector2? size = null, float gravity = 2000) : base(startPosition, tetrisGame)
     {
         velocity = startVelocity;
         // The syntax of this line: the value before the ?? if it is not null, else the value after the ??
@@ -75,12 +77,14 @@ public class FallingBlockAnimation : Animation
         this.color = color ?? Color.White;
         this.gravity = gravity;
         this.texture = texture;
+        this.rotationSpeed = rotationSpeed;
     }
 
     public override void Update(GameTime gameTime)
     {
         position = position + velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
         velocity.Y += gravity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+        rotation += rotationSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
         if (position.Y > Main.WindowHeight)
             CanBeDestroyed = true;
     }
@@ -89,6 +93,6 @@ public class FallingBlockAnimation : Animation
     {
         Rectangle drawRect = new Rectangle(Util.GetFullscreenSafePosition(position, tetrisGame).ToPoint(), 
             Util.GetFullscreenSafePosition(size, tetrisGame).ToPoint());
-        spriteBatch.Draw(texture, drawRect, null, color, 0, new Vector2(0, 0), SpriteEffects.None, 1);
+        spriteBatch.Draw(texture, drawRect, null, color, rotation, size / 2, SpriteEffects.None, 1);
     }
 }
