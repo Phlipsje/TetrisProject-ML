@@ -11,8 +11,8 @@ namespace TetrisProject
         public GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private TetrisGame tetrisGame;
-        private const int WindowWidth = 800;
-        private const int WindowHeight = 450;
+        public const int WindowWidth = 800;
+        public const int WindowHeight = 450;
         
 
         public Main()
@@ -79,7 +79,7 @@ namespace TetrisProject
             Util.Update();
             
             tetrisGame.Update(gameTime);
-
+            AnimationManager.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -89,6 +89,7 @@ namespace TetrisProject
 
             spriteBatch.Begin();
             tetrisGame.Draw(spriteBatch);
+            AnimationManager.Draw(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);

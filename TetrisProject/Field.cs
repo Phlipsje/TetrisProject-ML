@@ -65,7 +65,9 @@ public class Field //The field in which the pieces can be placed
         // Iterate Phase
         // This may be used for alternative game modes and such
         
-        //TODO Animate Phase
+        // TEMPORARY Animate Phase
+        AnimationManager.PlayAnimation(new FallingBlockAnimation(new Vector2(200, 100), 
+            tetrisGame, new Vector2(100, -800), tetrisGame.blockTexture));
         
         // Eliminate Phase
         ClearLines(rowsMarkedForDestruction);
