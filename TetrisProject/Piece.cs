@@ -179,6 +179,7 @@ public abstract class Piece
             
             if(remainingMovementCounter == 0) //Lock piece if counter can't be lowered anymore
             {
+                position.Y++;
                 LockPiece();
             }
         }
@@ -202,7 +203,7 @@ public abstract class Piece
                 return;
             }
 
-            position.Y--;
+            position.Y--; //Move the piece back if it landed in a block
         }
     }
 
