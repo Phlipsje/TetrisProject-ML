@@ -104,8 +104,8 @@ public class Field //The field in which the pieces can be placed
         {
             for (int x = 0; x < width; x++)
             {
-                Vector2 blockPosition = new Vector2(fieldX + blockSize * x,
-                    fieldY + blockSize * (y - height));
+                Vector2 blockPosition = new Vector2(defaultFieldX + defaultBlockSize * x,
+                    defaultFieldY + defaultBlockSize * (y - height));
                 AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, tetrisGame, new Vector2(rng.Next(-200, 200), -800), 
                     tetrisGame.blockTexture, rng.Next(-4, 4), color: GetColor(GetBlock(x, y - height)),
                     size: new Vector2(defaultBlockSize, defaultBlockSize)));
