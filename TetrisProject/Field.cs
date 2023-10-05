@@ -23,6 +23,11 @@ public class Field //The field in which the pieces can be placed
     private int fieldPixelHeight; //How many pixels high
     private int fieldX; //X value of top left of field
     private int fieldY; //Y value of top left of field
+    // These are needed for the animations, as they already calculate their actual position (also in fullscreen)
+    private readonly int defaultFieldX;
+    private readonly int defaultFieldY;
+    private readonly int defaultBlockSize;
+    
     private bool drawGrid;
 
     public byte Width
@@ -50,6 +55,9 @@ public class Field //The field in which the pieces can be placed
         //Visual setup
         SetFieldPixelSizeByWindowHeight(80);
         drawGrid = false; //Adjust in settings later
+        defaultFieldX = (tetrisGame.WindowSize.X - fieldPixelWidth) / 2;
+        defaultFieldY = (tetrisGame.WindowSize.Y - fieldPixelHeight) / 2;
+        defaultBlockSize = (int)Math.Round((double)fieldPixelHeight / Height);
     }
 
     //All the methods that are called when a piece is locked into place (in the form of a flowchart check list)
@@ -57,17 +65,14 @@ public class Field //The field in which the pieces can be placed
     {
         // Pattern Phase
         byte[] rowsMarkedForDestruction = PatternPhase();
-        string debugString = "d: ";
-        foreach (byte b in rowsMarkedForDestruction)
-            debugString += $"{b.ToString()}, ";
-        Debug.WriteLine(debugString);
         
         // Iterate Phase
         // This may be used for alternative game modes and such
         
         // TEMPORARY Animate Phase
-        AnimationManager.PlayAnimation(new FallingBlockAnimation(new Vector2(200, 100), 
-            tetrisGame, new Vector2(100, -800), tetrisGame.blockTexture, -2));
+        AnimationPhase(rowsMarkedForDestruction);
+        //AnimationManager.PlayAnimation(new FallingBlockAnimation(new Vector2(200, 100), 
+        //    tetrisGame, new Vector2(100, -800), tetrisGame.blockTexture, -2));
         
         // Eliminate Phase
         ClearLines(rowsMarkedForDestruction);
@@ -89,6 +94,25 @@ public class Field //The field in which the pieces can be placed
                 result.Add(i);
         }
         return result.ToArray();
+    }
+//  Rectangle blockRectangle =
+// new Rectangle(fieldX + blockSize * j, fieldY + blockSize * (i-height), blockSize, blockSize);
+    private void AnimationPhase(byte[] markedLines)
+    {
+        Random rng = new Random();
+        foreach (byte y in markedLines)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                Vector2 blockPosition = new Vector2(fieldX + blockSize * x,
+                    fieldY + blockSize * (y - height));
+                AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, tetrisGame, new Vector2(rng.Next(-200, 200), -800), 
+                    tetrisGame.blockTexture, rng.Next(-4, 4), color: GetColor(GetBlock(x, y - height)),
+                    size: new Vector2(defaultBlockSize, defaultBlockSize)));
+                
+            }
+
+        }
     }
     
     private void SetFieldPixelSizeByWindowHeight(int percentage)
@@ -129,6 +153,33 @@ public class Field //The field in which the pieces can be placed
 
     }
 
+    private static Color GetColor(Pieces piece)
+    {
+        //Get block color
+        Color blockColor;
+        switch (piece)
+        {
+            case Pieces.None:
+                return Color.Transparent;
+            case Pieces.Block:
+                return Color.Yellow;
+            case Pieces.Line:
+                return Color.LightBlue;
+            case Pieces.T:
+                return Color.Purple;
+            case Pieces.S:
+                return Color.LightGreen;
+            case Pieces.Z:
+                return Color.Red;
+            case Pieces.L:
+                return Color.Orange;
+            case Pieces.J:
+                return Color.Blue;
+            default:
+                return Color.Green;
+        }
+    }
+
     //Draw all the already placed pieces
     public void Draw(SpriteBatch spriteBatch)
     {
@@ -143,37 +194,7 @@ public class Field //The field in which the pieces can be placed
             for (int j = 0; j < width; j++)
             {
                 //Get block color
-                Color blockColor;
-                switch (blockArray[i][j])
-                {
-                    case Pieces.None:
-                        blockColor = Color.Transparent;
-                        break;
-                    case Pieces.Block:
-                        blockColor = Color.Yellow;
-                        break;
-                    case Pieces.Line:
-                        blockColor = Color.LightBlue;
-                        break;
-                    case Pieces.T:
-                        blockColor = Color.Purple;
-                        break;
-                    case Pieces.S:
-                        blockColor = Color.LightGreen;
-                        break;
-                    case Pieces.Z:
-                        blockColor = Color.Red;
-                        break;
-                    case Pieces.L:
-                        blockColor = Color.Orange;
-                        break;
-                    case Pieces.J:
-                        blockColor = Color.Blue;
-                        break;
-                    default:
-                        blockColor = Color.Green;
-                        break;
-                }
+                Color blockColor = GetColor(blockArray[i][j]);
 
                 Rectangle blockRectangle =
                     new Rectangle(fieldX + blockSize * j, fieldY + blockSize * (i-height), blockSize, blockSize);
