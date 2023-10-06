@@ -18,11 +18,11 @@ public class Field //The field in which the pieces can be placed
     private Pieces[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
     
     //Visual variables
-    private int blockSize; //How large a block is 
-    private int fieldPixelWidth; //How many pixels wide
-    private int fieldPixelHeight; //How many pixels high
-    private int fieldX; //X value of top left of field
-    private int fieldY; //Y value of top left of field
+    public int blockSize; //How large a block is 
+    public int fieldPixelWidth; //How many pixels wide
+    public int fieldPixelHeight; //How many pixels high
+    public int fieldX; //X value of top left of field
+    public int fieldY; //Y value of top left of field
     // These are needed for the animations, as they already calculate their actual position (also in fullscreen)
     private readonly int defaultFieldX;
     private readonly int defaultFieldY;

@@ -89,6 +89,7 @@ namespace TetrisProject
 
             spriteBatch.Begin();
             tetrisGame.Draw(spriteBatch);
+            
             AnimationManager.Draw(spriteBatch);
             spriteBatch.End();
 

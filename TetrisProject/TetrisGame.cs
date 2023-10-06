@@ -69,6 +69,31 @@ public class TetrisGame
         {
             field.DrawPiece(activePiece, spriteBatch); 
         }
+
+        //Draw next pieces
+        Point nextPieceTopLeft = new Point(field.fieldX + field.fieldPixelWidth + 20, field.fieldY + 30);
+        for (int i = 0; i < 5; i++)
+        {
+            DrawPiece(GetNextPiece(pieceQueue[i]), spriteBatch, nextPieceTopLeft + new Point(0, i*50));
+        }
+    }
+    
+    public void DrawPiece(Piece piece, SpriteBatch spriteBatch, Point position)
+    {
+        for (int y = 0; y < Piece.hitboxSize; y++)
+        {
+            for (int x =  0; x < Piece.hitboxSize; x++)
+            {
+                //Check if the is a block in that part of the piece (in the 4x4 matrix of possible hitbox points)
+                if (!piece.Hitbox[x, y])
+                    continue;
+                
+                //Draw individual block of a piece
+                Rectangle blockRectangle =
+                    new Rectangle(position.X + field.blockSize * x, position.Y + field.blockSize * -y, field.blockSize, field.blockSize);
+                spriteBatch.Draw(blockTexture, blockRectangle, piece.Color);
+            }
+        }
     }
     
     #region Phases
