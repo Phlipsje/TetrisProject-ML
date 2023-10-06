@@ -19,6 +19,7 @@ public class TetrisGame
     private readonly double nextPieceWaitTimeMax = 0.2; //When the next piece appears after the previous one is locked in place
     private Piece holdPiece;
     private bool holdUsed; //Can only hold a piece if has been placed since last time hold has been used
+    public bool IsGameOver;
     
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -60,6 +61,8 @@ public class TetrisGame
 
     public void Update(GameTime gameTime)
     {
+        if (IsGameOver)
+            return;
         if(activePiece == null)
         {
             GenerationPhase(gameTime.ElapsedGameTime.TotalSeconds);
@@ -68,11 +71,16 @@ public class TetrisGame
         {
             activePiece.Update(gameTime);
         }
+
+        if (Util.GetKeyPressed(Keys.G))
+            GameOver();
     }
     
     public void Draw(SpriteBatch spriteBatch)
     {
         field.Draw(spriteBatch);
+        if (IsGameOver)
+            return;
         if (activePiece != null)
         {
             field.DrawPiece(activePiece, spriteBatch); 
@@ -211,5 +219,19 @@ public class TetrisGame
         }
 
         return blockType;
+    }
+
+    public void GameOver()
+    {
+        IsGameOver = true;
+        field.PlayGameOverAnimation();
+        field = new Field(this);
+        Point lpos = new Point(3, 8);
+        field.SetBlock(lpos.X, lpos.Y, Pieces.Ghost);
+        field.SetBlock(lpos.X, lpos.Y + 1, Pieces.Ghost);
+        field.SetBlock(lpos.X, lpos.Y + 2, Pieces.Ghost);
+        field.SetBlock(lpos.X, lpos.Y + 3, Pieces.Ghost);
+        field.SetBlock(lpos.X + 1, lpos.Y + 3, Pieces.Ghost);
+        field.SetBlock(lpos.X + 2, lpos.Y + 3, Pieces.Ghost);
     }
 }

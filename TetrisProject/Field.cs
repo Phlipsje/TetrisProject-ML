@@ -99,8 +99,6 @@ public class Field //The field in which the pieces can be placed
 // new Rectangle(fieldX + blockSize * j, fieldY + blockSize * (i-height), blockSize, blockSize);
     private void AnimationPhase(byte[] markedLines)
     {
-        AnimationManager.PlayAnimation(new ExplosionAnimation(new Vector2(defaultFieldX, defaultFieldY), tetrisGame, 
-            new Vector2(fieldPixelWidth, fieldPixelHeight), tetrisGame.explosionTextures));
         Random rng = new Random();
         foreach (byte y in markedLines)
         {
@@ -285,5 +283,26 @@ public class Field //The field in which the pieces can be placed
     public void HoldPiece(Piece piece)
     {
         tetrisGame.HoldPiece(piece);
+    }
+
+    public void PlayGameOverAnimation()
+    {
+        Random rng = new Random();
+        AnimationManager.PlayAnimation(new ExplosionAnimation(new Vector2(defaultFieldX, defaultFieldY), tetrisGame, 
+            new Vector2(defaultBlockSize * Width, defaultBlockSize * Height), tetrisGame.explosionTextures));
+        for (int y = -Height;  y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                if (GetBlock(x, y) != Pieces.None)
+                {
+                    Vector2 blockPosition = new Vector2(defaultFieldX + defaultBlockSize * x,
+                        defaultFieldY + defaultBlockSize * y);
+                    AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, tetrisGame, new Vector2(rng.Next(-200, 200), -800), 
+                        tetrisGame.blockTexture, rng.Next(-4, 4), color: GetColor(GetBlock(x, y)),
+                        size: new Vector2(defaultBlockSize, defaultBlockSize)), 0);
+                }
+            }
+        }
     }
 }
