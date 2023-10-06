@@ -179,7 +179,8 @@ public abstract class Piece
     private void HardDrop()
     {
         //Iterate down until the place to place the piece is found
-        while (!fieldReference.CollidesVertical(Hitbox, position))
+        lockDownTimer = 0;
+        while (!fieldReference.CollidesVertical(Hitbox, Position))
         {
             MoveDown();
         }
