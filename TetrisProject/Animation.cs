@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,6 +17,11 @@ public static class AnimationManager
     public static void PlayAnimation(Animation animation)
     {
         animations.Add(animation);
+    }
+
+    public static void PlayAnimation(Animation animation, int layer)
+    {
+        animations.Insert(layer, animation);
     }
 
     public static void Update(GameTime gameTime)
@@ -93,14 +99,18 @@ public class FallingBlockAnimation : Animation
     {
         Rectangle drawRect = new Rectangle(Util.GetFullscreenSafePosition(position, tetrisGame).ToPoint(), 
             Util.GetFullscreenSafePosition(size, tetrisGame).ToPoint());
-        spriteBatch.Draw(texture, drawRect, null, color, rotation, size / 2, SpriteEffects.None, 1);
+        spriteBatch.Draw(texture, drawRect, null, color, rotation, size / 2, SpriteEffects.None, 0);
     }
 
-    public class ExplotionAnimation : Animation
+    }
+    public class ExplosionAnimation : Animation
     {
         private Vector2 size;
         private Texture2D[] textures;
-        public ExplotionAnimation(Vector2 startPosition, TetrisGame tetrisGame, Vector2 size, Texture2D[] textures) : base(startPosition, tetrisGame)
+        private double? spawnTime;
+        private int frameToDraw;
+        private const int fps = 30;
+        public ExplosionAnimation(Vector2 startPosition, TetrisGame tetrisGame, Vector2 size, Texture2D[] textures) : base(startPosition, tetrisGame)
         {
             this.size = size;
             this.textures = textures;
@@ -108,12 +118,20 @@ public class FallingBlockAnimation : Animation
 
         public override void Update(GameTime gameTime)
         {
-            throw new System.NotImplementedException();
+            if (!spawnTime.HasValue)
+                spawnTime = gameTime.TotalGameTime.TotalSeconds;
+            frameToDraw = (int)Math.Floor((double)(gameTime.TotalGameTime.TotalSeconds - spawnTime) * fps);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            throw new System.NotImplementedException();
+            if (frameToDraw > textures.Length - 1)
+            {
+                CanBeDestroyed = true;
+                return;
+            }
+            Rectangle drawRect = new Rectangle(Util.GetFullscreenSafePosition(position, tetrisGame).ToPoint(), 
+                Util.GetFullscreenSafePosition(size, tetrisGame).ToPoint());
+            spriteBatch.Draw(textures[frameToDraw], drawRect, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
-    }
 }

@@ -23,6 +23,7 @@ public class TetrisGame
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
     public Texture2D squareTexture; //Used for drawing rectangles with a single color
+    public Texture2D[] explosionTextures;
     
     //File locations
     private const string blockTextureFileName = "BaseBlock";
@@ -50,6 +51,11 @@ public class TetrisGame
     {
         blockTexture = content.Load<Texture2D>(blockTextureFileName);
         squareTexture = content.Load<Texture2D>(squareTextureFileName);
+        explosionTextures = new Texture2D[17];
+        for (int i = 0; i < 17; i++)
+        {
+            explosionTextures[i] = content.Load<Texture2D>($"eEffect/explosion{i}");
+        }
     }
 
     public void Update(GameTime gameTime)
