@@ -175,6 +175,8 @@ public class Field //The field in which the pieces can be placed
                 return Color.Orange;
             case Pieces.J:
                 return Color.Blue;
+            case Pieces.Ghost:
+                return Color.White * 0.5f;
             default:
                 return Color.Green;
         }
@@ -213,6 +215,8 @@ public class Field //The field in which the pieces can be placed
     
     public void DrawPiece(Piece piece, SpriteBatch spriteBatch)
     {
+        if (piece.GetType() != typeof(GhostPiece))
+            DrawPiece(new GhostPiece(this, piece), spriteBatch);
         for (int y = 0; y < Piece.hitboxSize; y++)
         {
             for (int x =  0; x < Piece.hitboxSize; x++)
@@ -220,6 +224,8 @@ public class Field //The field in which the pieces can be placed
                 //Check if the is a block in that part of the piece (in the 4x4 matrix of possible hitbox points)
                 if (!piece.Hitbox[x, y])
                     continue;
+                
+                //Draw the ghost piece
                 
                 //Draw individual block of a piece
                 Rectangle blockRectangle =

@@ -11,7 +11,8 @@ public abstract class Piece
     //Types: l-, r-, s-, z-, t-, block and line
     
     private bool[][,] hitboxes; //Contains the hitbox for every rotation
-    private byte rotationIndex; //What rotation the piece is currently on (from 0 to 3 for every piece, meaning some pieces have duplicate values)
+    protected byte rotationIndex; //What rotation the piece is currently on (from 0 to 3 for every piece, meaning some pieces have duplicate values)
+    public byte RotationIndex => rotationIndex;
     private Point position; //Position of top-left of hitbox position
     private Color color; //The color of the piece
     protected Pieces pieceType; //Used for setting block color when piece is locked in
@@ -292,7 +293,8 @@ public enum Pieces
     S,
     Z,
     L,
-    J
+    J,
+    Ghost
 }
 
 #region Piece types
@@ -565,6 +567,23 @@ public class JPiece : Piece
 
         this.Color = Color.Blue;
         pieceType = Pieces.J;
+    }
+}
+
+public class GhostPiece : Piece
+{
+    public GhostPiece(Field fieldReference, Piece piece) : base(fieldReference)
+    {
+        Piece pieceReference = piece;
+        Position = piece.Position;
+        Hitboxes = pieceReference.Hitboxes;
+        rotationIndex = pieceReference.RotationIndex;
+        Color = pieceReference.Color * 0.25f;
+        pieceType = Pieces.Ghost;
+    
+        while (!fieldReference.CollidesVertical(Hitbox, Position))
+            Position = new Point(Position.X, Position.Y + 1);
+        Position = new Point(Position.X, Position.Y - 1);
     }
 }
 #endregion
