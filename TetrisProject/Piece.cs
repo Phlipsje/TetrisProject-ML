@@ -37,6 +37,38 @@ public abstract class Piece
     private Point previousPosition; //Checks if position of piece changed to decide if timer should actually be reset
     
     private Field fieldReference;
+    
+    #region Rotation types
+
+    private Point[,] normalWallKickLeft = new[,]
+    {
+        {new Point(1, 0), new Point(1, -1), new Point(0, 2), new Point(1, 2) },
+        {new Point(-1, 0), new Point(-1, 1), new Point(0, -2), new Point(-1, -2) },
+        {new Point(-1, 0), new Point(-1, 1), new Point(0, -2), new Point(-1, 2) },
+        {new Point(1, 0), new Point(1, 1), new Point(0, -2), new Point(1, -2) }
+    };
+    private Point[,] normalWallKickRight = new[,]
+    {
+        {new Point(-1, 0), new Point(-1, 1), new Point(0, -2), new Point(-1, -2) },
+        {new Point(1, 0), new Point(1, -1), new Point(0, 2), new Point(1, 2) },
+        {new Point(1, 0), new Point(1, 1), new Point(0, -2), new Point(1, -2) },
+        {new Point(-1, 0), new Point(-1, 1), new Point(0, -2), new Point(-1, 2) }
+    };
+    private Point[,] lineWallKickLeft = new[,]
+    {
+        {new Point(2, 0), new Point(-1, 0), new Point(2, 1), new Point(-1, -2) },
+        {new Point(2, 0), new Point(-2, 0), new Point(1, -2), new Point(-2, 1) },
+        {new Point(-2, 0), new Point(1, 0), new Point(-2, -1), new Point(1, 2) },
+        {new Point(-2, 0), new Point(2, 0), new Point(-1, 2), new Point(2, -1) }
+    };
+    private Point[,] lineWallKickRight = new[,]
+    {
+        {new Point(-2, 0), new Point(1, 0), new Point(-2, -1), new Point(1, 2) },
+        {new Point(-2, 0), new Point(2, 0), new Point(-1, 2), new Point(2, -1) },
+        {new Point(2, 0), new Point(-1, 0), new Point(2, 1), new Point(-1, -2) },
+        {new Point(2, 0), new Point(-2, 0), new Point(1, -2), new Point(-2, 1) }
+    };
+    #endregion
 
     public double NextDropMaxTime
     {
@@ -262,18 +294,56 @@ public abstract class Piece
     //Rotate a piece clockwise
     public void RotateClockWise()
     {
+        int previousRotation = rotationIndex;
         rotationIndex++;
         if (rotationIndex == 4)
         {
             rotationIndex = 0;
         }
+
+        //Check if normal rotation is valid
+        if (!fieldReference.CollidesHorizontal(Hitbox, position) && !fieldReference.CollidesVertical(Hitbox,position))
+        {
+            return;
+        }
+
+        if (pieceType != Pieces.Line)
+        {
+            //Check if there is a different valid position for the rotation according to the super rotation system
+            for (int i = 0; i < 4; i++)
+            {
+                bool collideHorizontal = fieldReference.CollidesHorizontal(Hitbox, position + normalWallKickRight[previousRotation, i]);
+                bool collideVertical = fieldReference.CollidesVertical(Hitbox, position + normalWallKickRight[previousRotation, i]);
+                if (!collideHorizontal && !collideVertical)
+                {
+                    position += normalWallKickRight[previousRotation, i];
+                    return;
+                }
+            }
+        }
+        else //Different type of rotation offset if a line piece
+        {
+            //Check if there is a different valid position for the rotation according to the super rotation system
+            for (int i = 0; i < 4; i++)
+            {
+                bool collideHorizontal = fieldReference.CollidesHorizontal(Hitbox, position + lineWallKickRight[previousRotation, i]);
+                bool collideVertical = fieldReference.CollidesVertical(Hitbox, position + lineWallKickRight[previousRotation, i]);
+                if (!collideHorizontal && !collideVertical)
+                {
+                    position += lineWallKickRight[previousRotation, i];
+                    return;
+                }
+            }
+        }
         
-        //TODO Check if rotation is valid
+        //Rotate back to original position if there is no legal rotation
+        RotateCounterClockWise();
     }
 
     //Rotate a piece counterclockwise
     public void RotateCounterClockWise()
     {
+        int previousRotation = rotationIndex;
         //Needs different operation order than clockwise because rotationIndex is of type byte and can't be negative
         if (rotationIndex == 0)
         {
@@ -281,7 +351,43 @@ public abstract class Piece
         }
         rotationIndex--;
         
-        //TODO Check if rotation is valid
+        //Check if normal rotation is valid
+        if (!fieldReference.CollidesHorizontal(Hitbox, position) && !fieldReference.CollidesVertical(Hitbox,position))
+        {
+            return;
+        }
+        
+        if (pieceType != Pieces.Line)
+        {
+            //Check if there is a different valid position for the rotation according to the super rotation system
+            for (int i = 0; i < 4; i++)
+            {
+                bool collideHorizontal = fieldReference.CollidesHorizontal(Hitbox, position + normalWallKickLeft[previousRotation, i]);
+                bool collideVertical = fieldReference.CollidesVertical(Hitbox, position + normalWallKickLeft[previousRotation, i]);
+                if (!collideHorizontal && !collideVertical)
+                {
+                    position += normalWallKickLeft[previousRotation, i];
+                    return;
+                }
+            }
+        }
+        else //Different type of rotation offset if a line piece
+        {
+            //Check if there is a different valid position for the rotation according to the super rotation system
+            for (int i = 0; i < 4; i++)
+            {
+                bool collideHorizontal = fieldReference.CollidesHorizontal(Hitbox, position + lineWallKickLeft[previousRotation, i]);
+                bool collideVertical = fieldReference.CollidesVertical(Hitbox, position + lineWallKickLeft[previousRotation, i]);
+                if (!collideHorizontal && !collideVertical)
+                {
+                    position += lineWallKickLeft[previousRotation, i];
+                    return;
+                }
+            }
+        }
+        
+        //Rotate back to original position if there is no legal rotation
+        RotateClockWise();
     }
 }
 
