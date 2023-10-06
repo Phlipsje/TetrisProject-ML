@@ -108,18 +108,21 @@ public class TetrisGame
     {
         if (holdPiece == null)
         {
+            //If the hold piece function is used for the first time a new piece needs to be spawned instead of grabbing the previous one
             RequestPiece();
             holdPiece = piece;
             holdUsed = true;
         }
         else if(!holdUsed)
         {
+            //Take hold piece out and make it the active piece
             activePiece = holdPiece;
-            holdPiece = piece;
-            holdUsed = true;
-
             activePiece.Position = new Point(3, 0);
             activePiece.RotationIndex = 0;
+            
+            //Have the old active piece become the new held piece
+            holdPiece = piece;
+            holdUsed = true;
         }
     }
     
