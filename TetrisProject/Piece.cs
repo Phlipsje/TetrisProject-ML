@@ -12,7 +12,6 @@ public abstract class Piece
     
     private bool[][,] hitboxes; //Contains the hitbox for every rotation
     protected byte rotationIndex; //What rotation the piece is currently on (from 0 to 3 for every piece, meaning some pieces have duplicate values)
-    public byte RotationIndex => rotationIndex;
     private Point position; //Position of top-left of hitbox position
     private Color color; //The color of the piece
     protected Pieces pieceType; //Used for setting block color when piece is locked in
@@ -73,6 +72,12 @@ public abstract class Piece
     public double NextDropMaxTime
     {
         get => nextDropMaxTime;
+    }
+
+    public byte RotationIndex
+    {
+        get { return rotationIndex; }
+        set { rotationIndex = value; }
     }
     
     public bool[,] Hitbox
@@ -160,6 +165,11 @@ public abstract class Piece
 
     private void CheckInput()
     {
+        if (Util.GetKeyPressed(Keys.LeftShift))
+        {
+            fieldReference.HoldPiece(this);
+        }
+        
         if (Keyboard.GetState().IsKeyDown(Keys.Left))
         {
             if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0)  || Util.GetKeyPressed(Keys.Left))

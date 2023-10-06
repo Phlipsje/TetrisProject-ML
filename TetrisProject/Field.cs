@@ -109,7 +109,6 @@ public class Field //The field in which the pieces can be placed
                 AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, tetrisGame, new Vector2(rng.Next(-200, 200), -800), 
                     tetrisGame.blockTexture, rng.Next(-4, 4), color: GetColor(GetBlock(x, y - height)),
                     size: new Vector2(defaultBlockSize, defaultBlockSize)));
-                
             }
 
         }
@@ -279,5 +278,10 @@ public class Field //The field in which the pieces can be placed
             }
         }
         return false;
+    }
+
+    public void HoldPiece(Piece piece)
+    {
+        tetrisGame.HoldPiece(piece);
     }
 }

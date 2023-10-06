@@ -17,6 +17,8 @@ public class TetrisGame
     private int nextPieceLength = 5; //The amount of pieces shown in the next piece line
     private double nextPieceWaitTime;
     private readonly double nextPieceWaitTimeMax = 0.2; //When the next piece appears after the previous one is locked in place
+    private Piece holdPiece;
+    private bool holdUsed; //Can only hold a piece if has been placed since last time hold has been used
     
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -76,6 +78,12 @@ public class TetrisGame
         {
             DrawPiece(GetNextPiece(pieceQueue[i]), spriteBatch, nextPieceTopLeft + new Point(0, i*50));
         }
+
+        //Draw hold piece
+        if (holdPiece != null)
+        {
+            DrawPiece(holdPiece, spriteBatch, new Point(field.fieldX-80,field.fieldY+30));
+        }
     }
     
     public void DrawPiece(Piece piece, SpriteBatch spriteBatch, Point position)
@@ -93,6 +101,25 @@ public class TetrisGame
                     new Rectangle(position.X + field.blockSize * x, position.Y + field.blockSize * -y, field.blockSize, field.blockSize);
                 spriteBatch.Draw(blockTexture, blockRectangle, piece.Color);
             }
+        }
+    }
+
+    public void HoldPiece(Piece piece)
+    {
+        if (holdPiece == null)
+        {
+            RequestPiece();
+            holdPiece = piece;
+            holdUsed = true;
+        }
+        else if(!holdUsed)
+        {
+            activePiece = holdPiece;
+            holdPiece = piece;
+            holdUsed = true;
+
+            activePiece.Position = new Point(3, 0);
+            activePiece.RotationIndex = 0;
         }
     }
     
@@ -116,6 +143,7 @@ public class TetrisGame
     {
         nextPieceWaitTime = nextPieceWaitTimeMax;
         activePiece = null;
+        holdUsed = false;
     }
     
     //Adds new pieces to the list of pieces the player has to use
