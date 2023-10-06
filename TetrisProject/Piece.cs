@@ -30,6 +30,7 @@ public abstract class Piece
     private double softDropMaxTime; //The time for a piece to move down by one cell when holding down
     private double softDropTimer;
     private bool softDropped; //Check if soft dropped this frame
+    private bool hardDropped; //Check if piece is being hard dropped
     private bool lockDownTimerSet;
     private int maxMovementCounter;
     private int remainingMovementCounter; //Counts the amount of actions you can perform to extend the timer of the lock down phase
@@ -39,7 +40,6 @@ public abstract class Piece
     private Field fieldReference;
     
     #region Rotation types
-
     private Point[,] normalWallKickLeft = new[,]
     {
         {new Point(1, 0), new Point(1, -1), new Point(0, 2), new Point(1, 2) },
@@ -211,7 +211,7 @@ public abstract class Piece
     private void HardDrop()
     {
         //Iterate down until the place to place the piece is found
-        lockDownTimer = 0;
+        hardDropped = true;
         while (!fieldReference.CollidesVertical(Hitbox, Position))
         {
             MoveDown();
@@ -257,11 +257,12 @@ public abstract class Piece
         {
             highestHeight = position.Y;
             remainingMovementCounter = maxMovementCounter;
+            lockDownTimer = lockDownMaxTime;
         }
         
         if (fieldReference.CollidesVertical(Hitbox, position))
         {
-            if (lockDownTimer <= 0) //Lock Phase has ended
+            if (lockDownTimer <= 0 || hardDropped) //Lock Phase has ended
             {
                 LockPiece();
                 return;
