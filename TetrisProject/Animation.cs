@@ -26,6 +26,7 @@ public static class AnimationManager
             if (animations[i].CanBeDestroyed)
             {
                 animations.RemoveAt(i);
+                // A list item is destroyed, so i needs to be decremented
                 i--;
             }
         }
@@ -93,5 +94,26 @@ public class FallingBlockAnimation : Animation
         Rectangle drawRect = new Rectangle(Util.GetFullscreenSafePosition(position, tetrisGame).ToPoint(), 
             Util.GetFullscreenSafePosition(size, tetrisGame).ToPoint());
         spriteBatch.Draw(texture, drawRect, null, color, rotation, size / 2, SpriteEffects.None, 1);
+    }
+
+    public class ExplotionAnimation : Animation
+    {
+        private Vector2 size;
+        private Texture2D[] textures;
+        public ExplotionAnimation(Vector2 startPosition, TetrisGame tetrisGame, Vector2 size, Texture2D[] textures) : base(startPosition, tetrisGame)
+        {
+            this.size = size;
+            this.textures = textures;
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
