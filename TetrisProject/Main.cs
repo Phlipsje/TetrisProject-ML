@@ -11,9 +11,10 @@ namespace TetrisProject
         public GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private TetrisGame tetrisGame;
+        private Menu menu;
         public const int WindowWidth = 800;
         public const int WindowHeight = 450;
-        
+        private GameState gameState;
 
         public Main()
         {
@@ -27,11 +28,15 @@ namespace TetrisProject
             graphics.PreferredBackBufferWidth = WindowWidth;
             graphics.PreferredBackBufferHeight = WindowHeight;
             graphics.ApplyChanges();
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            menu = new Menu(this, spriteBatch);
             tetrisGame = new TetrisGame(this);
+
+            gameState = GameState.Playing; //Change this to decide how the game starts
             
-            
+            menu.Instantiate();
             tetrisGame.Instantiate();
-            
+
             base.Initialize();
         }
 
@@ -63,9 +68,8 @@ namespace TetrisProject
 
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            
-            tetrisGame.LoadContent(this.Content);
+            menu.LoadContent(Content);
+            tetrisGame.LoadContent(Content);
         }
 
         protected override void Update(GameTime gameTime)
@@ -77,8 +81,16 @@ namespace TetrisProject
                 ToggleFullScreen();
             
             Util.Update();
+
+            if (gameState == GameState.Menu)
+            {
+                menu.Update(gameTime);
+            }
+            else
+            {
+                tetrisGame.Update(gameTime);
+            }
             
-            tetrisGame.Update(gameTime);
             AnimationManager.Update(gameTime);
             base.Update(gameTime);
         }
@@ -88,7 +100,15 @@ namespace TetrisProject
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-            tetrisGame.Draw(spriteBatch);
+            
+            if (gameState == GameState.Menu)
+            {
+                menu.Draw();
+            }
+            else
+            {
+                tetrisGame.Draw(spriteBatch);
+            }
             
             AnimationManager.Draw(spriteBatch);
             spriteBatch.End();
@@ -96,4 +116,10 @@ namespace TetrisProject
             base.Draw(gameTime);
         }
     }
+}
+
+public enum GameState
+{
+    Menu,
+    Playing,
 }
