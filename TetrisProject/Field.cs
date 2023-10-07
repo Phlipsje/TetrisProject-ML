@@ -67,6 +67,7 @@ public class Field //The field in which the pieces can be placed
         
         // Iterate Phase
         // This may be used for alternative game modes and such
+        tetrisGame.HandleScore(rowsMarkedForDestruction.Length);
         
         // TEMPORARY Animate Phase
         AnimationPhase(rowsMarkedForDestruction);

@@ -10,6 +10,7 @@ namespace TetrisProject;
 
 public class TetrisGame
 {
+    private static readonly int[] scoreRewarded = new int[] {0, 100, 300, 500, 800};
     //The in-match game logic
     private Field field; //The field in which the game is being played
     private Piece activePiece; //The currently being controlled piece
@@ -20,11 +21,13 @@ public class TetrisGame
     private Piece holdPiece;
     private bool holdUsed; //Can only hold a piece if has been placed since last time hold has been used
     public bool IsGameOver;
+    public int Score;
     
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
     public Texture2D squareTexture; //Used for drawing rectangles with a single color
     public Texture2D[] explosionTextures;
+    private SpriteFont font;
     
     //File locations
     private const string blockTextureFileName = "BaseBlock";
@@ -46,12 +49,14 @@ public class TetrisGame
         field = new Field(this);
         FillQueue();
         NextPiece();
+        Score = 0;
     }
 
     public void LoadContent(ContentManager content)
     {
         blockTexture = content.Load<Texture2D>(blockTextureFileName);
         squareTexture = content.Load<Texture2D>(squareTextureFileName);
+        font = content.Load<SpriteFont>("Font");
         explosionTextures = new Texture2D[17];
         for (int i = 0; i < 17; i++)
         {
@@ -95,6 +100,9 @@ public class TetrisGame
         {
             DrawPiece(holdPiece, spriteBatch, new Point(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize));
         }
+        
+        //Draw score
+        spriteBatch.DrawString(font, Score.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 6), Color.White);
     }
     
     public void DrawPiece(Piece piece, SpriteBatch spriteBatch, Point position)
@@ -230,5 +238,10 @@ public class TetrisGame
         field.SetBlock(lpos.X, lpos.Y + 3, Pieces.Ghost);
         field.SetBlock(lpos.X + 1, lpos.Y + 3, Pieces.Ghost);
         field.SetBlock(lpos.X + 2, lpos.Y + 3, Pieces.Ghost);
+    }
+
+    public void HandleScore(int rowsCleared)
+    {
+        Score += scoreRewarded[rowsCleared];
     }
 }
