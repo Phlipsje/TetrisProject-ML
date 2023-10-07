@@ -272,6 +272,18 @@
 /processorParam:TextureFormat=Compressed
 /build:Font.spritefont
 
+#begin sfx/explosion.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/explosion.mp3
+
+#begin sfx/LockPiece.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/LockPiece.wav
+
 #begin Square.png
 /importer:TextureImporter
 /processor:TextureProcessor

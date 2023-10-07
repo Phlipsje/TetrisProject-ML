@@ -114,6 +114,7 @@ public class FallingBlockAnimation : Animation
         {
             this.size = size;
             this.textures = textures;
+            SfxManager.Play(SfxManager.Explosion);
         }
 
         public override void Update(GameTime gameTime)

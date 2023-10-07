@@ -247,7 +247,7 @@ public abstract class Piece
                 }
             }
         }
-        
+        SfxManager.Play(SfxManager.LockPiece);
         fieldReference.FieldControlFlow(); //Pattern Phase
     }
 

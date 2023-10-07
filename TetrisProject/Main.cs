@@ -79,6 +79,7 @@ namespace TetrisProject
         {
             menu.LoadContent(Content);
             tetrisGame.LoadContent(Content);
+            SfxManager.Load(Content);
         }
 
         protected override void Update(GameTime gameTime)
@@ -101,6 +102,7 @@ namespace TetrisProject
             }
             
             AnimationManager.Update(gameTime);
+            SfxManager.Update();
             base.Update(gameTime);
         }
 
