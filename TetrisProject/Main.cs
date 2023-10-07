@@ -118,7 +118,7 @@ namespace TetrisProject
             
             if (gameState == GameState.Menu)
             {
-                menu.Draw();
+                menu.Draw(gameTime);
             }
             else
             {

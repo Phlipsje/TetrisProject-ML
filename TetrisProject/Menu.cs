@@ -19,6 +19,7 @@ public class Menu
     private Texture2D buttonMiddle;
     private Texture2D buttonEnd;
     private SpriteFont font;
+    private Texture2D tile;
     
     //Variables
     private MenuState menuState; //The currently active menu
@@ -40,6 +41,7 @@ public class Menu
         buttonMiddle = content.Load<Texture2D>("Button Middle");
         buttonEnd = content.Load<Texture2D>("Button End");
         font = content.Load<SpriteFont>("Font");
+        tile = content.Load<Texture2D>("square");
     }
 
     public void Instantiate()
@@ -55,8 +57,31 @@ public class Menu
         MenuMovement();
     }
 
-    public void Draw()
+    public void Draw(GameTime gameTime)
     {
+        //Background
+        int tileCountHorizontal = 10; //Amount of tiles in horizontal direction on screen at once
+        int tileSize = Main.WorldWidth / tileCountHorizontal;
+        int aspectRatio = Main.WorldWidth / Main.WorldHeight;
+        double timeFrame = gameTime.TotalGameTime.TotalSeconds % 2.5/2.5; //Used to make background move
+        //Draw tiles of background
+        for (int i = -1; i < tileCountHorizontal; i++)
+        {
+            for (int j = -1; j < tileCountHorizontal/aspectRatio + 1; j++)
+            {
+                //Decide color based on checkerboard pattern
+                Color tileColor = Color.ForestGreen;
+                if ((j * (tileCountHorizontal + 1) + i) % 2 == 0)
+                {
+                    tileColor = Color.DarkOliveGreen;
+                }
+                
+                //Draw tile
+                spriteBatch.Draw(tile, new Rectangle((int)((i + timeFrame)*tileSize), (int)((j + timeFrame)*tileSize), tileSize, tileSize), tileColor);
+            }
+        }
+        
+        //Buttons
         switch (menuState)
         {
             case MenuState.MainMenu:
