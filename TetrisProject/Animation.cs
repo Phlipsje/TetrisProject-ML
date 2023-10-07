@@ -91,14 +91,14 @@ public class FallingBlockAnimation : Animation
         position = position + velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
         velocity.Y += gravity * (float)gameTime.ElapsedGameTime.TotalSeconds;
         rotation += rotationSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-        if (position.Y > Main.WindowHeight)
+        if (position.Y > Main.WorldHeight)
             CanBeDestroyed = true;
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        Rectangle drawRect = new Rectangle(Util.GetFullscreenSafePosition(position, tetrisGame).ToPoint(), 
-            Util.GetFullscreenSafePosition(size, tetrisGame).ToPoint());
+        Rectangle drawRect = new Rectangle(position.ToPoint(), 
+            size.ToPoint());
         spriteBatch.Draw(texture, drawRect, null, color, rotation, size / 2, SpriteEffects.None, 0);
     }
 
@@ -130,8 +130,8 @@ public class FallingBlockAnimation : Animation
                 CanBeDestroyed = true;
                 return;
             }
-            Rectangle drawRect = new Rectangle(Util.GetFullscreenSafePosition(position, tetrisGame).ToPoint(), 
-                Util.GetFullscreenSafePosition(size, tetrisGame).ToPoint());
+            Rectangle drawRect = new Rectangle(position.ToPoint(), 
+                size.ToPoint());
             spriteBatch.Draw(textures[frameToDraw], drawRect, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
 }

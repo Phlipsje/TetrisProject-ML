@@ -24,10 +24,7 @@ public class Field //The field in which the pieces can be placed
     public int fieldX; //X value of top left of field
     public int fieldY; //Y value of top left of field
     // These are needed for the animations, as they already calculate their actual position (also in fullscreen)
-    private readonly int defaultFieldX;
-    private readonly int defaultFieldY;
-    private readonly int defaultBlockSize;
-    
+
     private bool drawGrid;
 
     public byte Width
@@ -53,11 +50,13 @@ public class Field //The field in which the pieces can be placed
         }
         
         //Visual setup
-        SetFieldPixelSizeByWindowHeight(80);
         drawGrid = false; //Adjust in settings later
-        defaultFieldX = (tetrisGame.WindowSize.X - fieldPixelWidth) / 2;
-        defaultFieldY = (tetrisGame.WindowSize.Y - fieldPixelHeight) / 2;
-        defaultBlockSize = (int)Math.Round((double)fieldPixelHeight / Height);
+        blockSize = 32;
+        fieldPixelWidth = width * blockSize;
+        fieldPixelHeight = height * blockSize;
+        fieldX = (Main.WorldWidth-fieldPixelWidth)/2;
+        fieldY = (Main.WorldHeight-fieldPixelHeight)/2;
+        
     }
 
     //All the methods that are called when a piece is locked into place (in the form of a flowchart check list)
@@ -104,25 +103,16 @@ public class Field //The field in which the pieces can be placed
         {
             for (int x = 0; x < width; x++)
             {
-                Vector2 blockPosition = new Vector2(defaultFieldX + defaultBlockSize * x,
-                    defaultFieldY + defaultBlockSize * (y - height));
+                Vector2 blockPosition = new Vector2(fieldX + blockSize * x,
+                    fieldY + blockSize * (y - height));
                 AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, tetrisGame, new Vector2(rng.Next(-200, 200), -800), 
                     tetrisGame.blockTexture, rng.Next(-4, 4), color: GetColor(GetBlock(x, y - height)),
-                    size: new Vector2(defaultBlockSize, defaultBlockSize)), 0);
+                    size: new Vector2(blockSize, blockSize)), 0);
             }
 
         }
     }
-    
-    private void SetFieldPixelSizeByWindowHeight(int percentage)
-    {
-        fieldPixelHeight = (int)Math.Round(tetrisGame.WindowSize.Y * (percentage / 100.0));
-        fieldPixelWidth = (int)Math.Round((double)fieldPixelHeight / height * width);
-        blockSize = (int)Math.Round((double)fieldPixelHeight / Height);
-        fieldX = (tetrisGame.WindowSize.X - fieldPixelWidth) / 2;
-        fieldY = (tetrisGame.WindowSize.Y - fieldPixelHeight) / 2;
-    }
-    
+
     //Handles clearing multiple lines at once
     public void ClearLines(byte[] lines)
     {
@@ -149,13 +139,11 @@ public class Field //The field in which the pieces can be placed
         blockArray[0] = new Pieces[width];
         for (int j = 0; j < width; j++)
             blockArray[0][j] = Pieces.None;
-
     }
 
     private static Color GetColor(Pieces piece)
     {
         //Get block color
-        Color blockColor;
         switch (piece)
         {
             case Pieces.None:
@@ -186,7 +174,6 @@ public class Field //The field in which the pieces can be placed
     {
         //Draw field
         
-        SetFieldPixelSizeByWindowHeight(80);
         spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, fieldPixelHeight), Color.LightGray * 0.5f); //Temp values
         //Draw blocks
         //For loops for getting blocks in sequence
@@ -288,19 +275,19 @@ public class Field //The field in which the pieces can be placed
     public void PlayGameOverAnimation()
     {
         Random rng = new Random();
-        AnimationManager.PlayAnimation(new ExplosionAnimation(new Vector2(defaultFieldX, defaultFieldY), tetrisGame, 
-            new Vector2(defaultBlockSize * Width, defaultBlockSize * Height), tetrisGame.explosionTextures));
+        AnimationManager.PlayAnimation(new ExplosionAnimation(new Vector2(fieldX, fieldY), tetrisGame, 
+            new Vector2(blockSize * Width, blockSize * Height), tetrisGame.explosionTextures));
         for (int y = -Height;  y < Height; y++)
         {
             for (int x = 0; x < Width; x++)
             {
                 if (GetBlock(x, y) != Pieces.None)
                 {
-                    Vector2 blockPosition = new Vector2(defaultFieldX + defaultBlockSize * x,
-                        defaultFieldY + defaultBlockSize * y);
+                    Vector2 blockPosition = new Vector2(fieldX + blockSize * x,
+                        fieldY + blockSize * y);
                     AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, tetrisGame, new Vector2(rng.Next(-200, 200), -800), 
                         tetrisGame.blockTexture, rng.Next(-4, 4), color: GetColor(GetBlock(x, y)),
-                        size: new Vector2(defaultBlockSize, defaultBlockSize)), 0);
+                        size: new Vector2(blockSize, blockSize)), 0);
                 }
             }
         }

@@ -58,16 +58,4 @@ public static class Util
 
         return array;
     }
-
-    public static Point GetPixelPositionFromPercentage(Vector2 position, TetrisGame tetrisGame)
-    {
-        return new Point((int)MathF.Round(position.X * tetrisGame.WindowSize.X / 100), 
-            (int)MathF.Round(position.X * tetrisGame.WindowSize.X / 100));
-    }
-
-    public static Vector2 GetFullscreenSafePosition(Vector2 vector, TetrisGame tetrisGame)
-    {
-        return new Vector2(vector.X * tetrisGame.WindowSize.X / Main.WindowWidth,
-            vector.Y * tetrisGame.WindowSize.Y / Main.WindowHeight);
-    }
 }

@@ -87,16 +87,16 @@ public class TetrisGame
         }
 
         //Draw next pieces
-        Point nextPieceTopLeft = new Point(field.fieldX + field.fieldPixelWidth + 20, field.fieldY + 30);
+        Point nextPieceTopLeft = new Point(field.fieldX + field.fieldPixelWidth + 20, field.fieldY + 60);
         for (int i = 0; i < 5; i++)
         {
-            DrawPiece(GetNextPiece(pieceQueue[i]), spriteBatch, nextPieceTopLeft + new Point(0, i*50));
+            DrawPiece(GetNextPiece(pieceQueue[i]), spriteBatch, nextPieceTopLeft + new Point(0, i*100));
         }
 
         //Draw hold piece
         if (holdPiece != null)
         {
-            DrawPiece(holdPiece, spriteBatch, new Point(field.fieldX-80,field.fieldY+30));
+            DrawPiece(holdPiece, spriteBatch, new Point(field.fieldX-140,field.fieldY+30));
         }
     }
     
