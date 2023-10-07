@@ -51,7 +51,7 @@ public class Field //The field in which the pieces can be placed
         
         //Visual setup
         drawGrid = false; //Adjust in settings later
-        blockSize = 32;
+        blockSize = 40;
         fieldPixelWidth = width * blockSize;
         fieldPixelHeight = height * blockSize;
         fieldX = (Main.WorldWidth-fieldPixelWidth)/2;
