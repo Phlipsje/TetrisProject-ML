@@ -16,6 +16,7 @@ public class Field //The field in which the pieces can be placed
     private const byte width = 10;
     private const byte height = 20;
     private Pieces[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
+    public int level; //Passing through from TetrisGame
     
     //Visual variables
     public int blockSize; //How large a block is 
@@ -56,7 +57,7 @@ public class Field //The field in which the pieces can be placed
         fieldPixelHeight = height * blockSize;
         fieldX = (Main.WorldWidth-fieldPixelWidth)/2;
         fieldY = (Main.WorldHeight-fieldPixelHeight)/2;
-        
+        level = tetrisGameReference.level;
     }
 
     //All the methods that are called when a piece is locked into place (in the form of a flowchart check list)

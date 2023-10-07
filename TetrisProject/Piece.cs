@@ -22,7 +22,6 @@ public abstract class Piece
     private double autoRepeatStartTimer;
     private double autoRepeatDelay; //The wait time between the piece moving one grid cell while holding down left/right
     private double autoRepeatTimer;
-    private double nextDropMaxTime; //The time it takes until a piece moves down one line
     private double dropTimer; //The timer counting down checked by nextDropTime
     private double lockDownMaxTime; //The time before a piece is locked into place
     private double lockDownTimer;
@@ -36,6 +35,7 @@ public abstract class Piece
     private int highestHeight; //Check to see if remainingMovementCounter needs to be reset (when reaching new highest height (higher is lower on field))
     private Point previousPosition; //Checks if position of piece changed to decide if timer should actually be reset
     private bool firstFrame = true;
+    private double[] dropTimes = new []{1, 0.793, 0.618, 0.473, 0.355, 0.262, 0.190, 0.135, 0.094, 0.064, 0.043, 0.028, 0.018, 0.011, 0.007 };
     
     private Field fieldReference;
     
@@ -69,11 +69,6 @@ public abstract class Piece
         {new Point(2, 0), new Point(-2, 0), new Point(1, -2), new Point(-2, 1) }
     };
     #endregion
-
-    public double NextDropMaxTime
-    {
-        get => nextDropMaxTime;
-    }
 
     public byte RotationIndex
     {
@@ -110,17 +105,15 @@ public abstract class Piece
         position = new Point(3, 0);
         hitboxes = new bool[4][,];
         rotationIndex = 0;
-        nextDropMaxTime = 0.5;
         lockDownMaxTime = 0.5;
         autoRepeatDelay = 0.5/fieldReference.Width;
         autoRepeatStartDelay = 0.25;
         maxMovementCounter = 15;
         remainingMovementCounter = maxMovementCounter;
-        dropTimer = nextDropMaxTime;
+        dropTimer = dropTimes[this.fieldReference.level-1];
         highestHeight = position.Y;
         
-        softDropMaxTime = NextDropMaxTime / 20;
-        
+        softDropMaxTime = dropTimer / 20;
     }
 
     public void Update(GameTime gameTime)
@@ -161,7 +154,8 @@ public abstract class Piece
         //Lock Phase (That half a second before piece is fully in place)
         if (dropTimer <= 0 && !softDropped) //Piece drops down 1 line
         {
-            dropTimer = nextDropMaxTime;
+            dropTimer = dropTimes[fieldReference.level-1];
+            softDropMaxTime = dropTimer / 20;
             MoveDown();
         }
         

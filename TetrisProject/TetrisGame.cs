@@ -22,6 +22,9 @@ public class TetrisGame
     private bool holdUsed; //Can only hold a piece if has been placed since last time hold has been used
     public bool IsGameOver;
     public int Score;
+    public int level = 1;
+    public const int maxLevel = 15;
+    public int clearedLines;
     
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -44,12 +47,14 @@ public class TetrisGame
     {
         this.main = main;
     }
-    public void Instantiate()
+    public void Instantiate(int level)
     {
+        this.level = level;
         field = new Field(this);
         FillQueue();
         NextPiece();
         Score = 0;
+        clearedLines = 0;
     }
 
     public void LoadContent(ContentManager content)
@@ -103,6 +108,9 @@ public class TetrisGame
         
         //Draw score
         spriteBatch.DrawString(font, Score.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 6), Color.White);
+        
+        //Draw level
+        spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 8), Color.White);
     }
     
     public void DrawPiece(Piece piece, SpriteBatch spriteBatch, Point position)
@@ -242,6 +250,17 @@ public class TetrisGame
 
     public void HandleScore(int rowsCleared)
     {
+        //Update score
         Score += scoreRewarded[rowsCleared];
+        
+        //Update level
+        clearedLines += rowsCleared;
+        level = 1 + clearedLines / 10;
+        if (level > maxLevel)
+        {
+            level = maxLevel;
+        }
+
+        field.level = level;
     }
 }

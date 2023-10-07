@@ -39,7 +39,7 @@ namespace TetrisProject
             gameState = GameState.Playing; //Change this to decide how the game starts
             
             menu.Instantiate();
-            tetrisGame.Instantiate();
+            tetrisGame.Instantiate(1);
 
             base.Initialize();
         }
