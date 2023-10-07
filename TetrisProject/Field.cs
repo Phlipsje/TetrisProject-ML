@@ -272,6 +272,11 @@ public class Field //The field in which the pieces can be placed
         tetrisGame.HoldPiece(piece);
     }
 
+    public void GameOver()
+    {
+        tetrisGame.GameOver();
+    }
+
     public void PlayGameOverAnimation()
     {
         Random rng = new Random();

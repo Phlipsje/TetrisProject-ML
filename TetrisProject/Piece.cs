@@ -35,6 +35,7 @@ public abstract class Piece
     private int remainingMovementCounter; //Counts the amount of actions you can perform to extend the timer of the lock down phase
     private int highestHeight; //Check to see if remainingMovementCounter needs to be reset (when reaching new highest height (higher is lower on field))
     private Point previousPosition; //Checks if position of piece changed to decide if timer should actually be reset
+    private bool firstFrame = true;
     
     private Field fieldReference;
     
@@ -119,11 +120,15 @@ public abstract class Piece
         highestHeight = position.Y;
         
         softDropMaxTime = NextDropMaxTime / 20;
+        
     }
 
     public void Update(GameTime gameTime)
     {
         double deltaTime = gameTime.ElapsedGameTime.TotalSeconds;
+        if (firstFrame && fieldReference.CollidesVertical(Hitbox, position))
+            fieldReference.GameOver(); // if block spawn in an occupied space, game over
+        firstFrame = false;
         
         //All the piece logic
         PieceControlFlow();
@@ -237,6 +242,8 @@ public abstract class Piece
                 if (Hitbox[x, y])
                 {
                     fieldReference.SetBlock(position.X + x,position.Y - y - 1,pieceType);
+                    if (position.Y - y - 1 < 0)
+                        fieldReference.GameOver(); // if block is locked down above skyline the game is over
                 }
             }
         }

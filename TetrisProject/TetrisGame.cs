@@ -71,9 +71,6 @@ public class TetrisGame
         {
             activePiece.Update(gameTime);
         }
-
-        if (Util.GetKeyPressed(Keys.G))
-            GameOver();
     }
     
     public void Draw(SpriteBatch spriteBatch)
