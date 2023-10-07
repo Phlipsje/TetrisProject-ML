@@ -25,7 +25,7 @@
 /processorParam:TextureFormat=Color
 /build:BaseBlock.png
 
-#begin Big Button Begin.png
+#begin Button Begin.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -35,9 +35,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Big Button Begin.png
+/build:Button Begin.png
 
-#begin Big Button End.png
+#begin Button End.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -47,9 +47,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Big Button End.png
+/build:Button End.png
 
-#begin Big Button Middle.png
+#begin Button Middle.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -59,7 +59,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Big Button Middle.png
+/build:Button Middle.png
 
 #begin eEffect/explosion0.png
 /importer:TextureImporter

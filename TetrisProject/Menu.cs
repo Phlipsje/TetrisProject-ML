@@ -36,9 +36,9 @@ public class Menu
     
     public void LoadContent(ContentManager content)
     {
-        buttonBegin = content.Load<Texture2D>("Big Button Begin");
-        buttonMiddle = content.Load<Texture2D>("Big Button Middle");
-        buttonEnd = content.Load<Texture2D>("Big Button End");
+        buttonBegin = content.Load<Texture2D>("Button Begin");
+        buttonMiddle = content.Load<Texture2D>("Button Middle");
+        buttonEnd = content.Load<Texture2D>("Button End");
         font = content.Load<SpriteFont>("Font");
     }
 
@@ -47,7 +47,7 @@ public class Menu
         menuState = MenuState.MainMenu;
         menuIndex = 0;
         topLeftTopButtonPosition = new Vector2(50, 50);
-        buttonVerticalOffset = new Vector2(0, 30);
+        buttonVerticalOffset = new Vector2(0, 90);
     }
     
     public void Update(GameTime gameTime)
@@ -60,8 +60,9 @@ public class Menu
         switch (menuState)
         {
             case MenuState.MainMenu:
-                DrawButton("Test", 0);
-                DrawButton("Extended test", 1);
+                DrawButton("Test", 0, null);
+                DrawButton("Extended test", 1, null);
+                DrawButton("this doesn't fuck it up", 1, "Extended test");
                 break;
         }
     }
@@ -76,17 +77,17 @@ public class Menu
             }
             else //Loop around
             {
-                menuIndex = (byte)GetMenuLength();
+                menuIndex = (byte)(GetMenuLength() - 1);
             }
         }
         
         if (Util.GetKeyPressed(Keys.Down))
         {
-            menuIndex--;
+            menuIndex++;
             
             if (menuIndex == GetMenuLength()) //Loop around
             {
-                menuIndex = (byte)GetMenuLength();
+                menuIndex = 0;
             }
         }
     }
@@ -102,60 +103,6 @@ public class Menu
         }
     }
 
-    //Gets the width of a letter, used to determine width of buttons at runtime
-    private int GetLetterWidth(char letter)
-    {
-        //TODO add other symbols
-        //Default size is 3 pixels wide, switch statement contains all exceptions
-        switch (letter.ToString().ToLower())
-        {
-            case "a":
-                return 4;
-            case "b":
-                return 4;
-            case "d":
-                return 4;
-            case "g":
-                return 4;
-            case "h":
-                return 4;
-            case "m":
-                return 5;
-            case "n":
-                return 4;
-            case "o":
-                return 4;
-            case "p":
-                return 4;
-            case "q":
-                return 4;
-            case "r":
-                return 4;
-            case "s":
-                return 4;
-            case "t":
-                return 5;
-            case "v":
-                return 5;
-            case "w":
-                return 5;
-        }
-
-        return 3;
-    }
-
-    private int GetStringWidth(string text)
-    {
-        int count = 0;
-        
-        for (int i = 0; i < text.Length; i++)
-        {
-            count += GetLetterWidth(text[i]) + 1; //Add 1 for spacing
-        }
-
-        return count;
-    }
-
     private Color GetButtonColor(int index)
     {
         if (menuIndex == index)
@@ -166,13 +113,35 @@ public class Menu
         return Color.White;
     }
 
-    private void DrawButton(string text, int index)
+    //Gets the length of a button based on what text it holds
+    private int GetButtonLength(string text)
     {
-        int buttonMiddleWidth = GetStringWidth(text);
-        spriteBatch.Draw(buttonBegin, topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
-        spriteBatch.Draw(buttonMiddle, new Vector2(26,0) + topLeftTopButtonPosition + buttonVerticalOffset * index, null, GetButtonColor(index), 0f, Vector2.Zero, new Vector2(buttonMiddleWidth, 1), SpriteEffects.None, 0f);
-        spriteBatch.Draw(buttonEnd, new Vector2(26 + buttonMiddleWidth*2,0) + topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
-        spriteBatch.DrawString(font, text, new Vector2(26,13) + topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
+        //Assumes buttons are 80 pixels tall (and begin and end are also 80 pixels wide)
+        if (text == null)
+        {
+            return 160;
+        }
+        
+        return 160 + (int)font.MeasureString(text).X;
+    }
+
+    //Draw a button with a dynamic length and spacing
+    private void DrawButton(string text, int index, string previousString)
+    {
+        //Get button spacing
+        int horizontalOffset = GetButtonLength(previousString);
+        
+        //Extra spacing so buttons aren't glued together
+        if (horizontalOffset != 160)
+        {
+            horizontalOffset += 100;
+        }
+
+        //Creates a button with a dynamic length based on the length of the string
+        spriteBatch.Draw(buttonBegin, new Vector2(horizontalOffset, 0) + topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
+        spriteBatch.Draw(buttonMiddle, new Vector2(horizontalOffset + 80,0) + topLeftTopButtonPosition + buttonVerticalOffset * index, null, GetButtonColor(index), 0f, Vector2.Zero, new Vector2(font.MeasureString(text).X, 1), SpriteEffects.None, 0f);
+        spriteBatch.Draw(buttonEnd, new Vector2( horizontalOffset + 80 + font.MeasureString(text).X,0) + topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
+        spriteBatch.DrawString(font, text, new Vector2(horizontalOffset + 80,40) + topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
     }
 }
 
