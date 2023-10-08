@@ -41,7 +41,7 @@ public class Menu
         buttonMiddle = content.Load<Texture2D>("Button Middle");
         buttonEnd = content.Load<Texture2D>("Button End");
         font = content.Load<SpriteFont>("Font");
-        tile = content.Load<Texture2D>("square");
+        tile = content.Load<Texture2D>("Square");
     }
 
     public void Instantiate()

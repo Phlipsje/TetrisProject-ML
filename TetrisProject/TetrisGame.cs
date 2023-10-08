@@ -251,15 +251,12 @@ public class TetrisGame
     public void HandleScore(int rowsCleared)
     {
         //Update score
-        Score += scoreRewarded[rowsCleared];
+        Score += level * scoreRewarded[rowsCleared];
         
         //Update level
         clearedLines += rowsCleared;
         level = 1 + clearedLines / 10;
-        if (level > maxLevel)
-        {
-            level = maxLevel;
-        }
+        level = MathHelper.Min(level, maxLevel);
 
         field.level = level;
     }
