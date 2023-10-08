@@ -1,8 +1,10 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 
 namespace TetrisProject
 {
@@ -18,12 +20,16 @@ namespace TetrisProject
         public const int WorldWidth = 1920;
         public const int WorldHeight = 1080;
         public GameState gameState;
+        public int[] masterVolume = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+        public byte masterVolumeIndex;
+        public int[] soundEffectVolume = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+        public byte soundEffectVolumeIndex;
 
         public Main()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
         }
 
         protected override void Initialize()
@@ -37,8 +43,11 @@ namespace TetrisProject
             tetrisGame = new TetrisGame(this);
 
             gameState = GameState.Menu; //Change this to decide how the game starts
+
+            masterVolumeIndex = (byte)(masterVolume.Length-1);
+            soundEffectVolumeIndex = (byte)(soundEffectVolume.Length-1);
+            UpdateVolume();
             
-            menu.Instantiate();
             tetrisGame.Instantiate(1);
 
             base.Initialize();
@@ -89,7 +98,15 @@ namespace TetrisProject
                 switch (gameState)
                 {
                     case GameState.Menu:
-                        Exit();
+                        switch (menu.menuState)
+                        {
+                            case MenuState.MainMenu:
+                                Exit();
+                                break;
+                            case MenuState.Settings:
+                                menu.GoToMenu(MenuState.MainMenu);
+                                break;
+                        }
                         break;
                     case GameState.Playing:
                         gameState = GameState.Menu;
@@ -157,6 +174,11 @@ namespace TetrisProject
             spriteBatch.End();
             
             base.Draw(gameTime);
+        }
+        
+        public void UpdateVolume()
+        {
+            SoundEffect.MasterVolume = (float)masterVolume[masterVolumeIndex]/100 * soundEffectVolume[soundEffectVolumeIndex]/100;
         }
     }
 }

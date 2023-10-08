@@ -24,7 +24,7 @@ public class TetrisGame
     public int level = 1;
     public const int maxLevel = 15;
     public int clearedLines;
-    private const double lineClearTextTimeMax = 1;
+    private const double lineClearTextTimeMax = 1.4f;
     private double lineClearTextTime; //Amount of time a line clear text is shown on screen
     private string lineClearType = "";  //What type of line clear to show on screen
     private bool backToBack; //Check if a backToBack sequence is active

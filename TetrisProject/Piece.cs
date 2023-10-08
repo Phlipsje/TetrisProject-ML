@@ -208,6 +208,18 @@ public abstract class Piece
             Rotate();
             ResetLockDownTimer();
         }
+        
+        if (Util.GetKeyPressed(Keys.A))
+        {
+            RotateCounterClockWise();
+            ResetLockDownTimer();
+        }
+        
+        if (Util.GetKeyPressed(Keys.D))
+        {
+            RotateClockWise();
+            ResetLockDownTimer();
+        }
 
         if ((Util.GetKeyLetGo(Keys.Left) && !Util.GetKeyHeld(Keys.Right)) || (Util.GetKeyLetGo(Keys.Right) && !Util.GetKeyHeld(Keys.Left)))
         {
@@ -360,7 +372,7 @@ public abstract class Piece
     }
 
     //Default rotation (clockwise)
-    public void Rotate()
+    private void Rotate()
     {
         RotateClockWise();
     }

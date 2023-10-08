@@ -33,6 +33,10 @@ public class Menu
     {
         this.main = main;
         this.spriteBatch = spriteBatch;
+        menuState = MenuState.MainMenu;
+        menuIndex = 0;
+        topLeftTopButtonPosition = new Vector2(50, 50);
+        buttonVerticalOffset = new Vector2(0, 90);
     }
     
     public void LoadContent(ContentManager content)
@@ -44,14 +48,6 @@ public class Menu
         tile = content.Load<Texture2D>("Square");
     }
 
-    public void Instantiate()
-    {
-        menuState = MenuState.MainMenu;
-        menuIndex = 0;
-        topLeftTopButtonPosition = new Vector2(50, 50);
-        buttonVerticalOffset = new Vector2(0, 90);
-    }
-    
     public void Update(GameTime gameTime)
     {
         MenuMovement();
@@ -85,8 +81,16 @@ public class Menu
         switch (menuState)
         {
             case MenuState.MainMenu:
-                DrawButton("Play", 0, null);
-                DrawButton("Quit", 1, null);
+                DrawButton("Play", 0);
+                DrawButton("Settings", 1);
+                DrawButton("Quit", 2);
+                break;
+            case MenuState.Settings:
+                DrawButton("Master Volume", 0);
+                DrawButton($"{main.masterVolume[main.masterVolumeIndex]}%", 0, "Master Volume");
+                DrawButton("Sfx Volume", 1);
+                DrawButton($"{main.soundEffectVolume[main.soundEffectVolumeIndex]}%", 1, "Sfx Volume");
+                DrawButton("Back", 2);
                 break;
         }
     }
@@ -143,8 +147,30 @@ public class Menu
                     case (byte)MainMenu.Play:
                         if (inputType == InputType.Select) main.gameState = GameState.Playing;
                         break;
+                    case (byte)MainMenu.Settings:
+                        if (inputType == InputType.Select) GoToMenu(MenuState.Settings);
+                        break;
                     case (byte)MainMenu.Quit:
                         if (inputType == InputType.Select) main.Exit();
+                        break;
+                }
+                break;
+            
+            case MenuState.Settings:
+                switch (menuIndex)
+                {
+                    case (byte)Settings.MasterVolume:
+                        if (inputType == InputType.Select) {main.masterVolumeIndex = ToggleNext(main.masterVolume, main.masterVolumeIndex); main.UpdateVolume();}
+                        if (inputType == InputType.MoveRight) {main.masterVolumeIndex = ToggleNext(main.masterVolume, main.masterVolumeIndex); main.UpdateVolume();}
+                        if (inputType == InputType.MoveLeft) {main.masterVolumeIndex = TogglePrevious(main.masterVolume, main.masterVolumeIndex); main.UpdateVolume();}
+                        break;
+                    case (byte)Settings.SfxVolume:
+                        if (inputType == InputType.Select) {main.soundEffectVolumeIndex = ToggleNext(main.soundEffectVolume, main.soundEffectVolumeIndex); main.UpdateVolume();}
+                        if (inputType == InputType.MoveRight) {main.soundEffectVolumeIndex = ToggleNext(main.soundEffectVolume, main.soundEffectVolumeIndex); main.UpdateVolume();}
+                        if (inputType == InputType.MoveLeft) {main.soundEffectVolumeIndex = TogglePrevious(main.soundEffectVolume, main.soundEffectVolumeIndex); main.UpdateVolume();}
+                        break;
+                    case (byte)Settings.Back:
+                        if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
                         break;
                 }
                 break;
@@ -153,6 +179,32 @@ public class Menu
     #endregion
     
     #region Extra functions
+
+    public void GoToMenu(MenuState state)
+    {
+        menuState = state;
+        menuIndex = 0;
+    }
+    private byte ToggleNext(int[] array, byte index)
+    {
+        if (index == array.Length - 1)
+        {
+            return 0;
+        }
+
+        return (byte)(index + 1);
+    }
+    
+    private byte TogglePrevious(int[] array, byte index)
+    {
+        if (index == 0)
+        {
+            return (byte)(array.Length - 1);
+        }
+
+        return (byte)(index - 1);
+    }
+
     private int GetMenuLength()
     {
         switch (menuState)
@@ -187,7 +239,7 @@ public class Menu
     }
 
     //Draw a button with a dynamic length and spacing
-    private void DrawButton(string text, int index, string previousString)
+    private void DrawButton(string text, int index, string previousString = null)
     {
         //Get button spacing
         int horizontalOffset = GetButtonLength(previousString);
@@ -218,10 +270,19 @@ public class Menu
 public enum MenuState
 {
     MainMenu,
+    Settings,
 }
 
 public enum MainMenu
 {
     Play,
+    Settings,
     Quit,
+}
+
+public enum Settings
+{
+    MasterVolume,
+    SfxVolume,
+    Back,
 }
