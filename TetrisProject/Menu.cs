@@ -22,8 +22,8 @@ public class Menu
     private Texture2D tile;
     
     //Variables
-    private MenuState menuState; //The currently active menu
-    private byte menuIndex; //What is selected in the menu
+    public MenuState menuState; //The currently active menu
+    public byte menuIndex; //What is selected in the menu
     
     //Visual variables
     private Vector2 topLeftTopButtonPosition;
@@ -85,9 +85,8 @@ public class Menu
         switch (menuState)
         {
             case MenuState.MainMenu:
-                DrawButton("Test", 0, null);
-                DrawButton("Extended test", 1, null);
-                DrawButton("this doesn't fuck it up", 1, "Extended test");
+                DrawButton("Play", 0, null);
+                DrawButton("Quit", 1, null);
                 break;
         }
     }
@@ -115,8 +114,45 @@ public class Menu
                 menuIndex = 0;
             }
         }
+
+        if (Util.GetKeyPressed(Keys.Enter))
+        {
+            MenuFunction(InputType.Select);
+        }
+        
+        if (Util.GetKeyPressed(Keys.Left))
+        {
+            MenuFunction(InputType.MoveLeft);
+        }
+        
+        if (Util.GetKeyPressed(Keys.Right))
+        {
+            MenuFunction(InputType.MoveRight);
+        }
     }
 
+    #region Menu functions
+
+    private void MenuFunction(InputType inputType)
+    {
+        switch (menuState)
+        {
+            case MenuState.MainMenu:
+                switch (menuIndex)
+                {
+                    case (byte)MainMenu.Play:
+                        if (inputType == InputType.Select) main.gameState = GameState.Playing;
+                        break;
+                    case (byte)MainMenu.Quit:
+                        if (inputType == InputType.Select) main.Exit();
+                        break;
+                }
+                break;
+        }
+    }
+    #endregion
+    
+    #region Extra functions
     private int GetMenuLength()
     {
         switch (menuState)
@@ -168,6 +204,15 @@ public class Menu
         spriteBatch.Draw(buttonEnd, new Vector2( horizontalOffset + 80 + font.MeasureString(text).X,0) + topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
         spriteBatch.DrawString(font, text, new Vector2(horizontalOffset + 80,40) + topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
     }
+    #endregion
+    
+    //What type of input is done on a button
+    private enum InputType
+    {
+        Select,
+        MoveLeft,
+        MoveRight,
+    }
 }
 
 public enum MenuState
@@ -177,6 +222,6 @@ public enum MenuState
 
 public enum MainMenu
 {
-    Start,
+    Play,
     Quit,
 }

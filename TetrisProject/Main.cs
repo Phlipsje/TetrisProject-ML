@@ -17,7 +17,7 @@ namespace TetrisProject
         public int WindowHeight = 450;
         public const int WorldWidth = 1920;
         public const int WorldHeight = 1080;
-        private GameState gameState;
+        public GameState gameState;
 
         public Main()
         {
@@ -36,7 +36,7 @@ namespace TetrisProject
             menu = new Menu(this, spriteBatch);
             tetrisGame = new TetrisGame(this);
 
-            gameState = GameState.Playing; //Change this to decide how the game starts
+            gameState = GameState.Menu; //Change this to decide how the game starts
             
             menu.Instantiate();
             tetrisGame.Instantiate(1);
@@ -84,8 +84,24 @@ namespace TetrisProject
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            if (Util.GetKeyPressed(Keys.Escape))
+            {
+                switch (gameState)
+                {
+                    case GameState.Menu:
+                        Exit();
+                        break;
+                    case GameState.Playing:
+                        gameState = GameState.Menu;
+                        menu.menuState = MenuState.MainMenu;
+                        menu.menuIndex = 0;
+                        break;
+                    default:
+                        Exit();
+                        break;
+                }
+            }
+                
 
             if (Util.GetKeyPressed(Keys.F11))
                 ToggleFullScreen();
