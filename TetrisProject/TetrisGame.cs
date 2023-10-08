@@ -204,7 +204,6 @@ public class TetrisGame
 
     private void NextPiece()
     {
-        //TODO place the active piece in the correct orientation and position, do this in Piece.cs Constructor
         activePiece = GetNextPiece(pieceQueue[0]);
         pieceQueue.RemoveAt(0);
 
@@ -264,9 +263,6 @@ public class TetrisGame
 
     public void HandleScore(int rowsCleared)
     {
-        //Update score
-        //Score += level * scoreRewarded[rowsCleared];
-        
         //Update time to show clear text on screen
         lineClearTextTime = lineClearTextTimeMax;
         
@@ -294,11 +290,13 @@ public class TetrisGame
                 {
                     Score += 100 * level;
                     lineClearType = "Mini-T-Spin";
+                    clearedLines += (int)(1 * multiplier);
                 }
                 if (field.tSpin)
                 {
                     Score += 400 * level;
                     lineClearType = "T-Spin";
+                    clearedLines += (int)(4 * multiplier);
                 }
                 
                 break;
@@ -308,18 +306,21 @@ public class TetrisGame
                 {
                     Score += (int)(100 * level * multiplier);
                     lineClearType += "Single";
+                    clearedLines += (int)(1 * multiplier);
                 }
                 
                 if (field.miniTSpin)
                 {
                     Score += (int)(200 * level * multiplier);
                     lineClearType += "Mini-T-Spin Single";
+                    clearedLines += (int)(2 * multiplier);
                 }
                 
                 if (field.tSpin)
                 {
                     Score += 800 * level;
                     lineClearType += "T-Spin Single";
+                    clearedLines += (int)(8 * multiplier);
                 }
                 
                 backToBack = true;
@@ -331,11 +332,13 @@ public class TetrisGame
                 {
                     Score += (int)(300 * level * multiplier);
                     lineClearType += "Double";
+                    clearedLines += (int)(3 * multiplier);
                 }
                 else
                 {
                     Score += (int)(1200 * level * multiplier);
                     lineClearType += "T-Spin Double";
+                    clearedLines += (int)(12 * multiplier);
                 }
                 
                 backToBack = true;
@@ -347,11 +350,13 @@ public class TetrisGame
                 {
                     Score += (int)(500 * level * multiplier);
                     lineClearType += "Triple";
+                    clearedLines += (int)(5 * multiplier);
                 }
                 else
                 {
                     Score += (int)(1600 * level * multiplier);
                     lineClearType += "T-Spin Double";
+                    clearedLines += (int)(16 * multiplier);
                 }
                 
                 backToBack = true;
@@ -361,6 +366,7 @@ public class TetrisGame
             case 4:
                 Score += (int)(800 * level * multiplier);
                 lineClearType += "Tetris";
+                clearedLines += (int)(8 * multiplier);
                 
                 backToBack = true;
                 multiplier = 1.5f;
@@ -369,8 +375,29 @@ public class TetrisGame
         #endregion
         
         //Update level
-        clearedLines += rowsCleared;
-        level = 1 + clearedLines / 10;
-        level = MathHelper.Min(level, maxLevel);
+        level = CalculateLevel();
+    }
+
+    private int CalculateLevel()
+    {
+        if (clearedLines >= 600) //Over max level
+        {
+            return 15;
+        }
+        int clearedLinesRemaining = clearedLines;
+
+        for (int i = 1; i < 15; i++)
+        {
+            if (clearedLinesRemaining >= i * 5)
+            {
+                clearedLinesRemaining -= i * 5;
+            }
+            else
+            {
+                return i;
+            }
+        }
+
+        return 0;
     }
 }
