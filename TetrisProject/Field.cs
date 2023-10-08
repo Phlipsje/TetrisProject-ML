@@ -16,7 +16,8 @@ public class Field //The field in which the pieces can be placed
     private const byte width = 10;
     private const byte height = 20;
     private Pieces[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
-    public int level; //Passing through from TetrisGame
+    public bool miniTSpin; //Check if a mini-t-spin has been made
+    public bool tSpin; //Check if a t-spin has been made
     
     //Visual variables
     public int blockSize; //How large a block is 
@@ -57,7 +58,6 @@ public class Field //The field in which the pieces can be placed
         fieldPixelHeight = height * blockSize;
         fieldX = (Main.WorldWidth-fieldPixelWidth)/2;
         fieldY = (Main.WorldHeight-fieldPixelHeight)/2;
-        level = tetrisGameReference.level;
     }
 
     //All the methods that are called when a piece is locked into place (in the form of a flowchart check list)
@@ -82,6 +82,10 @@ public class Field //The field in which the pieces can be placed
         
         // Generation Phase
         tetrisGame.RequestPiece();
+
+        //Update checks
+        miniTSpin = false;
+        tSpin = false;
     }
 
     private byte[] PatternPhase()
@@ -204,7 +208,7 @@ public class Field //The field in which the pieces can be placed
     public void DrawPiece(Piece piece, SpriteBatch spriteBatch)
     {
         if (piece.GetType() != typeof(GhostPiece))
-            DrawPiece(new GhostPiece(this, piece), spriteBatch);
+            DrawPiece(new GhostPiece(this, tetrisGame, piece), spriteBatch);
         for (int y = 0; y < Piece.hitboxSize; y++)
         {
             for (int x =  0; x < Piece.hitboxSize; x++)
@@ -223,6 +227,16 @@ public class Field //The field in which the pieces can be placed
         }
     }
 
+    //Used to check T-spins and mini-T-spins
+    public bool TSpinCheck(int x, int y)
+    {
+        if (x < 0 || x >= width || y >= height) //Return if out of bounds
+        {
+            return true;
+        }
+        return GetBlock(x,y) != Pieces.None;
+    }
+    
     //Used to get a block in a more intuitive manner
     public Pieces GetBlock(int x, int y)
     {

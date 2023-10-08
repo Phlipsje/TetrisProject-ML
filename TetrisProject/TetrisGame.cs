@@ -10,7 +10,6 @@ namespace TetrisProject;
 
 public class TetrisGame
 {
-    private static readonly int[] scoreRewarded = new int[] {0, 100, 300, 500, 800};
     //The in-match game logic
     private Field field; //The field in which the game is being played
     private Piece activePiece; //The currently being controlled piece
@@ -25,7 +24,12 @@ public class TetrisGame
     public int level = 1;
     public const int maxLevel = 15;
     public int clearedLines;
-    
+    private const double lineClearTextTimeMax = 1;
+    private double lineClearTextTime; //Amount of time a line clear text is shown on screen
+    private string lineClearType = "";  //What type of line clear to show on screen
+    private bool backToBack; //Check if a backToBack sequence is active
+    private float multiplier = 1; //Based on backToBack (nothing or +0.5x total)
+
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
     public Texture2D squareTexture; //Used for drawing rectangles with a single color
@@ -71,6 +75,8 @@ public class TetrisGame
 
     public void Update(GameTime gameTime)
     {
+        lineClearTextTime -= gameTime.ElapsedGameTime.TotalSeconds;
+        
         if (IsGameOver)
             return;
         if(activePiece == null)
@@ -113,6 +119,12 @@ public class TetrisGame
         //Draw level
         spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 10), Color.White);
         spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 11), Color.White);
+        
+        //Draw line clear popup
+        if (lineClearTextTime > 0 && lineClearType != null && lineClearType != "B2B ")
+        {
+            spriteBatch.DrawString(font, lineClearType, new Vector2(field.fieldX+field.blockSize * 2,field.fieldY + field.blockSize * 5), Color.Yellow);
+        }
     }
     
     public void DrawPiece(Piece piece, SpriteBatch spriteBatch, Point position)
@@ -209,25 +221,25 @@ public class TetrisGame
         switch (pieceInQueue)
         {
             case Pieces.Block:
-                blockType = new BlockPiece(field);
+                blockType = new BlockPiece(field, this);
                 break;
             case Pieces.Line:
-                blockType = new LinePiece(field);
+                blockType = new LinePiece(field, this);
                 break;
             case Pieces.T:
-                blockType = new TPiece(field);
+                blockType = new TPiece(field, this);
                 break;
             case Pieces.S:
-                blockType = new SPiece(field);
+                blockType = new SPiece(field, this);
                 break;
             case Pieces.Z:
-                blockType = new ZPiece(field);
+                blockType = new ZPiece(field, this);
                 break;
             case Pieces.L:
-                blockType = new LPiece(field);
+                blockType = new LPiece(field, this);
                 break;
             case Pieces.J:
-                blockType = new JPiece(field);
+                blockType = new JPiece(field, this);
                 break;
             default:
                 throw new Exception("blockType not specified");
@@ -253,13 +265,112 @@ public class TetrisGame
     public void HandleScore(int rowsCleared)
     {
         //Update score
-        Score += level * scoreRewarded[rowsCleared];
+        //Score += level * scoreRewarded[rowsCleared];
+        
+        //Update time to show clear text on screen
+        lineClearTextTime = lineClearTextTimeMax;
+        
+        if (backToBack)
+        {
+            lineClearType = "B2B ";
+        }
+        else
+        {
+            lineClearType = "";
+        }
+        
+        #region Scoring table
+        //Decide how many points to award
+        switch (rowsCleared)
+        {
+            case 0:
+                if (!field.miniTSpin && !field.tSpin)
+                {
+                    //Break back-to-back combo
+                    backToBack = false;
+                    multiplier = 1;
+                }
+                if (field.miniTSpin)
+                {
+                    Score += 100 * level;
+                    lineClearType = "Mini-T-Spin";
+                }
+                if (field.tSpin)
+                {
+                    Score += 400 * level;
+                    lineClearType = "T-Spin";
+                }
+                
+                break;
+            
+            case 1:
+                if (!field.miniTSpin && !field.tSpin)
+                {
+                    Score += (int)(100 * level * multiplier);
+                    lineClearType += "Single";
+                }
+                
+                if (field.miniTSpin)
+                {
+                    Score += (int)(200 * level * multiplier);
+                    lineClearType += "Mini-T-Spin Single";
+                }
+                
+                if (field.tSpin)
+                {
+                    Score += 800 * level;
+                    lineClearType += "T-Spin Single";
+                }
+                
+                backToBack = true;
+                multiplier = 1.5f;
+                break;
+            
+            case 2:
+                if (!field.tSpin)
+                {
+                    Score += (int)(300 * level * multiplier);
+                    lineClearType += "Double";
+                }
+                else
+                {
+                    Score += (int)(1200 * level * multiplier);
+                    lineClearType += "T-Spin Double";
+                }
+                
+                backToBack = true;
+                multiplier = 1.5f;
+                break;
+            
+            case 3:
+                if (!field.tSpin)
+                {
+                    Score += (int)(500 * level * multiplier);
+                    lineClearType += "Triple";
+                }
+                else
+                {
+                    Score += (int)(1600 * level * multiplier);
+                    lineClearType += "T-Spin Double";
+                }
+                
+                backToBack = true;
+                multiplier = 1.5f;
+                break;
+            
+            case 4:
+                Score += (int)(800 * level * multiplier);
+                lineClearType += "Tetris";
+                
+                backToBack = true;
+                multiplier = 1.5f;
+                break;
+        }
+        #endregion
         
         //Update level
         clearedLines += rowsCleared;
         level = 1 + clearedLines / 10;
         level = MathHelper.Min(level, maxLevel);
-
-        field.level = level;
     }
 }

@@ -36,8 +36,10 @@ public abstract class Piece
     private Point previousPosition; //Checks if position of piece changed to decide if timer should actually be reset
     private bool firstFrame = true;
     private double[] dropTimes = new []{1, 0.793, 0.618, 0.473, 0.355, 0.262, 0.190, 0.135, 0.094, 0.064, 0.043, 0.028, 0.018, 0.011, 0.007 };
+    private bool lastActionIsRotation = false; //Check if the last action before locking in is a rotation (to signal the possibility of a t-spin/mini-t-spin)
     
     private Field fieldReference;
+    private TetrisGame tetrisGameReference;
     
     #region Rotation types
     private Point[,] normalWallKickLeft = new[,]
@@ -99,9 +101,10 @@ public abstract class Piece
         protected set => color = value;
     }
 
-    public Piece(Field fieldReference)
+    public Piece(Field fieldReference, TetrisGame tetrisGameReference)
     {
         this.fieldReference = fieldReference;
+        this.tetrisGameReference = tetrisGameReference;
         position = new Point(3, 0);
         hitboxes = new bool[4][,];
         rotationIndex = 0;
@@ -110,7 +113,7 @@ public abstract class Piece
         autoRepeatStartDelay = 0.25;
         maxMovementCounter = 15;
         remainingMovementCounter = maxMovementCounter;
-        dropTimer = dropTimes[this.fieldReference.level-1];
+        dropTimer = dropTimes[this.tetrisGameReference.level-1];
         highestHeight = position.Y;
         
         softDropMaxTime = dropTimer / 20;
@@ -154,7 +157,7 @@ public abstract class Piece
         //Lock Phase (That half a second before piece is fully in place)
         if (dropTimer <= 0 && !softDropped) //Piece drops down 1 line
         {
-            dropTimer = dropTimes[fieldReference.level-1];
+            dropTimer = dropTimes[tetrisGameReference.level-1];
             softDropMaxTime = dropTimer / 20;
             MoveDown();
         }
@@ -194,9 +197,9 @@ public abstract class Piece
         {
             if (softDropTimer <= 0)
             {
-                MoveDown();
                 softDropTimer = softDropMaxTime;
                 softDropped = true;
+                MoveDown();
             }
         }
         
@@ -221,8 +224,10 @@ public abstract class Piece
     {
         //Iterate down until the place to place the piece is found
         hardDropped = true;
+        lastActionIsRotation = false;
         while (!fieldReference.CollidesVertical(Hitbox, Position))
         {
+            tetrisGameReference.Score += 2; //Increase score by 2 per grid line that is dropped by hard dropping
             MoveDown();
         }
     }
@@ -242,6 +247,53 @@ public abstract class Piece
             }
         }
         SfxManager.Play(SfxManager.LockPiece);
+        
+        //Check for T-spins
+        if (pieceType == Pieces.T && lastActionIsRotation)
+        {
+            bool checkA = false;
+            bool checkB = false;
+            bool checkC = false;
+            bool checkD = false;
+
+            switch (rotationIndex)
+            {
+                case 0: //Facing top
+                    if (fieldReference.TSpinCheck(position.X, Position.Y - 3)) checkA = true;
+                    if (fieldReference.TSpinCheck(position.X+2, Position.Y - 3)) checkB = true;
+                    if (fieldReference.TSpinCheck(position.X, Position.Y - 1)) checkC = true;
+                    if (fieldReference.TSpinCheck(position.X+2, Position.Y - 1)) checkD = true;
+                    break;
+                case 1: //Facing right
+                    if (fieldReference.TSpinCheck(position.X, Position.Y - 3)) checkC = true;
+                    if (fieldReference.TSpinCheck(position.X+2, Position.Y - 3)) checkA = true;
+                    if (fieldReference.TSpinCheck(position.X, Position.Y - 1)) checkD = true;
+                    if (fieldReference.TSpinCheck(position.X+2, Position.Y - 1)) checkB = true;
+                    break;
+                case 2: //Facing bottom
+                    if (fieldReference.TSpinCheck(position.X, Position.Y - 3)) checkD = true;
+                    if (fieldReference.TSpinCheck(position.X+2, Position.Y - 3)) checkC = true;
+                    if (fieldReference.TSpinCheck(position.X, Position.Y - 1)) checkB = true;
+                    if (fieldReference.TSpinCheck(position.X+2, Position.Y - 1)) checkA = true;
+                    break;
+                case 3: //Facing left
+                    if (fieldReference.TSpinCheck(position.X, Position.Y - 3)) checkB = true;
+                    if (fieldReference.TSpinCheck(position.X+2, Position.Y - 3)) checkD = true;
+                    if (fieldReference.TSpinCheck(position.X, Position.Y - 1)) checkA = true;
+                    if (fieldReference.TSpinCheck(position.X+2, Position.Y - 1)) checkC = true;
+                    break;
+            }
+
+            if (checkA && checkB && (checkC || checkD)) //T-spin requirements
+            {
+                fieldReference.tSpin = true;
+            }
+            else if ((checkA || checkB) && checkC && checkD) //Mini-T-spin requirements
+            {
+                fieldReference.miniTSpin = true;
+            }
+        }
+        
         fieldReference.FieldControlFlow(); //Pattern Phase
     }
 
@@ -281,10 +333,19 @@ public abstract class Piece
 
             position.Y--; //Move the piece back if it landed in a block
         }
+        
+        lastActionIsRotation = false; //Only updates if this was not the frame that the piece was locked (otherwise this check is always false)
+        
+        //Increase score by 1 for each grid line dropped by soft dropping
+        if (softDropped)
+        {
+            tetrisGameReference.Score++;
+        }
     }
 
     public void MoveLeft()
     {
+        lastActionIsRotation = false;
         position.X--;
         if (fieldReference.CollidesHorizontal(Hitbox, position))
             position.X++;
@@ -292,6 +353,7 @@ public abstract class Piece
 
     public void MoveRight()
     {
+        lastActionIsRotation = false;
         position.X++;
         if (fieldReference.CollidesHorizontal(Hitbox, position))
             position.X--;
@@ -306,6 +368,7 @@ public abstract class Piece
     //Rotate a piece clockwise
     public void RotateClockWise()
     {
+        lastActionIsRotation = true;
         int previousRotation = rotationIndex;
         rotationIndex++;
         if (rotationIndex == 4)
@@ -328,8 +391,14 @@ public abstract class Piece
                 bool collideVertical = fieldReference.CollidesVertical(Hitbox, position + normalWallKickRight[previousRotation, i]);
                 if (!collideHorizontal && !collideVertical)
                 {
+                    lastActionIsRotation = false;
                     position += normalWallKickRight[previousRotation, i];
                     return;
+                }
+
+                if (i == 3 && pieceType == Pieces.T) //Rotation through point 5 with a T-piece is a t-spin under Tetris Guidelines
+                {
+                    fieldReference.tSpin = true;
                 }
             }
         }
@@ -355,6 +424,7 @@ public abstract class Piece
     //Rotate a piece counterclockwise
     public void RotateCounterClockWise()
     {
+        lastActionIsRotation = true;
         int previousRotation = rotationIndex;
         //Needs different operation order than clockwise because rotationIndex is of type byte and can't be negative
         if (rotationIndex == 0)
@@ -378,8 +448,14 @@ public abstract class Piece
                 bool collideVertical = fieldReference.CollidesVertical(Hitbox, position + normalWallKickLeft[previousRotation, i]);
                 if (!collideHorizontal && !collideVertical)
                 {
+                    lastActionIsRotation = false;
                     position += normalWallKickLeft[previousRotation, i];
                     return;
+                }
+                
+                if (i == 3 && pieceType == Pieces.T) //Rotation through point 5 with a T-piece is a t-spin under Tetris Guidelines
+                {
+                    fieldReference.tSpin = true;
                 }
             }
         }
@@ -420,7 +496,7 @@ public enum Pieces
 public class BlockPiece : Piece
 {
     //All hitbox points for every rotation
-    public BlockPiece(Field fieldReference) : base(fieldReference)
+    public BlockPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
     {
         bool[,] hitbox =
         {
@@ -439,7 +515,7 @@ public class BlockPiece : Piece
 
 public class LinePiece : Piece
 {
-    public LinePiece(Field fieldReference) : base(fieldReference)
+    public LinePiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -481,7 +557,7 @@ public class LinePiece : Piece
 
 public class TPiece : Piece
 {
-    public TPiece(Field fieldReference) : base(fieldReference)
+    public TPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -523,7 +599,7 @@ public class TPiece : Piece
 
 public class SPiece : Piece
 {
-    public SPiece(Field fieldReference) : base(fieldReference)
+    public SPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -565,7 +641,7 @@ public class SPiece : Piece
 
 public class ZPiece : Piece
 {
-    public ZPiece(Field fieldReference) : base(fieldReference)
+    public ZPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -607,7 +683,7 @@ public class ZPiece : Piece
 
 public class LPiece : Piece
 {
-    public LPiece(Field fieldReference) : base(fieldReference)
+    public LPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -649,7 +725,7 @@ public class LPiece : Piece
 
 public class JPiece : Piece
 {
-    public JPiece(Field fieldReference) : base(fieldReference)
+    public JPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -691,7 +767,7 @@ public class JPiece : Piece
 
 public class GhostPiece : Piece
 {
-    public GhostPiece(Field fieldReference, Piece piece) : base(fieldReference)
+    public GhostPiece(Field fieldReference, TetrisGame tetrisGameReference, Piece piece) : base(fieldReference, tetrisGameReference)
     {
         Piece pieceReference = piece;
         Position = piece.Position;
