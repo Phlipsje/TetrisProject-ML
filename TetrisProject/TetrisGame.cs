@@ -280,12 +280,6 @@ public class TetrisGame
         switch (rowsCleared)
         {
             case 0:
-                if (!field.miniTSpin && !field.tSpin)
-                {
-                    //Break back-to-back combo
-                    backToBack = false;
-                    multiplier = 1;
-                }
                 if (field.miniTSpin)
                 {
                     Score += 100 * level;
@@ -304,9 +298,13 @@ public class TetrisGame
             case 1:
                 if (!field.miniTSpin && !field.tSpin)
                 {
-                    Score += (int)(100 * level * multiplier);
-                    lineClearType += "Single";
-                    clearedLines += (int)(1 * multiplier);
+                    Score += 100 * level;
+                    lineClearType = "Single";
+                    clearedLines += 1;
+                    
+                    //Break back-to-back combo
+                    backToBack = false;
+                    multiplier = 1;
                 }
                 
                 if (field.miniTSpin)
@@ -328,13 +326,17 @@ public class TetrisGame
                 break;
             
             case 2:
-                if (!field.tSpin)
+                if (!field.tSpin && !field.miniTSpin)
                 {
-                    Score += (int)(300 * level * multiplier);
-                    lineClearType += "Double";
-                    clearedLines += (int)(3 * multiplier);
+                    Score += 300 * level;
+                    lineClearType = "Double";
+                    clearedLines += 3;
+                    
+                    //Break back-to-back combo
+                    backToBack = false;
+                    multiplier = 1;
                 }
-                else
+                else if(field.tSpin || field.miniTSpin) //The conditions for a mini-t-spin double count as a t-spin double
                 {
                     Score += (int)(1200 * level * multiplier);
                     lineClearType += "T-Spin Double";
@@ -348,14 +350,18 @@ public class TetrisGame
             case 3:
                 if (!field.tSpin)
                 {
-                    Score += (int)(500 * level * multiplier);
-                    lineClearType += "Triple";
-                    clearedLines += (int)(5 * multiplier);
+                    Score += 500 * level;
+                    lineClearType = "Triple";
+                    clearedLines += 5;
+                    
+                    //Break back-to-back combo
+                    backToBack = false;
+                    multiplier = 1;
                 }
                 else
                 {
                     Score += (int)(1600 * level * multiplier);
-                    lineClearType += "T-Spin Double";
+                    lineClearType += "T-Spin Triple";
                     clearedLines += (int)(16 * multiplier);
                 }
                 
