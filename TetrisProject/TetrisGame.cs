@@ -86,31 +86,33 @@ public class TetrisGame
     public void Draw(SpriteBatch spriteBatch)
     {
         field.Draw(spriteBatch);
-        if (IsGameOver)
-            return;
-        if (activePiece != null)
+        if (activePiece != null && !IsGameOver)
         {
             field.DrawPiece(activePiece, spriteBatch); 
         }
 
         //Draw next pieces
         Point nextPieceTopLeft = new Point(field.fieldX + field.fieldPixelWidth + field.blockSize, field.fieldY);
+        spriteBatch.DrawString(font, "NEXT", new Vector2(nextPieceTopLeft.X, nextPieceTopLeft.Y), Color.White);
         for (int i = 0; i < 5; i++)
         {
             DrawPiece(GetNextPiece(pieceQueue[i]), spriteBatch, nextPieceTopLeft + new Point(0, (i+1)*field.blockSize*4));
         }
 
         //Draw hold piece
+        spriteBatch.DrawString(font, "HOLD", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize ), Color.White);
         if (holdPiece != null)
         {
-            DrawPiece(holdPiece, spriteBatch, new Point(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize));
+            DrawPiece(holdPiece, spriteBatch, new Point(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 4));
         }
         
         //Draw score
-        spriteBatch.DrawString(font, Score.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 6), Color.White);
+        spriteBatch.DrawString(font, "SCORE", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 6), Color.White);
+        spriteBatch.DrawString(font, Score.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 7), Color.White);
         
         //Draw level
-        spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 8), Color.White);
+        spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 10), Color.White);
+        spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 11), Color.White);
     }
     
     public void DrawPiece(Piece piece, SpriteBatch spriteBatch, Point position)
