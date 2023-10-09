@@ -281,6 +281,12 @@ public class TetrisGame
         switch (rowsCleared)
         {
             case 0:
+                if (!field.miniTSpin && !field.tSpin)
+                {
+                    //Break back-to-back combo
+                    backToBack = false;
+                    multiplier = 1;
+                }
                 if (field.miniTSpin)
                 {
                     Score += 100 * level;
@@ -299,13 +305,9 @@ public class TetrisGame
             case 1:
                 if (!field.miniTSpin && !field.tSpin)
                 {
-                    Score += 100 * level;
-                    lineClearType = "Single";
-                    clearedLines += 1;
-                    
-                    //Break back-to-back combo
-                    backToBack = false;
-                    multiplier = 1;
+                    Score += (int)(100 * level * multiplier);
+                    lineClearType += "Single";
+                    clearedLines += (int)(1 * multiplier);
                 }
                 
                 if (field.miniTSpin)
@@ -328,14 +330,11 @@ public class TetrisGame
             
             case 2:
                 if (!field.tSpin && !field.miniTSpin)
-                {
-                    Score += 300 * level;
-                    lineClearType = "Double";
-                    clearedLines += 3;
+                {  
+                    Score += (int)(300 * level * multiplier);
+                    lineClearType += "Double";
+                    clearedLines += (int)(3 * multiplier);
                     
-                    //Break back-to-back combo
-                    backToBack = false;
-                    multiplier = 1;
                 }
                 else if(field.tSpin || field.miniTSpin) //The conditions for a mini-t-spin double count as a t-spin double
                 {
@@ -351,13 +350,9 @@ public class TetrisGame
             case 3:
                 if (!field.tSpin)
                 {
-                    Score += 500 * level;
-                    lineClearType = "Triple";
-                    clearedLines += 5;
-                    
-                    //Break back-to-back combo
-                    backToBack = false;
-                    multiplier = 1;
+                    Score += (int)(500 * level * multiplier);
+                    lineClearType += "Triple";
+                    clearedLines += (int)(5 * multiplier);
                 }
                 else
                 {
