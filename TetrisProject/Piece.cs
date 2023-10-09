@@ -345,14 +345,14 @@ public abstract class Piece
 
             position.Y--; //Move the piece back if it landed in a block
         }
+        else if (softDropped && position.Y == highestHeight )
+        {
+            tetrisGameReference.Score++;
+        }
         
         lastActionIsRotation = false; //Only updates if this was not the frame that the piece was locked (otherwise this check is always false)
         
         //Increase score by 1 for each grid line dropped by soft dropping
-        if (softDropped)
-        {
-            tetrisGameReference.Score++;
-        }
     }
 
     public void MoveLeft()
