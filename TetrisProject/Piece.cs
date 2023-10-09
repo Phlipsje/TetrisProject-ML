@@ -18,16 +18,10 @@ public abstract class Piece
     
     public const int hitboxSize = 4;
 
-    private enum direction
-    {
-        left,
-        right
-    };
     private double autoRepeatStartDelay; //The wait time before auto repeat starts
     private double autoRepeatStartTimer;
     private double autoRepeatDelay; //The wait time between the piece moving one grid cell while holding down left/right
     private double autoRepeatTimer;
-    private direction autoRepeatDirection; 
     private double dropTimer; //The timer counting down checked by nextDropTime
     private double lockDownMaxTime; //The time before a piece is locked into place
     private double lockDownTimer;
@@ -39,7 +33,8 @@ public abstract class Piece
     private int maxMovementCounter;
     private int remainingMovementCounter; //Counts the amount of actions you can perform to extend the timer of the lock down phase
     private int highestHeight; //Check to see if remainingMovementCounter needs to be reset (when reaching new highest height (higher is lower on field))
-    private Point previousPosition; //Checks if position of piece changed to decide if timer should actually be reset
+    private Point previousPosition; //Checks if position of piece changed to decide if lock down timer should actually be reset
+    private int previousRotationIndex; //Checks if rotation of piece changed to decide if lock down timer should actually be reset
     private bool firstFrame = true;
     private double[] dropTimes = new []{1, 0.793, 0.618, 0.473, 0.355, 0.262, 0.190, 0.135, 0.094, 0.064, 0.043, 0.028, 0.018, 0.011, 0.007 };
     private bool lastActionIsRotation = false; //Check if the last action before locking in is a rotation (to signal the possibility of a t-spin/mini-t-spin)
@@ -127,7 +122,10 @@ public abstract class Piece
 
     public void Update(GameTime gameTime)
     {
-        double deltaTime = gameTime.ElapsedGameTime.TotalSeconds;
+        //Get time to load previous frame in seconds
+        double deltaTime = gameTime.ElapsedGameTime.TotalSeconds; 
+        
+        //Check if player has lost
         if (firstFrame && fieldReference.CollidesVertical(Hitbox, position))
             fieldReference.GameOver(); // if block spawn in an occupied space, game over
         firstFrame = false;
@@ -137,11 +135,12 @@ public abstract class Piece
 
         //Update timers and checks
         previousPosition = position;
+        previousRotationIndex = rotationIndex;
         softDropped = false;
-        dropTimer -= deltaTime;
-        softDropTimer -= deltaTime;
-        lockDownTimer -= deltaTime;
-        autoRepeatStartTimer -= deltaTime;
+        dropTimer -= deltaTime; //Time for piece to fall down 1 row by itself due to gravity
+        softDropTimer -= deltaTime; //Time between dropping down another line while holding down the soft drop button
+        lockDownTimer -= deltaTime; //To check if a piece should be locked into place
+        autoRepeatStartTimer -= deltaTime; //For moving left and right
         if (autoRepeatStartTimer <= 0)
         {
             autoRepeatTimer -= deltaTime;
@@ -152,16 +151,13 @@ public abstract class Piece
     {
         //Falling Phase
         CheckInput();
-        
-        //Check for hard drop
-        if (Util.GetKeyPressed(Keys.Space))
+
+        if (lockDownTimer <= 0)
         {
-            HardDrop();
-            return;
+            CheckForLockDown();
         }
-        
+
         //Lock Phase (That half a second before piece is fully in place)
-        // !hardDropped hopefully fixes a block being locked down twice
         if (dropTimer <= 0 && !softDropped && !hardDropped) //Piece drops down 1 line
         {
             dropTimer = dropTimes[tetrisGameReference.level-1];
@@ -174,40 +170,27 @@ public abstract class Piece
 
     private void CheckInput()
     {
+        //Hold piece
         if (Util.GetKeyPressed(Keys.LeftShift))
         {
             fieldReference.HoldPiece(this);
         }
         
-        if (Keyboard.GetState().IsKeyDown(Keys.Left) && Util.LastMovementKeyPressed == Keys.Left)
+        //Move left
+        if (Util.GetKeyHeld(Keys.Left))
         {
-            if (autoRepeatDirection == direction.right)
-            {
-                autoRepeatDirection = direction.left;
-                autoRepeatTimer = autoRepeatDelay;
-                autoRepeatStartTimer = autoRepeatStartDelay;
-                MoveLeft();
-                ResetLockDownTimer();
-            }
-            else if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0)  || Util.GetKeyPressed(Keys.Left))
+            if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0)  || Util.GetKeyPressed(Keys.Left))
             {
                 MoveLeft();
                 ResetLockDownTimer();
                 autoRepeatTimer = autoRepeatDelay;
             }
-            
         }
-        if (Keyboard.GetState().IsKeyDown(Keys.Right) && Util.LastMovementKeyPressed == Keys.Right)
+        
+        //Move right
+        if (Util.GetKeyHeld(Keys.Right))
         {
-            if (autoRepeatDirection == direction.left)
-            {
-                autoRepeatDirection = direction.right;
-                autoRepeatTimer = autoRepeatDelay;
-                autoRepeatStartTimer = autoRepeatStartDelay;
-                MoveRight();
-                ResetLockDownTimer();
-            }
-            else if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0) || Util.GetKeyPressed(Keys.Right))
+            if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0) || Util.GetKeyPressed(Keys.Right))
             {
                 MoveRight();
                 ResetLockDownTimer();
@@ -216,42 +199,69 @@ public abstract class Piece
         }
         
         //Soft drop
-        if (Keyboard.GetState().IsKeyDown(Keys.Down))
+        if (Util.GetKeyHeld(Keys.Down) && softDropTimer <= 0)
         {
-            if (softDropTimer <= 0)
-            {
-                softDropTimer = softDropMaxTime;
-                softDropped = true;
-                MoveDown();
-            }
+            softDropTimer = softDropMaxTime;
+            softDropped = true;
+            MoveDown();
         }
         
+        //Clockwise rotation
         if (Util.GetKeyPressed(Keys.Up))
         {
             Rotate();
             ResetLockDownTimer();
         }
         
+        //Counterclockwise rotation
         if (Util.GetKeyPressed(Keys.A))
         {
             RotateCounterClockWise();
             ResetLockDownTimer();
         }
         
+        //Clockwise rotation
         if (Util.GetKeyPressed(Keys.D))
         {
             RotateClockWise();
             ResetLockDownTimer();
         }
+        
+        //Check for hard drop
+        if (Util.GetKeyPressed(Keys.Space))
+        {
+            HardDrop();
+            return;
+        }
 
+        //Check if counter movement is given in the horizontal axis
         if ((Util.GetKeyLetGo(Keys.Left) && !Util.GetKeyHeld(Keys.Right)) || (Util.GetKeyLetGo(Keys.Right) && !Util.GetKeyHeld(Keys.Left)))
         {
             autoRepeatStartTimer = autoRepeatStartDelay;
         }
 
+        //Check if started moving in the horizontal axis
         if (Util.GetKeyPressed(Keys.Left) || Util.GetKeyPressed(Keys.Right))
         {
             autoRepeatStartTimer = autoRepeatStartDelay;
+        }
+    }
+
+    //Check if lock down is in effect due to 0.5 seconds on delay being over
+    private void CheckForLockDown()
+    {
+        //Move piece down by one to check for possible collisions
+        position.Y++;
+        
+        //Check if piece is in lock phase
+        if (fieldReference.CollidesVertical(Hitbox, position))
+        {
+            LockPiece();
+        }
+        else //There is still room for piece to fall
+        {
+            //Revert to original position
+            position.Y--;
         }
     }
 
@@ -334,48 +344,73 @@ public abstract class Piece
 
     private void ResetLockDownTimer()
     {
-        if (remainingMovementCounter > 0 && previousPosition != position && fieldReference.CollidesVertical(Hitbox, position))
+        if (remainingMovementCounter > 0 && previousPosition != position || rotationIndex != previousRotationIndex)
         {
             remainingMovementCounter--;
             lockDownTimer = lockDownMaxTime;
             
-            if(remainingMovementCounter == 0) //Lock piece if counter can't be lowered anymore
+            //Lock piece if counter can't be lowered anymore
+            if(remainingMovementCounter == 0)
             {
                 position.Y++;
                 LockPiece();
             }
         }
     }
+
+    //Used to get the point closest to the bottom of the grid (used for lock down timer reset calculation)
+    private int GetHighestYPoint()
+    {
+        int highestY = 0;
+        
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                if (Hitbox[i, j] && j > highestY)
+                {
+                    highestY = j;
+                }
+            }
+        }
+
+        return position.Y - highestY;
+    }
     
     public void MoveDown()
     {
         position.Y++;
         
-        if (position.Y > highestHeight) //Check if new highest position to reset remaining movement counter
+        //Check if new highest position to reset remaining movement counter
+        if (GetHighestYPoint() > highestHeight)
         {
-            highestHeight = position.Y;
+            highestHeight = GetHighestYPoint();
             remainingMovementCounter = maxMovementCounter;
             lockDownTimer = lockDownMaxTime;
         }
         
+        //Check if the piece has entered an illegal position
         if (fieldReference.CollidesVertical(Hitbox, position))
         {
-            if (lockDownTimer <= 0 || hardDropped) //Lock Phase has ended
+            //Check if lock Phase has ended
+            if (lockDownTimer <= 0 || hardDropped) 
             {
                 LockPiece();
                 return;
             }
 
-            position.Y--; //Move the piece back if it landed in a block
+            //Move the piece back if it landed in a block
+            position.Y--;
         }
-        else if (softDropped && position.Y == highestHeight )
+        
+        //Only updates if this was not the frame that the piece was locked (otherwise this check is always false)
+        lastActionIsRotation = false; 
+        
+        //Increase score by 1 for each grid line dropped by soft dropping
+        if (softDropped)
         {
             tetrisGameReference.Score++;
         }
-        
-        lastActionIsRotation = false; //Only updates if this was not the frame that the piece was locked (otherwise this check is always false)
-        
-        //Increase score by 1 for each grid line dropped by soft dropping
     }
 
     public void MoveLeft()
