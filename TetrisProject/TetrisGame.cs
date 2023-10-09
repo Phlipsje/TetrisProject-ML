@@ -147,6 +147,7 @@ public class TetrisGame
 
     public void HoldPiece(Piece piece)
     {
+        piece.RotationIndex = 0;
         if (holdPiece == null)
         {
             //If the hold piece function is used for the first time a new piece needs to be spawned instead of grabbing the previous one
