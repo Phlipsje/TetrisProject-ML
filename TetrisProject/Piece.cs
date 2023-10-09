@@ -18,10 +18,16 @@ public abstract class Piece
     
     public const int hitboxSize = 4;
 
+    private enum direction
+    {
+        left,
+        right
+    };
     private double autoRepeatStartDelay; //The wait time before auto repeat starts
     private double autoRepeatStartTimer;
     private double autoRepeatDelay; //The wait time between the piece moving one grid cell while holding down left/right
     private double autoRepeatTimer;
+    private direction autoRepeatDirection; 
     private double dropTimer; //The timer counting down checked by nextDropTime
     private double lockDownMaxTime; //The time before a piece is locked into place
     private double lockDownTimer;
@@ -173,9 +179,17 @@ public abstract class Piece
             fieldReference.HoldPiece(this);
         }
         
-        if (Keyboard.GetState().IsKeyDown(Keys.Left))
+        if (Keyboard.GetState().IsKeyDown(Keys.Left) && Util.LastMovementKeyPressed == Keys.Left)
         {
-            if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0)  || Util.GetKeyPressed(Keys.Left))
+            if (autoRepeatDirection == direction.right)
+            {
+                autoRepeatDirection = direction.left;
+                autoRepeatTimer = autoRepeatDelay;
+                autoRepeatStartTimer = autoRepeatStartDelay;
+                MoveLeft();
+                ResetLockDownTimer();
+            }
+            else if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0)  || Util.GetKeyPressed(Keys.Left))
             {
                 MoveLeft();
                 ResetLockDownTimer();
@@ -183,9 +197,17 @@ public abstract class Piece
             }
             
         }
-        if (Keyboard.GetState().IsKeyDown(Keys.Right))
+        if (Keyboard.GetState().IsKeyDown(Keys.Right) && Util.LastMovementKeyPressed == Keys.Right)
         {
-            if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0) || Util.GetKeyPressed(Keys.Right))
+            if (autoRepeatDirection == direction.left)
+            {
+                autoRepeatDirection = direction.right;
+                autoRepeatTimer = autoRepeatDelay;
+                autoRepeatStartTimer = autoRepeatStartDelay;
+                MoveRight();
+                ResetLockDownTimer();
+            }
+            else if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0) || Util.GetKeyPressed(Keys.Right))
             {
                 MoveRight();
                 ResetLockDownTimer();

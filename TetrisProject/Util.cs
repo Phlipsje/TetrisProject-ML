@@ -28,6 +28,12 @@ public static class Util
             if (leftRightKeys.Contains(key) && GetKeyPressed(key))
                 lastMovementKeyPressed = key;
         }
+
+        if (currentKeyboardState.IsKeyDown(leftRightKeys[0]) && !currentKeyboardState.IsKeyDown(leftRightKeys[1]))
+            lastMovementKeyPressed = leftRightKeys[0];
+        else if (currentKeyboardState.IsKeyDown(leftRightKeys[1]) && !currentKeyboardState.IsKeyDown(leftRightKeys[0]))
+            lastMovementKeyPressed = leftRightKeys[1];
+
     }
     
     //Check if key is only pressed on the current frame
