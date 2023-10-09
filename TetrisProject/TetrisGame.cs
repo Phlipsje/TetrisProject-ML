@@ -23,7 +23,7 @@ public class TetrisGame
     public int Score;
     public int level = 1;
     public const int maxLevel = 15;
-    public int clearedLines;
+    private int clearedLines;
     private const double lineClearTextTimeMax = 1.4f;
     private double lineClearTextTime; //Amount of time a line clear text is shown on screen
     private string lineClearType = "";  //What type of line clear to show on screen
@@ -58,7 +58,7 @@ public class TetrisGame
         FillQueue();
         NextPiece();
         Score = 0;
-        clearedLines = 0;
+        clearedLines = GetClearedLines(level);
     }
 
     public void LoadContent(ContentManager content)
@@ -119,7 +119,7 @@ public class TetrisGame
         //Draw level
         spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 10), Color.White);
         spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 11), Color.White);
-        
+
         //Draw line clear popup
         if (lineClearTextTime > 0 && lineClearType != null && lineClearType != "B2B ")
         {
@@ -143,6 +143,19 @@ public class TetrisGame
                 spriteBatch.Draw(blockTexture, blockRectangle, piece.Color);
             }
         }
+    }
+
+    //Get amount of clearedLines if you start at a certain level
+    private int GetClearedLines(int level)
+    {
+        int lines = 0;
+
+        for (int i = 1; i <= level; i++)
+        {
+            lines += (i-1) * 5;
+        }
+
+        return lines;
     }
 
     public void HoldPiece(Piece piece)
