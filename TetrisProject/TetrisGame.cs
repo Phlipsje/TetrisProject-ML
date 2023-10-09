@@ -109,7 +109,7 @@ public class TetrisGame
         spriteBatch.DrawString(font, "HOLD", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize ), Color.White);
         if (holdPiece != null)
         {
-            DrawPiece(holdPiece, spriteBatch, new Point(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 4));
+            DrawPiece(holdPiece, spriteBatch, new Point(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 5));
         }
         
         //Draw score
@@ -147,9 +147,9 @@ public class TetrisGame
 
     public void HoldPiece(Piece piece)
     {
-        piece.RotationIndex = 0;
         if (holdPiece == null)
         {
+            piece.RotationIndex = 0;
             //If the hold piece function is used for the first time a new piece needs to be spawned instead of grabbing the previous one
             RequestPiece();
             holdPiece = piece;
@@ -157,6 +157,7 @@ public class TetrisGame
         }
         else if(!holdUsed)
         {
+            piece.RotationIndex = 0;
             //Take hold piece out and make it the active piece
             activePiece = holdPiece;
             activePiece.Position = new Point(3, 0);

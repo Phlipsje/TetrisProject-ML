@@ -155,7 +155,8 @@ public abstract class Piece
         }
         
         //Lock Phase (That half a second before piece is fully in place)
-        if (dropTimer <= 0 && !softDropped) //Piece drops down 1 line
+        // !hardDropped hopefully fixes a block being locked down twice
+        if (dropTimer <= 0 && !softDropped && !hardDropped) //Piece drops down 1 line
         {
             dropTimer = dropTimes[tetrisGameReference.level-1];
             softDropMaxTime = dropTimer / 20;
@@ -311,7 +312,7 @@ public abstract class Piece
 
     private void ResetLockDownTimer()
     {
-        if (remainingMovementCounter > 0 && previousPosition != position)
+        if (remainingMovementCounter > 0 && previousPosition != position && fieldReference.CollidesVertical(Hitbox, position))
         {
             remainingMovementCounter--;
             lockDownTimer = lockDownMaxTime;
