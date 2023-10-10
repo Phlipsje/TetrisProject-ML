@@ -43,9 +43,9 @@ public abstract class Piece
     private Point previousPosition; //Checks if position of piece changed to decide if lock down timer should actually be reset
     private int previousRotationIndex; //Checks if rotation of piece changed to decide if lock down timer should actually be reset
     private bool firstFrame = true;
-    private double[] dropTimes = new []{1, 0.793, 0.618, 0.473, 0.355, 0.262, 0.190, 0.135, 0.094, 0.064, 0.043, 0.028, 0.018, 0.011, 0.007 };
-    private bool lastActionIsRotation = false; //Check if the last action before locking in is a rotation (to signal the possibility of a t-spin/mini-t-spin)
-    
+    private double[] dropTimes = {1, 0.793, 0.618, 0.473, 0.355, 0.262, 0.190, 0.135, 0.094, 0.064, 0.043, 0.028, 0.018, 0.011, 0.007 };
+    private bool lastActionIsRotation; //Check if the last action before locking in is a rotation (to signal the possibility of a t-spin/mini-t-spin)
+
     private Field fieldReference;
     private TetrisGame tetrisGameReference;
     
@@ -130,13 +130,17 @@ public abstract class Piece
     public void Update(GameTime gameTime)
     {
         //Get time to load previous frame in seconds
-        double deltaTime = gameTime.ElapsedGameTime.TotalSeconds; 
-        
+        double deltaTime = gameTime.ElapsedGameTime.TotalSeconds;
+
         //Check if player has lost
         if (firstFrame && fieldReference.CollidesVertical(Hitbox, position))
-            fieldReference.GameOver(); // if block spawn in an occupied space, game over
+        {
+            //If block spawn in an occupied space, game over
+            fieldReference.GameOver(); 
+        }
+        //It is not the first frame that a block has spawned in anymore
         firstFrame = false;
-        
+
         //All the piece logic
         PieceControlFlow();
 
@@ -156,12 +160,23 @@ public abstract class Piece
 
     private void PieceControlFlow()
     {
-        //Falling Phase
-        CheckInput();
-
+        //Check if piece needs to be locked down
         if (lockDownTimer <= 0)
         {
             CheckForLockDown();
+        }
+        
+        //Falling Phase
+        CheckInput();
+        
+        //Check if the last input was a legal rotation
+        if (position != previousPosition)
+        {
+            lastActionIsRotation = false;
+        }
+        if(rotationIndex != previousRotationIndex)
+        {
+            lastActionIsRotation = true;
         }
 
         //Lock Phase (That half a second before piece is fully in place)
@@ -315,10 +330,11 @@ public abstract class Piece
             }
         }
         SfxManager.Play(SfxManager.LockPiece);
-        
+
         //Check for T-spins
         if (pieceType == Pieces.T && lastActionIsRotation)
         {
+            //A, B, C and D are corners around t-piece, visualization can be found in Tetris Guidelines
             bool checkA = false;
             bool checkB = false;
             bool checkC = false;
@@ -438,7 +454,6 @@ public abstract class Piece
 
     public void MoveLeft()
     {
-        lastActionIsRotation = false;
         position.X--;
         if (fieldReference.CollidesHorizontal(Hitbox, position))
             position.X++;
@@ -446,7 +461,6 @@ public abstract class Piece
 
     public void MoveRight()
     {
-        lastActionIsRotation = false;
         position.X++;
         if (fieldReference.CollidesHorizontal(Hitbox, position))
             position.X--;
@@ -461,7 +475,6 @@ public abstract class Piece
     //Rotate a piece clockwise
     public void RotateClockWise()
     {
-        lastActionIsRotation = true;
         int previousRotation = rotationIndex;
         rotationIndex++;
         if (rotationIndex == 4)
@@ -484,7 +497,6 @@ public abstract class Piece
                 bool collideVertical = fieldReference.CollidesVertical(Hitbox, position + normalWallKickRight[previousRotation, i]);
                 if (!collideHorizontal && !collideVertical)
                 {
-                    lastActionIsRotation = false;
                     position += normalWallKickRight[previousRotation, i];
                     return;
                 }
@@ -517,7 +529,6 @@ public abstract class Piece
     //Rotate a piece counterclockwise
     public void RotateCounterClockWise()
     {
-        lastActionIsRotation = true;
         int previousRotation = rotationIndex;
         //Needs different operation order than clockwise because rotationIndex is of type byte and can't be negative
         if (rotationIndex == 0)
@@ -541,7 +552,6 @@ public abstract class Piece
                 bool collideVertical = fieldReference.CollidesVertical(Hitbox, position + normalWallKickLeft[previousRotation, i]);
                 if (!collideHorizontal && !collideVertical)
                 {
-                    lastActionIsRotation = false;
                     position += normalWallKickLeft[previousRotation, i];
                     return;
                 }

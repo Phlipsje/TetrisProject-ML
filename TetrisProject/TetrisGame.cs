@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -119,7 +120,7 @@ public class TetrisGame
         //Draw level
         spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 10), Color.White);
         spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 11), Color.White);
-
+        
         //Draw line clear popup
         if (lineClearTextTime > 0 && lineClearType != null && lineClearType != "B2B ")
         {
@@ -295,47 +296,44 @@ public class TetrisGame
         switch (rowsCleared)
         {
             case 0:
-                if (!field.miniTSpin && !field.tSpin)
-                {
-                    //Break back-to-back combo
-                    backToBack = false;
-                    multiplier = 1;
-                }
                 if (field.miniTSpin)
                 {
                     Score += 100 * level;
                     lineClearType = "Mini-T-Spin";
                     clearedLines += (int)(1 * multiplier);
                 }
-                if (field.tSpin)
+                else if (field.tSpin)
                 {
                     Score += 400 * level;
                     lineClearType = "T-Spin";
                     clearedLines += (int)(4 * multiplier);
                 }
-                
+                else
+                {
+                    //Break back-to-back combo
+                    backToBack = false;
+                    multiplier = 1;
+                }
                 break;
             
             case 1:
-                if (!field.miniTSpin && !field.tSpin)
-                {
-                    Score += (int)(100 * level * multiplier);
-                    lineClearType += "Single";
-                    clearedLines += (int)(1 * multiplier);
-                }
-                
                 if (field.miniTSpin)
                 {
                     Score += (int)(200 * level * multiplier);
                     lineClearType += "Mini-T-Spin Single";
                     clearedLines += (int)(2 * multiplier);
                 }
-                
-                if (field.tSpin)
+                else if (field.tSpin)
                 {
                     Score += 800 * level;
                     lineClearType += "T-Spin Single";
                     clearedLines += (int)(8 * multiplier);
+                }
+                else
+                {
+                    Score += (int)(100 * level * multiplier);
+                    lineClearType += "Single";
+                    clearedLines += (int)(1 * multiplier);
                 }
                 
                 backToBack = true;
@@ -343,18 +341,19 @@ public class TetrisGame
                 break;
             
             case 2:
-                if (!field.tSpin && !field.miniTSpin)
+                
+                if(field.tSpin || field.miniTSpin) //The conditions for a mini-t-spin double count as a t-spin double
+                {
+                    Score += (int)(1200 * level * multiplier);
+                    lineClearType += "T-Spin Double";
+                    clearedLines += (int)(12 * multiplier);
+                }
+                else
                 {  
                     Score += (int)(300 * level * multiplier);
                     lineClearType += "Double";
                     clearedLines += (int)(3 * multiplier);
                     
-                }
-                else if(field.tSpin || field.miniTSpin) //The conditions for a mini-t-spin double count as a t-spin double
-                {
-                    Score += (int)(1200 * level * multiplier);
-                    lineClearType += "T-Spin Double";
-                    clearedLines += (int)(12 * multiplier);
                 }
                 
                 backToBack = true;

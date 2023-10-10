@@ -230,7 +230,7 @@ public class Field //The field in which the pieces can be placed
     //Used to check T-spins and mini-T-spins
     public bool TSpinCheck(int x, int y)
     {
-        if (x < 0 || x >= width || y >= height) //Return if out of bounds
+        if (x < 0 || x >= width || y >= height) //Return true if out of bounds
         {
             return true;
         }
@@ -250,7 +250,7 @@ public class Field //The field in which the pieces can be placed
     //Used to set a block in a more intuitive manner
     public void SetBlock(int x, int y, Pieces value)
     {
-        blockArray[y+height][x] = value;
+         blockArray[y+height][x] = value;
     }
     
     public bool CollidesVertical(bool[,] hitbox, Point position)
