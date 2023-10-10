@@ -446,7 +446,7 @@ public abstract class Piece
         lastActionIsRotation = false; 
         
         //Increase score by 1 for each grid line dropped by soft dropping
-        if (softDropped)
+        if (softDropped && GetHighestYPoint() == highestHeight)
         {
             tetrisGameReference.Score++;
         }
