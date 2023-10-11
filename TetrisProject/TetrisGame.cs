@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -386,6 +384,14 @@ public class TetrisGame
                 backToBack = true;
                 multiplier = 1.5f;
                 break;
+        }
+
+        //Extra bonus if player clears the entire field
+        if (field.allClear)
+        {
+            Score += 1000 * level;
+            lineClearType = "All clear!";
+            clearedLines += 10;
         }
         #endregion
         

@@ -18,6 +18,7 @@ public class Field //The field in which the pieces can be placed
     private Pieces[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
     public bool miniTSpin; //Check if a mini-t-spin has been made
     public bool tSpin; //Check if a t-spin has been made
+    public bool allClear; //Check if the entire field is wiped after clearing a row
     
     //Visual variables
     public int blockSize; //How large a block is 
@@ -67,10 +68,8 @@ public class Field //The field in which the pieces can be placed
         byte[] rowsMarkedForDestruction = PatternPhase();
         
         // Iterate Phase
-        // This may be used for alternative game modes and such
-        tetrisGame.HandleScore(rowsMarkedForDestruction.Length);
         
-        // TEMPORARY Animate Phase
+        //Animate Phase
         AnimationPhase(rowsMarkedForDestruction);
         //AnimationManager.PlayAnimation(new FallingBlockAnimation(new Vector2(200, 100), 
         //    tetrisGame, new Vector2(100, -800), tetrisGame.blockTexture, -2));
@@ -78,7 +77,9 @@ public class Field //The field in which the pieces can be placed
         // Eliminate Phase
         ClearLines(rowsMarkedForDestruction);
         
-        // TODO Completion Phase
+        //Completion Phase
+        // This may be used for alternative game modes and such
+        tetrisGame.HandleScore(rowsMarkedForDestruction.Length);
         
         // Generation Phase
         tetrisGame.RequestPiece();
@@ -86,6 +87,7 @@ public class Field //The field in which the pieces can be placed
         //Update checks
         miniTSpin = false;
         tSpin = false;
+        allClear = false;
     }
 
     private byte[] PatternPhase()
@@ -120,7 +122,7 @@ public class Field //The field in which the pieces can be placed
     }
 
     //Handles clearing multiple lines at once
-    public void ClearLines(byte[] lines)
+    private void ClearLines(byte[] lines)
     {
         //Make sure lines are sorted top to bottom
         
@@ -128,10 +130,15 @@ public class Field //The field in which the pieces can be placed
         {
             ClearSingleLine(line);
         }
-    }
 
+        if (lines.Length != 0)
+        {
+            allClear = CheckAllClear();
+        }
+    }
+    
     //Handles clearing a line
-    public void ClearSingleLine(byte line)
+    private void ClearSingleLine(byte line)
     {
         //Move all rows above the cleared row down one
         //Because the lowest rows get the higher indices, this loop is a little unorthodox
@@ -145,6 +152,25 @@ public class Field //The field in which the pieces can be placed
         blockArray[0] = new Pieces[width];
         for (int j = 0; j < width; j++)
             blockArray[0][j] = Pieces.None;
+    }
+
+    private bool CheckAllClear()
+    {
+        //Check for empty rows
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                //If a single block is not air there is no all clear
+                if (blockArray[i+height][j] != Pieces.None)
+                {
+                    return false;
+                }
+            }
+        }
+
+        //If all rows are empty it's an all clear
+        return true;
     }
 
     private static Color GetColor(Pieces piece)
