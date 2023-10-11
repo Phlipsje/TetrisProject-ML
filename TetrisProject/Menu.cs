@@ -26,8 +26,14 @@ public class Menu
     public byte menuIndex; //What is selected in the menu
     
     //Visual variables
+    private byte previousMenuIndex; //Used for moving animations back to original position
     private Vector2 topLeftTopButtonPosition;
     private Vector2 buttonVerticalOffset;
+    private int selectedHorizontalOffsetTotal; //Applied to the button that is selected
+    private int selectedHorizontalOffset;
+    private int previousSelectedHorizontalOffset;
+    private double buttonAnimationTimeMax;
+    private double buttonAnimationTime;
 
     public Menu(Main main, SpriteBatch spriteBatch)
     {
@@ -35,8 +41,11 @@ public class Menu
         this.spriteBatch = spriteBatch;
         menuState = MenuState.MainMenu;
         menuIndex = 0;
+        previousMenuIndex = 0;
+        buttonAnimationTimeMax = 0.3;
         topLeftTopButtonPosition = new Vector2(50, 50);
         buttonVerticalOffset = new Vector2(0, 90);
+        selectedHorizontalOffsetTotal = 80;
     }
     
     public void LoadContent(ContentManager content)
@@ -51,6 +60,20 @@ public class Menu
     public void Update(GameTime gameTime)
     {
         MenuMovement();
+
+        AnimateMenu();
+
+        buttonAnimationTime -= gameTime.ElapsedGameTime.TotalSeconds;
+    }
+
+    //Update offsets of buttons that are animated based on selected button
+    private void AnimateMenu()
+    {
+        double movementFraction = 1 - buttonAnimationTime / buttonAnimationTimeMax;
+        movementFraction = MathHelper.Clamp((float)movementFraction, 0, 1);
+
+        selectedHorizontalOffset = (int)(selectedHorizontalOffsetTotal * movementFraction);
+        previousSelectedHorizontalOffset = selectedHorizontalOffsetTotal - selectedHorizontalOffset;
     }
 
     public void Draw(GameTime gameTime)
@@ -84,6 +107,7 @@ public class Menu
                 DrawButton("Play", 0);
                 DrawButton("Settings", 1);
                 DrawButton("Quit", 2);
+                
                 break;
             case MenuState.Settings:
                 DrawButton("Master Volume", 0);
@@ -99,6 +123,7 @@ public class Menu
     {
         if (Util.GetKeyPressed(Keys.Up))
         {
+            previousMenuIndex = menuIndex;
             if (menuIndex != 0)
             {
                 menuIndex--;
@@ -107,16 +132,23 @@ public class Menu
             {
                 menuIndex = (byte)(GetMenuLength() - 1);
             }
+
+            //Set time for animation
+            buttonAnimationTime = buttonAnimationTimeMax;
         }
         
         if (Util.GetKeyPressed(Keys.Down))
         {
+            previousMenuIndex = menuIndex;
             menuIndex++;
             
             if (menuIndex == GetMenuLength()) //Loop around
             {
                 menuIndex = 0;
             }
+            
+            //Set time for animation
+            buttonAnimationTime = buttonAnimationTimeMax;
         }
 
         if (Util.GetKeyPressed(Keys.Enter))
@@ -221,9 +253,26 @@ public class Menu
     {
         if (menuIndex == index)
         {
-            return Color.Yellow;
+            switch (index % 7)
+            {
+                case 0:
+                    return Color.LightBlue;
+                case 1:
+                    return Color.Blue;
+                case 2:
+                    return Color.Orange;
+                case 3:
+                    return Color.Yellow;
+                case 4:
+                    return Color.Red;
+                case 5:
+                    return Color.Purple;
+                case 6:
+                    return Color.LightGreen;
+            }
         }
 
+        //Error value
         return Color.White;
     }
 
@@ -244,9 +293,19 @@ public class Menu
     {
         //Get button spacing
         int horizontalOffset = GetButtonLength(previousString);
+
+        //Extra horizontal offset if button is selected
+        if (index == menuIndex)
+        {
+            horizontalOffset += selectedHorizontalOffset;
+        }
+        else if (index == previousMenuIndex)
+        {
+            horizontalOffset += previousSelectedHorizontalOffset;
+        }
         
         //Extra spacing so buttons aren't glued together
-        if (horizontalOffset != 160)
+        if (previousString != null)
         {
             horizontalOffset += 100;
         }
