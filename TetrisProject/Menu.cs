@@ -136,7 +136,6 @@ public class Menu
     }
 
     #region Menu functions
-
     private void MenuFunction(InputType inputType)
     {
         switch (menuState)
@@ -211,6 +210,8 @@ public class Menu
         {
             case MenuState.MainMenu:
                 return Enum.GetNames(typeof(MainMenu)).Length;
+            case MenuState.Settings:
+                return Enum.GetNames(typeof(Settings)).Length;
             default: //Error value
                 return 0;
         }
