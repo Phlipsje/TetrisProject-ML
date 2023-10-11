@@ -52,17 +52,17 @@ public abstract class Piece
     #region Rotation types
     private Point[,] normalWallKickLeft = new[,]
     {
-        {new Point(1, 0), new Point(1, -1), new Point(0, 2), new Point(1, 2) },
-        {new Point(-1, 0), new Point(-1, 1), new Point(0, -2), new Point(-1, -2) },
-        {new Point(-1, 0), new Point(-1, 1), new Point(0, -2), new Point(-1, 2) },
-        {new Point(1, 0), new Point(1, 1), new Point(0, -2), new Point(1, -2) }
+        {new Point(1, 0), new Point(1, 1), new Point(0, -2), new Point(1, -2) },
+        {new Point(-1, 0), new Point(-1, -1), new Point(0, 2), new Point(-1, 2) },
+        {new Point(-1, 0), new Point(-1, -1), new Point(0, 2), new Point(-1, -2) },
+        {new Point(1, 0), new Point(1, -1), new Point(0, 2), new Point(1, 2) }
     };
     private Point[,] normalWallKickRight = new[,]
     {
-        {new Point(-1, 0), new Point(-1, 1), new Point(0, -2), new Point(-1, -2) },
-        {new Point(1, 0), new Point(1, -1), new Point(0, 2), new Point(1, 2) },
+        {new Point(-1, 0), new Point(-1, -1), new Point(0, 2), new Point(-1, 2) },
         {new Point(1, 0), new Point(1, 1), new Point(0, -2), new Point(1, -2) },
-        {new Point(-1, 0), new Point(-1, 1), new Point(0, -2), new Point(-1, 2) }
+        {new Point(1, 0), new Point(1, -1), new Point(0, 2), new Point(1, 2) },
+        {new Point(-1, 0), new Point(-1, -1), new Point(0, 2), new Point(-1, -2) }
     };
     private Point[,] lineWallKickLeft = new[,]
     {
