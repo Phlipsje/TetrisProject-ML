@@ -333,9 +333,9 @@ public class TetrisGame
                 }
                 else
                 {
-                    Score += (int)(100 * level * multiplier);
-                    lineClearType += "Single";
-                    clearedLines += (int)(1 * multiplier);
+                    Score += 100 * level;
+                    lineClearType = "Single";
+                    clearedLines += 1;
                 }
                 
                 backToBack = true;
@@ -352,9 +352,9 @@ public class TetrisGame
                 }
                 else
                 {  
-                    Score += (int)(300 * level * multiplier);
-                    lineClearType += "Double";
-                    clearedLines += (int)(3 * multiplier);
+                    Score += 300 * level;
+                    lineClearType = "Double";
+                    clearedLines += 3;
                     
                 }
                 
@@ -365,9 +365,9 @@ public class TetrisGame
             case 3:
                 if (!field.tSpin)
                 {
-                    Score += (int)(500 * level * multiplier);
-                    lineClearType += "Triple";
-                    clearedLines += (int)(5 * multiplier);
+                    Score += 500 * level;
+                    lineClearType = "Triple";
+                    clearedLines += 5;
                 }
                 else
                 {
