@@ -119,6 +119,10 @@ public class TetrisGame
         spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 10), Color.White);
         spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 11), Color.White);
         
+        //Draw cleared lines
+        spriteBatch.DrawString(font, "CLEARED LINES", new Vector2(field.fieldX-field.blockSize * 10,field.fieldY + field.blockSize * 13), Color.White);
+        spriteBatch.DrawString(font, clearedLines.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 14), Color.White);
+
         //Draw line clear popup
         if (lineClearTextTime > 0 && lineClearType != null && lineClearType != "B2B ")
         {
@@ -401,13 +405,13 @@ public class TetrisGame
 
     private int CalculateLevel()
     {
-        if (clearedLines >= 600) //Over max level
+        if (clearedLines >= 525) //Over max level
         {
             return 15;
         }
         int clearedLinesRemaining = clearedLines;
 
-        for (int i = 1; i < 15; i++)
+        for (int i = 1; i <= 15; i++)
         {
             if (clearedLinesRemaining >= i * 5)
             {

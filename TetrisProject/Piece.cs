@@ -45,7 +45,8 @@ public abstract class Piece
     private bool firstFrame = true;
     private double[] dropTimes = {1, 0.793, 0.618, 0.473, 0.355, 0.262, 0.190, 0.135, 0.094, 0.064, 0.043, 0.028, 0.018, 0.011, 0.007 };
     private bool lastActionIsRotation; //Check if the last action before locking in is a rotation (to signal the possibility of a t-spin/mini-t-spin)
-
+    private bool lockedDown;
+    
     private Field fieldReference;
     private TetrisGame tetrisGameReference;
     
@@ -166,6 +167,12 @@ public abstract class Piece
         {
             CheckForLockDown();
         }
+
+        //Piece is now inactive
+        if (lockedDown)
+        {
+            return;
+        }
         
         //Falling Phase
         CheckInput();
@@ -241,7 +248,7 @@ public abstract class Piece
         if (Util.GetKeyHeld(Keys.Down) && softDropTimer <= 0)
         {
             softDropTimer = softDropMaxTime;
-            softDropped = true;
+            softDropped = true; 
             MoveDown();
         }
         
@@ -296,6 +303,7 @@ public abstract class Piece
         if (fieldReference.CollidesVertical(Hitbox, position))
         {
             LockPiece();
+            lockedDown = true;
         }
         else //There is still room for piece to fall
         {
@@ -318,6 +326,7 @@ public abstract class Piece
 
     private void LockPiece()
     {
+        lockedDown = true;
         bool anyBlockBelowSkyline = false;
         for (int x = 0; x < 4; x++)
         {
@@ -392,17 +401,10 @@ public abstract class Piece
 
     private void ResetLockDownTimer()
     {
-        if (remainingMovementCounter > 0 && previousPosition != position || rotationIndex != previousRotationIndex)
+        if (remainingMovementCounter > 0 && (previousPosition != position || rotationIndex != previousRotationIndex))
         {
             remainingMovementCounter--;
             lockDownTimer = lockDownMaxTime;
-            
-            //Lock piece if counter can't be lowered anymore
-            if(remainingMovementCounter == 0)
-            {
-                position.Y++;
-                LockPiece();
-            }
         }
     }
 
