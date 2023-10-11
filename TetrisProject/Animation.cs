@@ -91,7 +91,7 @@ public class FallingBlockAnimation : Animation
         position = position + velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
         velocity.Y += gravity * (float)gameTime.ElapsedGameTime.TotalSeconds;
         rotation += rotationSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-        if (position.Y > Main.WorldHeight)
+        if (position.Y > Main.WorldHeight * 1.5)
             CanBeDestroyed = true;
     }
 
