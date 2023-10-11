@@ -117,12 +117,13 @@ public abstract class Piece
         hitboxes = new bool[4][,];
         rotationIndex = 0;
         lockDownMaxTime = 0.5;
+        lockDownTimer = lockDownMaxTime;
         autoRepeatDelay = 0.5/fieldReference.Width;
         autoRepeatStartDelay = 0.25;
         maxMovementCounter = 15;
         remainingMovementCounter = maxMovementCounter;
         dropTimer = dropTimes[this.tetrisGameReference.level-1];
-        highestHeight = position.Y;
+        highestHeight = -20;
         
         softDropMaxTime = dropTimer / 20;
     }
