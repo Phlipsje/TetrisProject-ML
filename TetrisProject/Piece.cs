@@ -318,6 +318,7 @@ public abstract class Piece
 
     private void LockPiece()
     {
+        bool anyBlockBelowSkyline = false;
         for (int x = 0; x < 4; x++)
         {
             for (int y = 0; y < 4; y++)
@@ -325,11 +326,18 @@ public abstract class Piece
                 if (Hitbox[x, y])
                 {
                     fieldReference.SetBlock(position.X + x,position.Y - y - 1,pieceType);
-                    if (position.Y - y - 1 < 0)
-                        fieldReference.GameOver(); // if block is locked down above skyline the game is over
+                    if (position.Y - y - 1 >= 0)
+                        anyBlockBelowSkyline = true;
                 }
             }
         }
+
+        if (!anyBlockBelowSkyline)
+        {
+            fieldReference.GameOver();
+            return;
+        }
+
         SfxManager.Play(SfxManager.LockPiece);
 
         //Check for T-spins
