@@ -15,15 +15,12 @@ namespace TetrisProject
         private TetrisGame tetrisGame;
         private Menu menu;
         private RenderTarget2D renderTarget;
+        private Settings settings;
         public int WindowWidth = 800;
         public int WindowHeight = 450;
         public const int WorldWidth = 1920;
         public const int WorldHeight = 1080;
         public GameState gameState;
-        public int[] masterVolume = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-        public byte masterVolumeIndex;
-        public int[] soundEffectVolume = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
-        public byte soundEffectVolumeIndex;
 
         public Main()
         {
@@ -37,15 +34,14 @@ namespace TetrisProject
             graphics.PreferredBackBufferWidth = WindowWidth;
             graphics.PreferredBackBufferHeight = WindowHeight;
             graphics.ApplyChanges();
+            settings = new Settings();
             spriteBatch = new SpriteBatch(GraphicsDevice);
             renderTarget = new RenderTarget2D(GraphicsDevice, WorldWidth, WorldHeight);
-            menu = new Menu(this, spriteBatch);
+            menu = new Menu(this, spriteBatch, settings);
             tetrisGame = new TetrisGame(this);
 
             gameState = GameState.Menu; //Change this to decide how the game starts
-
-            masterVolumeIndex = (byte)(masterVolume.Length-1);
-            soundEffectVolumeIndex = (byte)(soundEffectVolume.Length-1);
+            
             UpdateVolume();
             
             tetrisGame.Instantiate(1);
@@ -178,7 +174,7 @@ namespace TetrisProject
         
         public void UpdateVolume()
         {
-            SoundEffect.MasterVolume = (float)masterVolume[masterVolumeIndex]/100 * soundEffectVolume[soundEffectVolumeIndex]/100;
+            SoundEffect.MasterVolume = (float)settings.masterVolume/100 * settings.soundEffectVolume/100;
         }
     }
 }

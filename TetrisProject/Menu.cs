@@ -13,6 +13,7 @@ public class Menu
     //References
     private Main main;
     private SpriteBatch spriteBatch;
+    private Settings settings;
 
     //Textures
     private Texture2D buttonBegin;
@@ -26,23 +27,21 @@ public class Menu
     public byte menuIndex; //What is selected in the menu
     
     //Visual variables
-    private byte previousMenuIndex; //Used for moving animations back to original position
     private Vector2 topLeftTopButtonPosition;
     private Vector2 buttonVerticalOffset;
     private int selectedHorizontalOffsetTotal; //Applied to the button that is selected
-    private int selectedHorizontalOffset;
-    private int previousSelectedHorizontalOffset;
-    private double buttonAnimationTimeMax;
-    private double buttonAnimationTime;
+    private float[] selectedHorizontalOffsets; //Offset of each individual button
+    private float buttonAnimationTimeMax;
+    
 
-    public Menu(Main main, SpriteBatch spriteBatch)
+    public Menu(Main main, SpriteBatch spriteBatch, Settings settings)
     {
         this.main = main;
         this.spriteBatch = spriteBatch;
+        this.settings = settings;
         menuState = MenuState.MainMenu;
         menuIndex = 0;
-        previousMenuIndex = 0;
-        buttonAnimationTimeMax = 0.3;
+        buttonAnimationTimeMax = 0.3f;
         topLeftTopButtonPosition = new Vector2(50, 50);
         buttonVerticalOffset = new Vector2(0, 90);
         selectedHorizontalOffsetTotal = 80;
@@ -55,25 +54,33 @@ public class Menu
         buttonEnd = content.Load<Texture2D>("Button End");
         font = content.Load<SpriteFont>("Font");
         tile = content.Load<Texture2D>("Square");
+        
+        GoToMenu(MenuState.MainMenu);
     }
 
     public void Update(GameTime gameTime)
     {
         MenuMovement();
 
-        AnimateMenu();
-
-        buttonAnimationTime -= gameTime.ElapsedGameTime.TotalSeconds;
+        AnimateMenu(gameTime.ElapsedGameTime.TotalSeconds);
     }
 
     //Update offsets of buttons that are animated based on selected button
-    private void AnimateMenu()
+    private void AnimateMenu(double deltaTime)
     {
-        double movementFraction = 1 - buttonAnimationTime / buttonAnimationTimeMax;
-        movementFraction = MathHelper.Clamp((float)movementFraction, 0, 1);
+        for (int i = 0; i < GetMenuLength(); i++)
+        {
+            if (i == menuIndex)
+            {
+                selectedHorizontalOffsets[i] += selectedHorizontalOffsetTotal/buttonAnimationTimeMax * (float)deltaTime;
+            }
+            else
+            {
+                selectedHorizontalOffsets[i] -= selectedHorizontalOffsetTotal/buttonAnimationTimeMax * (float)deltaTime;
+            }
 
-        selectedHorizontalOffset = (int)(selectedHorizontalOffsetTotal * movementFraction);
-        previousSelectedHorizontalOffset = selectedHorizontalOffsetTotal - selectedHorizontalOffset;
+            selectedHorizontalOffsets[i] = MathHelper.Clamp(selectedHorizontalOffsets[i], 0, selectedHorizontalOffsetTotal);
+        }
     }
 
     public void Draw(GameTime gameTime)
@@ -111,9 +118,9 @@ public class Menu
                 break;
             case MenuState.Settings:
                 DrawButton("Master Volume", 0);
-                DrawButton($"{main.masterVolume[main.masterVolumeIndex]}%", 0, "Master Volume");
+                DrawButton($"{settings.masterVolume}%", 0, "Master Volume");
                 DrawButton("Sfx Volume", 1);
-                DrawButton($"{main.soundEffectVolume[main.soundEffectVolumeIndex]}%", 1, "Sfx Volume");
+                DrawButton($"{settings.soundEffectVolume}%", 1, "Sfx Volume");
                 DrawButton("Back", 2);
                 break;
         }
@@ -123,7 +130,6 @@ public class Menu
     {
         if (Util.GetKeyPressed(Keys.Up))
         {
-            previousMenuIndex = menuIndex;
             if (menuIndex != 0)
             {
                 menuIndex--;
@@ -132,23 +138,16 @@ public class Menu
             {
                 menuIndex = (byte)(GetMenuLength() - 1);
             }
-
-            //Set time for animation
-            buttonAnimationTime = buttonAnimationTimeMax;
         }
         
         if (Util.GetKeyPressed(Keys.Down))
         {
-            previousMenuIndex = menuIndex;
             menuIndex++;
             
             if (menuIndex == GetMenuLength()) //Loop around
             {
                 menuIndex = 0;
             }
-            
-            //Set time for animation
-            buttonAnimationTime = buttonAnimationTimeMax;
         }
 
         if (Util.GetKeyPressed(Keys.Enter))
@@ -190,17 +189,17 @@ public class Menu
             case MenuState.Settings:
                 switch (menuIndex)
                 {
-                    case (byte)Settings.MasterVolume:
-                        if (inputType == InputType.Select) {main.masterVolumeIndex = ToggleNext(main.masterVolume, main.masterVolumeIndex); main.UpdateVolume();}
-                        if (inputType == InputType.MoveRight) {main.masterVolumeIndex = ToggleNext(main.masterVolume, main.masterVolumeIndex); main.UpdateVolume();}
-                        if (inputType == InputType.MoveLeft) {main.masterVolumeIndex = TogglePrevious(main.masterVolume, main.masterVolumeIndex); main.UpdateVolume();}
+                    case (byte)SettingsMenu.MasterVolume:
+                        if (inputType == InputType.Select) { settings.masterVolume = Increment(settings.masterVolume, 10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.MoveRight) { settings.masterVolume = Increment(settings.masterVolume, 10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.MoveLeft) { settings.masterVolume = Increment(settings.masterVolume, -10, 0, 100); main.UpdateVolume();}
                         break;
-                    case (byte)Settings.SfxVolume:
-                        if (inputType == InputType.Select) {main.soundEffectVolumeIndex = ToggleNext(main.soundEffectVolume, main.soundEffectVolumeIndex); main.UpdateVolume();}
-                        if (inputType == InputType.MoveRight) {main.soundEffectVolumeIndex = ToggleNext(main.soundEffectVolume, main.soundEffectVolumeIndex); main.UpdateVolume();}
-                        if (inputType == InputType.MoveLeft) {main.soundEffectVolumeIndex = TogglePrevious(main.soundEffectVolume, main.soundEffectVolumeIndex); main.UpdateVolume();}
+                    case (byte)SettingsMenu.SfxVolume:
+                        if (inputType == InputType.Select) { settings.soundEffectVolume = Increment(settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.MoveRight) { settings.soundEffectVolume = Increment(settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.MoveLeft) { settings.soundEffectVolume = Increment(settings.soundEffectVolume, -10, 0, 100); main.UpdateVolume();}
                         break;
-                    case (byte)Settings.Back:
+                    case (byte)SettingsMenu.Back:
                         if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
                         break;
                 }
@@ -215,7 +214,11 @@ public class Menu
     {
         menuState = state;
         menuIndex = 0;
+        selectedHorizontalOffsets = new float[GetMenuLength()];
+        selectedHorizontalOffsets[menuIndex] = selectedHorizontalOffsetTotal;
     }
+    
+    //Toggle to next in list
     private byte ToggleNext(int[] array, byte index)
     {
         if (index == array.Length - 1)
@@ -226,6 +229,7 @@ public class Menu
         return (byte)(index + 1);
     }
     
+    //Toggle to previous in list
     private byte TogglePrevious(int[] array, byte index)
     {
         if (index == 0)
@@ -236,6 +240,13 @@ public class Menu
         return (byte)(index - 1);
     }
 
+    //Increase / decrease by a fixed amount
+    private int Increment(int value, int increment, int min, int max)
+    {
+        value += increment;
+        return MathHelper.Clamp(value, min, max);
+    }
+
     private int GetMenuLength()
     {
         switch (menuState)
@@ -243,7 +254,7 @@ public class Menu
             case MenuState.MainMenu:
                 return Enum.GetNames(typeof(MainMenu)).Length;
             case MenuState.Settings:
-                return Enum.GetNames(typeof(Settings)).Length;
+                return Enum.GetNames(typeof(SettingsMenu)).Length;
             default: //Error value
                 return 0;
         }
@@ -295,15 +306,8 @@ public class Menu
         int horizontalOffset = GetButtonLength(previousString);
 
         //Extra horizontal offset if button is selected
-        if (index == menuIndex)
-        {
-            horizontalOffset += selectedHorizontalOffset;
-        }
-        else if (index == previousMenuIndex)
-        {
-            horizontalOffset += previousSelectedHorizontalOffset;
-        }
-        
+        horizontalOffset += (int)selectedHorizontalOffsets[index];
+
         //Extra spacing so buttons aren't glued together
         if (previousString != null)
         {
@@ -340,7 +344,7 @@ public enum MainMenu
     Quit,
 }
 
-public enum Settings
+public enum SettingsMenu
 {
     MasterVolume,
     SfxVolume,
