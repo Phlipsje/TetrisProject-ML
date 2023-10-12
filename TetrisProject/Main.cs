@@ -44,7 +44,7 @@ namespace TetrisProject
             
             UpdateVolume();
             
-            tetrisGame.Instantiate(1);
+            tetrisGame.Instantiate(settings.game.startingLevel);
 
             base.Initialize();
         }
