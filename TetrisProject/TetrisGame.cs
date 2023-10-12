@@ -28,6 +28,7 @@ public class TetrisGame
     private string lineClearType = "";  //What type of line clear to show on screen
     private bool backToBack; //Check if a backToBack sequence is active
     private float multiplier = 1; //Based on backToBack (nothing or +0.5x total)
+    public double gravityMultipler; //Can be changed in settings
 
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -46,9 +47,10 @@ public class TetrisGame
     
     private Main main;
 
-    public TetrisGame(Main main)
+    public TetrisGame(Main main, Settings settings)
     {
         this.main = main;
+        gravityMultipler = settings.game.gravityMultiplier;
     }
     public void Instantiate(int level)
     {
@@ -352,8 +354,8 @@ public class TetrisGame
                 }
                 else
                 {  
-                    Score += 300 * level;
-                    lineClearType = "Double";
+                    Score += (int)(300 * level * multiplier);
+                    lineClearType += "Double";
                     clearedLines += 3;
                     
                 }
@@ -365,8 +367,8 @@ public class TetrisGame
             case 3:
                 if (!field.tSpin)
                 {
-                    Score += 500 * level;
-                    lineClearType = "Triple";
+                    Score += (int)(500 * level * multiplier);
+                    lineClearType += "Triple";
                     clearedLines += 5;
                 }
                 else

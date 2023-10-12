@@ -27,10 +27,12 @@ public struct Settings
 public struct GameRules
 {
     public int startingLevel;
+    public double gravityMultiplier;
 
     public GameRules()
     {
         startingLevel = 1;
+        gravityMultiplier = 1;
     }
 }
 

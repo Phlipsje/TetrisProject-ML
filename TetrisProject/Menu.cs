@@ -13,7 +13,6 @@ public class Menu
     //References
     private Main main;
     private SpriteBatch spriteBatch;
-    private Settings settings;
 
     //Textures
     private Texture2D buttonBegin;
@@ -34,11 +33,10 @@ public class Menu
     private float buttonAnimationTimeMax;
     
 
-    public Menu(Main main, SpriteBatch spriteBatch, Settings settings)
+    public Menu(Main main, SpriteBatch spriteBatch)
     {
         this.main = main;
         this.spriteBatch = spriteBatch;
-        this.settings = settings;
         menuState = MenuState.MainMenu;
         menuIndex = 0;
         buttonAnimationTimeMax = 0.3f;
@@ -114,13 +112,20 @@ public class Menu
                 DrawButton("Play", 0);
                 DrawButton("Settings", 1);
                 DrawButton("Quit", 2);
-                
+                break;
+            case MenuState.Lobby:
+                DrawButton("Start", 0);
+                DrawButton("Starting Level", 1);
+                DrawButton(main.settings.game.startingLevel.ToString(), 1, "Starting Level");
+                DrawButton("Gravity Multiplier", 2);
+                DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 2, "Gravity Multiplier");
+                DrawButton("Back", 3);
                 break;
             case MenuState.Settings:
                 DrawButton("Master Volume", 0);
-                DrawButton($"{settings.masterVolume}%", 0, "Master Volume");
+                DrawButton($"{main.settings.masterVolume}%", 0, "Master Volume");
                 DrawButton("Sfx Volume", 1);
-                DrawButton($"{settings.soundEffectVolume}%", 1, "Sfx Volume");
+                DrawButton($"{main.settings.soundEffectVolume}%", 1, "Sfx Volume");
                 DrawButton("Back", 2);
                 break;
         }
@@ -175,7 +180,7 @@ public class Menu
                 switch (menuIndex)
                 {
                     case (byte)MainMenu.Play:
-                        if (inputType == InputType.Select) main.gameState = GameState.Playing;
+                        if (inputType == InputType.Select) GoToMenu(MenuState.Lobby);
                         break;
                     case (byte)MainMenu.Settings:
                         if (inputType == InputType.Select) GoToMenu(MenuState.Settings);
@@ -186,18 +191,40 @@ public class Menu
                 }
                 break;
             
+            case MenuState.Lobby:
+                switch (menuIndex)
+                {
+                    case (byte)Lobby.Start:
+                        if (inputType == InputType.Select) main.gameState = GameState.Playing;
+                        break;
+                    case (byte)Lobby.StartingLevel:
+                        if (inputType == InputType.Select) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
+                        if (inputType == InputType.MoveRight) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
+                        if (inputType == InputType.MoveLeft) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, -1, 1, 15);
+                        break;
+                    case (byte)Lobby.GravityMultiplier:
+                        if (inputType == InputType.Select) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
+                        if (inputType == InputType.MoveRight) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
+                        if (inputType == InputType.MoveLeft) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, -0.1, 0.1, 5);
+                        break;
+                    case (byte)Lobby.Back:
+                        if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
+                        break;
+                }
+                break;
+            
             case MenuState.Settings:
                 switch (menuIndex)
                 {
                     case (byte)SettingsMenu.MasterVolume:
-                        if (inputType == InputType.Select) { settings.masterVolume = Increment(settings.masterVolume, 10, 0, 100); main.UpdateVolume();}
-                        if (inputType == InputType.MoveRight) { settings.masterVolume = Increment(settings.masterVolume, 10, 0, 100); main.UpdateVolume();}
-                        if (inputType == InputType.MoveLeft) { settings.masterVolume = Increment(settings.masterVolume, -10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.Select) { main.settings.masterVolume = Increment(main.settings.masterVolume, 10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.MoveRight) { main.settings.masterVolume = Increment(main.settings.masterVolume, 10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.MoveLeft) { main.settings.masterVolume = Increment(main.settings.masterVolume, -10, 0, 100); main.UpdateVolume();}
                         break;
                     case (byte)SettingsMenu.SfxVolume:
-                        if (inputType == InputType.Select) { settings.soundEffectVolume = Increment(settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
-                        if (inputType == InputType.MoveRight) { settings.soundEffectVolume = Increment(settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
-                        if (inputType == InputType.MoveLeft) { settings.soundEffectVolume = Increment(settings.soundEffectVolume, -10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.Select) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.MoveRight) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.MoveLeft) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, -10, 0, 100); main.UpdateVolume();}
                         break;
                     case (byte)SettingsMenu.Back:
                         if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
@@ -246,6 +273,12 @@ public class Menu
         value += increment;
         return MathHelper.Clamp(value, min, max);
     }
+    
+    private double Increment(double value, double increment, double min, double max)
+    {
+        value += increment;
+        return Util.Clamp(value, min, max);
+    }
 
     private int GetMenuLength()
     {
@@ -253,6 +286,8 @@ public class Menu
         {
             case MenuState.MainMenu:
                 return Enum.GetNames(typeof(MainMenu)).Length;
+            case MenuState.Lobby:
+                return Enum.GetNames(typeof(Lobby)).Length;
             case MenuState.Settings:
                 return Enum.GetNames(typeof(SettingsMenu)).Length;
             default: //Error value
@@ -334,6 +369,7 @@ public class Menu
 public enum MenuState
 {
     MainMenu,
+    Lobby,
     Settings,
 }
 
@@ -342,6 +378,14 @@ public enum MainMenu
     Play,
     Settings,
     Quit,
+}
+
+public enum Lobby
+{
+    Start,
+    StartingLevel,
+    GravityMultiplier,
+    Back,
 }
 
 public enum SettingsMenu

@@ -15,7 +15,7 @@ namespace TetrisProject
         private TetrisGame tetrisGame;
         private Menu menu;
         private RenderTarget2D renderTarget;
-        private Settings settings;
+        public Settings settings;
         public int WindowWidth = 800;
         public int WindowHeight = 450;
         public const int WorldWidth = 1920;
@@ -37,14 +37,12 @@ namespace TetrisProject
             settings = new Settings();
             spriteBatch = new SpriteBatch(GraphicsDevice);
             renderTarget = new RenderTarget2D(GraphicsDevice, WorldWidth, WorldHeight);
-            menu = new Menu(this, spriteBatch, settings);
-            tetrisGame = new TetrisGame(this);
+            menu = new Menu(this, spriteBatch);
+            tetrisGame = null;
 
-            gameState = GameState.Menu; //Change this to decide how the game starts
+            gameState = GameState.Menu;
             
             UpdateVolume();
-            
-            tetrisGame.Instantiate(settings.game.startingLevel);
 
             base.Initialize();
         }
@@ -83,7 +81,6 @@ namespace TetrisProject
         protected override void LoadContent()
         {
             menu.LoadContent(Content);
-            tetrisGame.LoadContent(Content);
             SfxManager.Load(Content);
         }
 
@@ -99,6 +96,9 @@ namespace TetrisProject
                             case MenuState.MainMenu:
                                 Exit();
                                 break;
+                            case MenuState.Lobby:
+                                menu.GoToMenu(MenuState.MainMenu);
+                                break;
                             case MenuState.Settings:
                                 menu.GoToMenu(MenuState.MainMenu);
                                 break;
@@ -108,6 +108,7 @@ namespace TetrisProject
                         gameState = GameState.Menu;
                         menu.menuState = MenuState.MainMenu;
                         menu.menuIndex = 0;
+                        tetrisGame = null;
                         break;
                     default:
                         Exit();
@@ -125,8 +126,15 @@ namespace TetrisProject
             {
                 menu.Update(gameTime);
             }
-            else
+            else if(gameState == GameState.Playing)
             {
+                //Create a new game when play is pressed
+                if (tetrisGame == null)
+                {
+                    tetrisGame = new TetrisGame(this, settings);
+                    tetrisGame.Instantiate(settings.game.startingLevel);
+                    tetrisGame.LoadContent(Content);
+                }
                 tetrisGame.Update(gameTime);
             }
             
@@ -149,7 +157,7 @@ namespace TetrisProject
             {
                 menu.Draw(gameTime);
             }
-            else
+            else if (gameState == GameState.Playing && tetrisGame != null)
             {
                 tetrisGame.Draw(spriteBatch);
             }
@@ -174,7 +182,6 @@ namespace TetrisProject
         
         public void UpdateVolume()
         {
-            //TODO this doesn't do anything?
             SoundEffect.MasterVolume = (float)settings.masterVolume / 100 * settings.soundEffectVolume/100;
         }
     }

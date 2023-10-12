@@ -123,7 +123,7 @@ public abstract class Piece
         autoRepeatStartDelay = 0.25;
         maxMovementCounter = 15;
         remainingMovementCounter = maxMovementCounter;
-        dropTimer = dropTimes[this.tetrisGameReference.level-1];
+        dropTimer = dropTimes[this.tetrisGameReference.level-1] / tetrisGameReference.gravityMultipler;
         highestHeight = -20;
         
         softDropMaxTime = dropTimer / 20;
