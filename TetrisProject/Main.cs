@@ -174,7 +174,8 @@ namespace TetrisProject
         
         public void UpdateVolume()
         {
-            SoundEffect.MasterVolume = (float)settings.masterVolume/100 * settings.soundEffectVolume/100;
+            //TODO this doesn't do anything?
+            SoundEffect.MasterVolume = (float)settings.masterVolume / 100 * settings.soundEffectVolume/100;
         }
     }
 }

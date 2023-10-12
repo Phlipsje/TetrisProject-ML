@@ -110,7 +110,7 @@ public abstract class Piece
         protected set => color = value;
     }
 
-    public Piece(Field fieldReference, TetrisGame tetrisGameReference)
+    protected Piece(Field fieldReference, TetrisGame tetrisGameReference)
     {
         this.fieldReference = fieldReference;
         this.tetrisGameReference = tetrisGameReference;
@@ -319,9 +319,15 @@ public abstract class Piece
         lastActionIsRotation = false;
         while (!fieldReference.CollidesVertical(Hitbox, Position))
         {
+            position.Y++;
             tetrisGameReference.Score += 2; //Increase score by 2 per grid line that is dropped by hard dropping
-            MoveDown();
         }
+
+        //Correct for piece now being stuck in block
+        position.Y--;
+        
+        //Final move down to trigger lock piece
+        MoveDown();
     }
 
     private void LockPiece()
@@ -427,7 +433,7 @@ public abstract class Piece
         return position.Y - highestY;
     }
     
-    public void MoveDown()
+    private void MoveDown()
     {
         position.Y++;
         
@@ -463,14 +469,14 @@ public abstract class Piece
         }
     }
 
-    public void MoveLeft()
+    private void MoveLeft()
     {
         position.X--;
         if (fieldReference.CollidesHorizontal(Hitbox, position))
             position.X++;
     }
 
-    public void MoveRight()
+    private void MoveRight()
     {
         position.X++;
         if (fieldReference.CollidesHorizontal(Hitbox, position))
@@ -484,7 +490,7 @@ public abstract class Piece
     }
     
     //Rotate a piece clockwise
-    public void RotateClockWise()
+    private void RotateClockWise()
     {
         int previousRotation = rotationIndex;
         rotationIndex++;
@@ -538,7 +544,7 @@ public abstract class Piece
     }
 
     //Rotate a piece counterclockwise
-    public void RotateCounterClockWise()
+    private void RotateCounterClockWise()
     {
         int previousRotation = rotationIndex;
         //Needs different operation order than clockwise because rotationIndex is of type byte and can't be negative
