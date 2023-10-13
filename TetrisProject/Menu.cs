@@ -116,10 +116,22 @@ public class Menu
             case MenuState.ControlProfiles:
                 //Draw all control profiles
                 
-                for (int i = 0; i < main.settings.controlProfiles.Count+1; i++)
+                for (int i = 0; i < main.settings.controlProfiles.Count+3; i++)
                 {
                     //Draw button at the bottom of the list
                     if (i == main.settings.controlProfiles.Count)
+                    {
+                        DrawButton("Create Profile", i);
+                        continue;
+                    }
+                    //Draw button at the bottom of the list
+                    if (i == main.settings.controlProfiles.Count+1)
+                    {
+                        DrawButton("Delete Profile", i);
+                        continue;
+                    }
+                    //Draw button at the bottom of the list
+                    if (i == main.settings.controlProfiles.Count+2)
                     {
                         DrawButton("Back", i);
                         continue;
@@ -285,6 +297,21 @@ public class Menu
             case MenuState.ControlProfiles:
                 if (inputType == InputType.Select)
                 {
+                    //Create new profile button
+                    if (menuIndex == GetMenuLength() - 3)
+                    {
+                        Controls newControls = new Controls();
+                        main.settings.controlProfiles.Add(newControls);
+                        edittingControlScheme = newControls;
+                        GoToMenu(MenuState.Controls);
+                        break;
+                    }
+                    //Delete profile button
+                    if (menuIndex == GetMenuLength() - 2)
+                    {
+                        //GoToMenu(MenuState.Settings);
+                        break;
+                    }
                     //Back button
                     if (menuIndex == GetMenuLength() - 1)
                     {
@@ -302,9 +329,10 @@ public class Menu
                 if (inputType == InputType.Select)
                 {
                     //Back button
-                    if (menuIndex == 7)
+                    if (menuIndex == (byte)ControlsMenu.Back)
                     {
                         GoToMenu(MenuState.ControlProfiles);
+                        break;
                     }
                     
                     //If not back button go to selecting keybind
@@ -371,7 +399,7 @@ public class Menu
             case MenuState.Settings:
                 return Enum.GetNames(typeof(SettingsMenu)).Length;
             case MenuState.ControlProfiles:
-                return main.settings.controlProfiles.Count+1; //1 extra for back button
+                return main.settings.controlProfiles.Count+3; //3 extra for create new, delete, and back button
             case MenuState.Controls:
                 return Enum.GetNames(typeof(ControlsMenu)).Length;
             default: //Error value
@@ -510,5 +538,6 @@ public enum ControlsMenu
     HardDrop,
     RotateClockWise,
     RotateCounterClockWise,
-    Hold
+    Hold,
+    Back
 }
