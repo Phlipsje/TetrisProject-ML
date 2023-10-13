@@ -105,10 +105,10 @@ namespace TetrisProject
                         }
                         break;
                     case GameState.Playing:
-                        gameState = GameState.Menu;
-                        menu.menuState = MenuState.MainMenu;
-                        menu.menuIndex = 0;
-                        tetrisGame = null;
+                        gameState = GameState.Pause;
+                        break;
+                    case GameState.Pause:
+                        gameState = GameState.Playing;
                         break;
                     default:
                         Exit();
@@ -136,6 +136,16 @@ namespace TetrisProject
                     tetrisGame.LoadContent(Content);
                 }
                 tetrisGame.Update(gameTime);
+            }
+            else if (gameState == GameState.Pause)
+            {
+                if (Util.GetKeyPressed(Keys.Back))
+                {
+                    menu.menuState = MenuState.MainMenu;
+                    menu.menuIndex = 0;
+                    gameState = GameState.Menu;
+                    tetrisGame = null;
+                }
             }
             
             AnimationManager.Update(gameTime);
@@ -191,4 +201,5 @@ public enum GameState
 {
     Menu,
     Playing,
+    Pause
 }
