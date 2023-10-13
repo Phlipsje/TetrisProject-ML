@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject;
@@ -12,7 +13,7 @@ public struct Settings
     public int musicVolume;
 
     public GameRules game;
-    public Controls controls;
+    public List<Controls> controlProfiles = new List<Controls>();
 
     public Settings()
     {
@@ -21,7 +22,9 @@ public struct Settings
         musicVolume = 100;
 
         game = new GameRules();
-        controls = new Controls();
+        controlProfiles = new List<Controls>();
+        controlProfiles.Add(new Controls()); //Default
+        //Rest of controls get imported with json when that is added
     }
 }
 

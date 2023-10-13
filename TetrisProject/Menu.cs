@@ -24,6 +24,7 @@ public class Menu
     //Variables
     public MenuState menuState; //The currently active menu
     public byte menuIndex; //What is selected in the menu
+    private Controls edittingControlScheme; //The control scheme that is actively being adjusted (used for changing keybinds)
     
     //Visual variables
     private Vector2 topLeftTopButtonPosition;
@@ -31,7 +32,6 @@ public class Menu
     private int selectedHorizontalOffsetTotal; //Applied to the button that is selected
     private float[] selectedHorizontalOffsets; //Offset of each individual button
     private float buttonAnimationTimeMax;
-    
 
     public Menu(Main main, SpriteBatch spriteBatch)
     {
@@ -63,6 +63,7 @@ public class Menu
         AnimateMenu(gameTime.ElapsedGameTime.TotalSeconds);
     }
 
+    #region Visual Methods
     //Update offsets of buttons that are animated based on selected button
     private void AnimateMenu(double deltaTime)
     {
@@ -84,6 +85,74 @@ public class Menu
     public void Draw(GameTime gameTime)
     {
         //Background
+        DrawBackground(gameTime);
+        
+        //Buttons
+        switch (menuState)
+        {
+            case MenuState.MainMenu:
+                DrawButton("Play", 0);
+                DrawButton("Settings", 1);
+                DrawButton("Quit", 2);
+                break;
+            case MenuState.Lobby:
+                DrawButton("Start", 0);
+                DrawButton("Starting Level", 1);
+                DrawButton(main.settings.game.startingLevel.ToString(), 1, "Starting Level");
+                DrawButton("Gravity Multiplier", 2);
+                DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 2, "Gravity Multiplier");
+                DrawButton("Back", 3);
+                break;
+            
+            case MenuState.Settings:
+                DrawButton("Master Volume", 0);
+                DrawButton($"{main.settings.masterVolume}%", 0, "Master Volume");
+                DrawButton("Sfx Volume", 1);
+                DrawButton($"{main.settings.soundEffectVolume}%", 1, "Sfx Volume");
+                DrawButton("Controls", 2);
+                DrawButton("Back", 3);
+                break;
+            
+            case MenuState.ControlProfiles:
+                //Draw all control profiles
+                
+                for (int i = 0; i < main.settings.controlProfiles.Count+1; i++)
+                {
+                    //Draw button at the bottom of the list
+                    if (i == main.settings.controlProfiles.Count)
+                    {
+                        DrawButton("Back", i);
+                        continue;
+                    }
+                    
+                    //Otherwise draw button representing that control scheme
+                    DrawButton(main.settings.controlProfiles[i].controlName, i);
+                }
+                break;
+            
+            case MenuState.Controls:
+                DrawButton("Move Left", 0);
+                DrawButton(ArrayListedAsString(edittingControlScheme.leftKey), 0, "Move Left");
+                DrawButton("Move Right", 1);
+                DrawButton(ArrayListedAsString(edittingControlScheme.rightKey), 1, "Move Right");
+                DrawButton("Soft Drop", 2);
+                DrawButton(ArrayListedAsString(edittingControlScheme.softDropKey), 2, "Soft Drop");
+                DrawButton("Hard Drop", 3);
+                DrawButton(ArrayListedAsString(edittingControlScheme.hardDropKey), 3, "Hard Drop");
+                DrawButton("Rotate Clockwise", 4);
+                DrawButton(ArrayListedAsString(edittingControlScheme.rotateClockWiseKey), 4, "Rotate Clockwise");
+                DrawButton("Rotate Counterclockwise", 5);
+                DrawButton(ArrayListedAsString(edittingControlScheme.rotateCounterClockWiseKey), 5, "Rotate Counterclockwise");
+                DrawButton("Hold", 6);
+                DrawButton(ArrayListedAsString(edittingControlScheme.holdKey), 6, "Hold");
+                DrawButton("Back", 7);
+
+                break;
+        }
+    }
+
+    private void DrawBackground(GameTime gameTime)
+    {
         int tileCountHorizontal = 10; //Amount of tiles in horizontal direction on screen at once
         int tileSize = Main.WorldWidth / tileCountHorizontal;
         int aspectRatio = Main.WorldWidth / Main.WorldHeight;
@@ -103,34 +172,11 @@ public class Menu
                 //Draw tile
                 spriteBatch.Draw(tile, new Rectangle((int)((i + timeFrame)*tileSize), (int)((j + timeFrame)*tileSize), tileSize, tileSize), tileColor);
             }
-        }
-        
-        //Buttons
-        switch (menuState)
-        {
-            case MenuState.MainMenu:
-                DrawButton("Play", 0);
-                DrawButton("Settings", 1);
-                DrawButton("Quit", 2);
-                break;
-            case MenuState.Lobby:
-                DrawButton("Start", 0);
-                DrawButton("Starting Level", 1);
-                DrawButton(main.settings.game.startingLevel.ToString(), 1, "Starting Level");
-                DrawButton("Gravity Multiplier", 2);
-                DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 2, "Gravity Multiplier");
-                DrawButton("Back", 3);
-                break;
-            case MenuState.Settings:
-                DrawButton("Master Volume", 0);
-                DrawButton($"{main.settings.masterVolume}%", 0, "Master Volume");
-                DrawButton("Sfx Volume", 1);
-                DrawButton($"{main.settings.soundEffectVolume}%", 1, "Sfx Volume");
-                DrawButton("Back", 2);
-                break;
-        }
+        } 
     }
+    #endregion
     
+    #region Menu Movement
     private void MenuMovement()
     {
         if (Util.GetKeyPressed(Keys.Up))
@@ -170,6 +216,7 @@ public class Menu
             MenuFunction(InputType.MoveRight);
         }
     }
+    #endregion
 
     #region Menu functions
     private void MenuFunction(InputType inputType)
@@ -226,9 +273,42 @@ public class Menu
                         if (inputType == InputType.MoveRight) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
                         if (inputType == InputType.MoveLeft) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, -10, 0, 100); main.UpdateVolume();}
                         break;
+                    case (byte)SettingsMenu.Controls:
+                        if(inputType == InputType.Select) GoToMenu(MenuState.ControlProfiles);
+                        break;
                     case (byte)SettingsMenu.Back:
                         if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
                         break;
+                }
+                break;
+            
+            case MenuState.ControlProfiles:
+                if (inputType == InputType.Select)
+                {
+                    //Back button
+                    if (menuIndex == GetMenuLength() - 1)
+                    {
+                        GoToMenu(MenuState.Settings);
+                        break;
+                    }
+
+                    //If not back button select the control scheme and go to menu page
+                    edittingControlScheme = main.settings.controlProfiles[menuIndex];
+                    GoToMenu(MenuState.Controls);
+                }
+                break;
+            
+            case MenuState.Controls:
+                if (inputType == InputType.Select)
+                {
+                    //Back button
+                    if (menuIndex == 7)
+                    {
+                        GoToMenu(MenuState.ControlProfiles);
+                    }
+                    
+                    //If not back button go to selecting keybind
+                    GoToMenu(MenuState.MapKeys);
                 }
                 break;
         }
@@ -290,6 +370,10 @@ public class Menu
                 return Enum.GetNames(typeof(Lobby)).Length;
             case MenuState.Settings:
                 return Enum.GetNames(typeof(SettingsMenu)).Length;
+            case MenuState.ControlProfiles:
+                return main.settings.controlProfiles.Count+1; //1 extra for back button
+            case MenuState.Controls:
+                return Enum.GetNames(typeof(ControlsMenu)).Length;
             default: //Error value
                 return 0;
         }
@@ -320,6 +404,25 @@ public class Menu
 
         //Error value
         return Color.White;
+    }
+
+    //List out an entire array as a string
+    private string ArrayListedAsString(Keys[] keys)
+    {
+        string text = "[";
+
+        for (int i = 0; i < keys.Length; i++)
+        {
+            if (i > 0)
+            {
+                text += ", ";
+            }
+            text += keys[i].ToString();
+        }
+
+        text += "]";
+
+        return text;
     }
 
     //Gets the length of a button based on what text it holds
@@ -371,6 +474,9 @@ public enum MenuState
     MainMenu,
     Lobby,
     Settings,
+    ControlProfiles,
+    Controls,
+    MapKeys,
 }
 
 public enum MainMenu
@@ -392,6 +498,7 @@ public enum SettingsMenu
 {
     MasterVolume,
     SfxVolume,
+    Controls,
     Back,
 }
 
