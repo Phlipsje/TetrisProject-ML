@@ -146,6 +146,16 @@ namespace TetrisProject
                     MusicManager.PlaySong(MusicManager.ClassicTheme);
                 }
                 tetrisGame.Update(gameTime);
+                if (tetrisGame.IsGameOver)
+                    MusicManager.SetPitch(gameTime, -1, 4000);
+                else if (tetrisGame.IsInStress && gameState != GameState.Pause)
+                {
+                    MusicManager.SetPitch(gameTime, 0.5f, 250);
+                }
+                else
+                {
+                    MusicManager.SetPitch(gameTime, 0, 1000);
+                }
             }
             else if (gameState == GameState.Pause)
             {
@@ -158,6 +168,8 @@ namespace TetrisProject
                     MusicManager.Stop(gameTime);
                 }
             }
+
+            
             
             AnimationManager.Update(gameTime);
             SfxManager.Update();

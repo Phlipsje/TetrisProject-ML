@@ -19,6 +19,7 @@ public class TetrisGame
     private Piece holdPiece;
     private bool holdUsed; //Can only hold a piece if has been placed since last time hold has been used
     public bool IsGameOver;
+    public bool IsInStress;
     public int Score;
     public int level = 1;
     public const int maxLevel = 15;
@@ -28,7 +29,7 @@ public class TetrisGame
     private string lineClearType = "";  //What type of line clear to show on screen
     private bool backToBack; //Check if a backToBack sequence is active
     private float multiplier = 1; //Based on backToBack (nothing or +0.5x total)
-    public double gravityMultipler; //Can be changed in settings
+    public double gravityMultipler; //Can be changed in setting
 
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece

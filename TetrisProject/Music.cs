@@ -79,10 +79,13 @@ public static class MusicManager
 
     public static void SetPitch(GameTime gameTime,  float pitch = -1, double delay = 500)
     {
-       targetPitch = pitch;
-       originalPitch = currentSong.Pitch;
-       PitchChangeStartTime = gameTime.TotalGameTime.TotalMilliseconds;
-       targetPitchChangeTime = gameTime.TotalGameTime.TotalMilliseconds + delay;
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        if (pitch == targetPitch)
+            return;
+        targetPitch = pitch;
+        originalPitch = currentSong.Pitch;
+        PitchChangeStartTime = gameTime.TotalGameTime.TotalMilliseconds;
+        targetPitchChangeTime = gameTime.TotalGameTime.TotalMilliseconds + delay;
     }
 
     public static void Normal(GameTime gameTime, double delay = 1000)

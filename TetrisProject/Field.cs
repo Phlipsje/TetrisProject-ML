@@ -80,6 +80,30 @@ public class Field //The field in which the pieces can be placed
         //Completion Phase
         // This may be used for alternative game modes and such
         tetrisGame.HandleScore(rowsMarkedForDestruction.Length);
+
+        bool anyBlockAtTop = false;
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < (int)MathF.Round((float)Height / 5); y++)
+            {
+                if (GetBlock(x, y) != Pieces.None)
+                {
+                    anyBlockAtTop = true;
+                    continue;
+                }
+            }
+            if (anyBlockAtTop)
+                continue;
+        }
+
+        if (anyBlockAtTop)
+        {
+            tetrisGame.IsInStress = true;
+        }
+        else
+        {
+            tetrisGame.IsInStress = false;
+        }
         
         // Generation Phase
         tetrisGame.RequestPiece();
