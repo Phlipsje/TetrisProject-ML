@@ -82,6 +82,7 @@ namespace TetrisProject
         {
             menu.LoadContent(Content);
             SfxManager.Load(Content);
+            MusicManager.Initialize(Content);
         }
 
         protected override void Update(GameTime gameTime)
@@ -106,9 +107,11 @@ namespace TetrisProject
                         break;
                     case GameState.Playing:
                         gameState = GameState.Pause;
+                        MusicManager.SetPitch(gameTime);
                         break;
                     case GameState.Pause:
                         gameState = GameState.Playing;
+                        MusicManager.Normal(gameTime);
                         break;
                     default:
                         Exit();
@@ -134,6 +137,7 @@ namespace TetrisProject
                     tetrisGame = new TetrisGame(this, settings);
                     tetrisGame.Instantiate(settings.game.startingLevel);
                     tetrisGame.LoadContent(Content);
+                    MusicManager.PlaySong(MusicManager.ClassicTheme);
                 }
                 tetrisGame.Update(gameTime);
             }
@@ -145,11 +149,13 @@ namespace TetrisProject
                     menu.menuIndex = 0;
                     gameState = GameState.Menu;
                     tetrisGame = null;
+                    MusicManager.Stop(gameTime);
                 }
             }
             
             AnimationManager.Update(gameTime);
             SfxManager.Update();
+            MusicManager.Update(gameTime);
             base.Update(gameTime);
         }
 

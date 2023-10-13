@@ -272,6 +272,12 @@
 /processorParam:TextureFormat=Compressed
 /build:Font.spritefont
 
+#begin music/TetrisTheme.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:music/TetrisTheme.wav
+
 #begin sfx/explosion.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
