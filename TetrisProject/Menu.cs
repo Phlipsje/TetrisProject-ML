@@ -394,3 +394,14 @@ public enum SettingsMenu
     SfxVolume,
     Back,
 }
+
+public enum ControlsMenu
+{
+    MoveLeft,
+    MoveRight,
+    SoftDrop,
+    HardDrop,
+    RotateClockWise,
+    RotateCounterClockWise,
+    Hold
+}

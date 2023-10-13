@@ -46,9 +46,11 @@ public abstract class Piece
     private double[] dropTimes = {1, 0.793, 0.618, 0.473, 0.355, 0.262, 0.190, 0.135, 0.094, 0.064, 0.043, 0.028, 0.018, 0.011, 0.007 };
     private bool lastActionIsRotation; //Check if the last action before locking in is a rotation (to signal the possibility of a t-spin/mini-t-spin)
     private bool lockedDown;
+    private Input lastMovementInputPressed;
     
     private Field fieldReference;
     private TetrisGame tetrisGameReference;
+    private Controls controls;
     
     #region Rotation types
     private Point[,] normalWallKickLeft = new[,]
@@ -110,10 +112,11 @@ public abstract class Piece
         protected set => color = value;
     }
 
-    protected Piece(Field fieldReference, TetrisGame tetrisGameReference)
+    protected Piece(Field fieldReference, TetrisGame tetrisGameReference, Controls controls)
     {
         this.fieldReference = fieldReference;
         this.tetrisGameReference = tetrisGameReference;
+        this.controls = controls;
         position = new Point(3, 0);
         hitboxes = new bool[4][,];
         rotationIndex = 0;
@@ -200,14 +203,25 @@ public abstract class Piece
 
     private void CheckInput()
     {
+        //Update lastMovementInputPressed
+        if(Util.GetKeyPressed(Input.Left, controls))
+            lastMovementInputPressed = Input.Left;
+        else if (Util.GetKeyPressed(Input.Right, controls))
+            lastMovementInputPressed = Input.Right;
+
+        if (Util.GetKeyHeld(Input.Left, controls) && !Util.GetKeyHeld(Input.Right, controls))
+            lastMovementInputPressed = Input.Left;
+        else if (Util.GetKeyHeld(Input.Right, controls) && !Util.GetKeyHeld(Input.Left, controls))
+            lastMovementInputPressed = Input.Right;
+        
         //Hold piece
-        if (Util.GetKeyPressed(Keys.LeftShift))
+        if (Util.GetKeyPressed(Input.Hold, controls))
         {
             fieldReference.HoldPiece(this);
         }
         
         //Move left
-        if (Util.GetKeyHeld(Keys.Left) && Util.LastMovementKeyPressed == Keys.Left)
+        if (Util.GetKeyHeld(Input.Left, controls) && lastMovementInputPressed == Input.Left)
         {
             if (autoRepeatDirection == Direction.Right)
             {
@@ -217,7 +231,7 @@ public abstract class Piece
                 MoveLeft();
                 ResetLockDownTimer();
             }
-            else if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0)  || Util.GetKeyPressed(Keys.Left))
+            else if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0)  || Util.GetKeyPressed(Input.Left, controls))
             {
                 MoveLeft();
                 ResetLockDownTimer();
@@ -226,7 +240,7 @@ public abstract class Piece
         }
         
         //Move right
-        if (Util.GetKeyHeld(Keys.Right) && Util.LastMovementKeyPressed == Keys.Right)
+        if (Util.GetKeyHeld(Input.Right, controls) && lastMovementInputPressed == Input.Right)
         {
             if (autoRepeatDirection == Direction.Left)
             {
@@ -236,7 +250,7 @@ public abstract class Piece
                 MoveRight();
                 ResetLockDownTimer();
             }
-            else if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0) || Util.GetKeyPressed(Keys.Right))
+            else if ((autoRepeatTimer <= 0 && autoRepeatStartTimer <= 0) || Util.GetKeyPressed(Input.Right, controls))
             {
                 MoveRight();
                 ResetLockDownTimer();
@@ -245,49 +259,42 @@ public abstract class Piece
         }
         
         //Soft drop
-        if (Util.GetKeyHeld(Keys.Down) && softDropTimer <= 0)
+        if (Util.GetKeyHeld(Input.SoftDrop, controls) && softDropTimer <= 0)
         {
             softDropTimer = softDropMaxTime;
             softDropped = true; 
             MoveDown();
         }
         
-        //Clockwise rotation
-        if (Util.GetKeyPressed(Keys.Up))
-        {
-            Rotate();
-            ResetLockDownTimer();
-        }
-        
         //Counterclockwise rotation
-        if (Util.GetKeyPressed(Keys.A))
+        if (Util.GetKeyPressed(Input.RotateCounterClockWise, controls))
         {
             RotateCounterClockWise();
             ResetLockDownTimer();
         }
         
         //Clockwise rotation
-        if (Util.GetKeyPressed(Keys.D))
+        if (Util.GetKeyPressed(Input.RotateClockWise, controls))
         {
             RotateClockWise();
             ResetLockDownTimer();
         }
         
         //Check for hard drop
-        if (Util.GetKeyPressed(Keys.Space))
+        if (Util.GetKeyPressed(Input.HardDrop, controls))
         {
             HardDrop();
             return;
         }
 
         //Check if counter movement is given in the horizontal axis
-        if ((Util.GetKeyLetGo(Keys.Left) && !Util.GetKeyHeld(Keys.Right)) || (Util.GetKeyLetGo(Keys.Right) && !Util.GetKeyHeld(Keys.Left)))
+        if ((Util.GetKeyLetGo(Input.Left, controls) && !Util.GetKeyHeld(Input.Right, controls)) || (Util.GetKeyLetGo(Input.Right, controls) && !Util.GetKeyHeld(Input.Left, controls)))
         {
             autoRepeatStartTimer = autoRepeatStartDelay;
         }
 
         //Check if started moving in the horizontal axis
-        if (Util.GetKeyPressed(Keys.Left) || Util.GetKeyPressed(Keys.Right))
+        if (Util.GetKeyPressed(Input.Left, controls) || Util.GetKeyPressed(Input.Right, controls))
         {
             autoRepeatStartTimer = autoRepeatStartDelay;
         }
@@ -482,12 +489,6 @@ public abstract class Piece
         if (fieldReference.CollidesHorizontal(Hitbox, position))
             position.X--;
     }
-
-    //Default rotation (clockwise)
-    private void Rotate()
-    {
-        RotateClockWise();
-    }
     
     //Rotate a piece clockwise
     private void RotateClockWise()
@@ -616,7 +617,7 @@ public enum Pieces
 public class BlockPiece : Piece
 {
     //All hitbox points for every rotation
-    public BlockPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
+    public BlockPiece(Field fieldReference, TetrisGame tetrisGameReference, Controls controls) : base(fieldReference, tetrisGameReference, controls)
     {
         bool[,] hitbox =
         {
@@ -635,7 +636,7 @@ public class BlockPiece : Piece
 
 public class LinePiece : Piece
 {
-    public LinePiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
+    public LinePiece(Field fieldReference, TetrisGame tetrisGameReference, Controls controls) : base(fieldReference, tetrisGameReference, controls)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -677,7 +678,7 @@ public class LinePiece : Piece
 
 public class TPiece : Piece
 {
-    public TPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
+    public TPiece(Field fieldReference, TetrisGame tetrisGameReference, Controls controls) : base(fieldReference, tetrisGameReference, controls)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -719,7 +720,7 @@ public class TPiece : Piece
 
 public class SPiece : Piece
 {
-    public SPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
+    public SPiece(Field fieldReference, TetrisGame tetrisGameReference, Controls controls) : base(fieldReference, tetrisGameReference, controls)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -761,7 +762,7 @@ public class SPiece : Piece
 
 public class ZPiece : Piece
 {
-    public ZPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
+    public ZPiece(Field fieldReference, TetrisGame tetrisGameReference, Controls controls) : base(fieldReference, tetrisGameReference, controls)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -803,7 +804,7 @@ public class ZPiece : Piece
 
 public class LPiece : Piece
 {
-    public LPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
+    public LPiece(Field fieldReference, TetrisGame tetrisGameReference, Controls controls) : base(fieldReference, tetrisGameReference, controls)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -845,7 +846,7 @@ public class LPiece : Piece
 
 public class JPiece : Piece
 {
-    public JPiece(Field fieldReference, TetrisGame tetrisGameReference) : base(fieldReference, tetrisGameReference)
+    public JPiece(Field fieldReference, TetrisGame tetrisGameReference, Controls controls) : base(fieldReference, tetrisGameReference, controls)
     {
         //All hitbox points for every rotation
         //A single row is the value of the 2nd index, not the first! (The structure does not indicate an x and y position)
@@ -887,7 +888,7 @@ public class JPiece : Piece
 
 public class GhostPiece : Piece
 {
-    public GhostPiece(Field fieldReference, TetrisGame tetrisGameReference, Piece piece) : base(fieldReference, tetrisGameReference)
+    public GhostPiece(Field fieldReference, TetrisGame tetrisGameReference, Controls controls, Piece piece) : base(fieldReference, tetrisGameReference, controls)
     {
         Piece pieceReference = piece;
         Position = piece.Position;
