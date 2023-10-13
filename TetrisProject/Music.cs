@@ -17,16 +17,25 @@ public static class MusicManager
     private static double targetPitchChangeTime = 1; // the time when the pitch should be fully change
     private static double PitchChangeStartTime = 1; // the time when the pitch started to change
     public static SoundEffect ClassicTheme;
+    private static Settings settings;
     
-    public static void Initialize(ContentManager content)
+    public static void Load(ContentManager content)
     {
         ClassicTheme = content.Load<SoundEffect>("music/TetrisTheme");
     }
 
+    public static void Initialize(Settings settingsStruct)
+    {
+        settings = settingsStruct;
+    }
+    
     public static void PlaySong(SoundEffect song, bool songIsRepeating = true)
     {
         currentSong = song.CreateInstance();
         currentSong.Play();
+        currentSong.Pitch = 0;
+        targetPitch = 0;
+        
         isRepeating = songIsRepeating;
     }
 
@@ -36,6 +45,7 @@ public static class MusicManager
             return;
         if (currentSong.State == SoundState.Stopped && isRepeating)
             currentSong.Play();
+        currentSong.Volume = (float)settings.musicVolume/100;
         if (gameTime.TotalGameTime.TotalMilliseconds == 0)
             return; // this could crash if this is 0 as some point so I'l do this just to be safe
         if (gameTime.TotalGameTime.TotalMilliseconds < targetPitchChangeTime)
@@ -54,6 +64,7 @@ public static class MusicManager
     public static void Stop(GameTime gameTime)
     {
         currentSong.Stop();
+        isRepeating = false;
     }
     
     public static void Pause()
