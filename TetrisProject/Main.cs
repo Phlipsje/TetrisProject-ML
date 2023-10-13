@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -103,6 +104,12 @@ namespace TetrisProject
                             case MenuState.Settings:
                                 menu.GoToMenu(MenuState.MainMenu);
                                 break;
+                            case MenuState.ControlProfiles:
+                                menu.GoToMenu(MenuState.Settings);
+                                break;
+                            case MenuState.Controls:
+                                menu.GoToMenu(MenuState.ControlProfiles);
+                                break;
                         }
                         break;
                     case GameState.Playing:
@@ -118,8 +125,7 @@ namespace TetrisProject
                         break;
                 }
             }
-                
-
+            
             if (Util.GetKeyPressed(Keys.F11))
                 ToggleFullScreen();
             
@@ -134,7 +140,7 @@ namespace TetrisProject
                 //Create a new game when play is pressed
                 if (tetrisGame == null)
                 {
-                    tetrisGame = new TetrisGame(this, settings);
+                    tetrisGame = new TetrisGame(this, settings, settings.controlProfiles[0]);
                     tetrisGame.Instantiate(settings.game.startingLevel);
                     tetrisGame.LoadContent(Content);
                     MusicManager.PlaySong(MusicManager.ClassicTheme);

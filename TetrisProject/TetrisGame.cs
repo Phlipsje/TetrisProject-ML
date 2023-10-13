@@ -48,10 +48,10 @@ public class TetrisGame
     private Main main;
     public Controls controls;
 
-    public TetrisGame(Main main, Settings settings)
+    public TetrisGame(Main main, Settings settings, Controls controls)
     {
         this.main = main;
-        controls = settings.controls;
+        this.controls = controls;
         gravityMultipler = settings.game.gravityMultiplier;
     }
     public void Instantiate(int level)
