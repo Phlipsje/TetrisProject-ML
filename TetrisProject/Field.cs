@@ -234,7 +234,7 @@ public class Field //The field in which the pieces can be placed
     public void DrawPiece(Piece piece, SpriteBatch spriteBatch)
     {
         if (piece.GetType() != typeof(GhostPiece))
-            DrawPiece(new GhostPiece(this, tetrisGame, piece), spriteBatch);
+            DrawPiece(new GhostPiece(this, tetrisGame, tetrisGame.controls, piece), spriteBatch);
         for (int y = 0; y < Piece.hitboxSize; y++)
         {
             for (int x =  0; x < Piece.hitboxSize; x++)

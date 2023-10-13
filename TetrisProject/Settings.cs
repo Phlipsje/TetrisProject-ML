@@ -1,3 +1,5 @@
+using Microsoft.Xna.Framework.Input;
+
 namespace TetrisProject;
 
 public struct Settings
@@ -38,8 +40,24 @@ public struct GameRules
 
 public struct Controls
 {
+    public string controlName; //Maybe save this somewhere else
+    public Keys[] leftKey;
+    public Keys[] rightKey;
+    public Keys[] softDropKey;
+    public Keys[] hardDropKey;
+    public Keys[] rotateClockWiseKey;
+    public Keys[] rotateCounterClockWiseKey;
+    public Keys[] holdKey;
+    
     public Controls()
     {
-        
+        controlName = "Default";
+        leftKey = new [] {Keys.A, Keys.Left};
+        rightKey = new [] {Keys.D, Keys.Right};
+        softDropKey = new [] {Keys.S, Keys.Down};
+        hardDropKey = new [] {Keys.Space};
+        rotateClockWiseKey = new[] { Keys.X, Keys.E, Keys.Up };
+        rotateCounterClockWiseKey = new [] { Keys.Z, Keys.Q };
+        holdKey = new[] { Keys.LeftShift, Keys.RightShift };
     }
 }

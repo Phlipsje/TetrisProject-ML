@@ -46,10 +46,12 @@ public class TetrisGame
     }
     
     private Main main;
+    public Controls controls;
 
     public TetrisGame(Main main, Settings settings)
     {
         this.main = main;
+        controls = settings.controls;
         gravityMultipler = settings.game.gravityMultiplier;
     }
     public void Instantiate(int level)
@@ -240,25 +242,25 @@ public class TetrisGame
         switch (pieceInQueue)
         {
             case Pieces.Block:
-                blockType = new BlockPiece(field, this);
+                blockType = new BlockPiece(field, this, controls);
                 break;
             case Pieces.Line:
-                blockType = new LinePiece(field, this);
+                blockType = new LinePiece(field, this, controls);
                 break;
             case Pieces.T:
-                blockType = new TPiece(field, this);
+                blockType = new TPiece(field, this, controls);
                 break;
             case Pieces.S:
-                blockType = new SPiece(field, this);
+                blockType = new SPiece(field, this, controls);
                 break;
             case Pieces.Z:
-                blockType = new ZPiece(field, this);
+                blockType = new ZPiece(field, this, controls);
                 break;
             case Pieces.L:
-                blockType = new LPiece(field, this);
+                blockType = new LPiece(field, this, controls);
                 break;
             case Pieces.J:
-                blockType = new JPiece(field, this);
+                blockType = new JPiece(field, this, controls);
                 break;
             default:
                 throw new Exception("blockType not specified");

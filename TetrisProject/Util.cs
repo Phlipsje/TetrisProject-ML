@@ -11,29 +11,73 @@ public static class Util
     //A class with extra utility functions shared with shared use cases among multiple classes
     private static KeyboardState currentKeyboardState;
     private static KeyboardState previousKeyboardState;
-    private static Keys[] leftRightKeys = { Keys.Left, Keys.Right };
-
-    private static Keys lastMovementKeyPressed;
-    public static Keys LastMovementKeyPressed
-    {
-        get => lastMovementKeyPressed;
-    }
 
     public static void Update()
     {
         previousKeyboardState = currentKeyboardState;
         currentKeyboardState = Keyboard.GetState();
-        foreach (Keys key in currentKeyboardState.GetPressedKeys())
+    }
+
+    //Returns a list of types of inputs based on the players control scheme
+    private static List<Input> GetInputsPressed(Controls controls)
+    {
+        List<Input> inputs = new List<Input>();
+        Keys[] currentKeysHeld = currentKeyboardState.GetPressedKeys();
+        Keys[] previousKeysHeld = previousKeyboardState.GetPressedKeys();
+        List<Keys> keysPressed = new List<Keys>();
+
+        for (int i = 0; i < currentKeysHeld.Length; i++)
         {
-            if (leftRightKeys.Contains(key) && GetKeyPressed(key))
-                lastMovementKeyPressed = key;
+            if (!previousKeysHeld.Contains(currentKeysHeld[i]))
+            {
+                keysPressed.Add(currentKeysHeld[i]);
+            }
         }
 
-        if (currentKeyboardState.IsKeyDown(leftRightKeys[0]) && !currentKeyboardState.IsKeyDown(leftRightKeys[1]))
-            lastMovementKeyPressed = leftRightKeys[0];
-        else if (currentKeyboardState.IsKeyDown(leftRightKeys[1]) && !currentKeyboardState.IsKeyDown(leftRightKeys[0]))
-            lastMovementKeyPressed = leftRightKeys[1];
+        foreach (var key in keysPressed)
+        {
+            if (controls.leftKey.Contains(key))
+            {
+                inputs.Add(Input.Left);
+            }
+            if (controls.rightKey.Contains(key))
+            {
+                inputs.Add(Input.Right);
+            }
+            if (controls.softDropKey.Contains(key))
+            {
+                inputs.Add(Input.SoftDrop);
+            }
+            if (controls.hardDropKey.Contains(key))
+            {
+                inputs.Add(Input.HardDrop);
+            }
+            if (controls.rotateClockWiseKey.Contains(key))
+            {
+                inputs.Add(Input.RotateClockWise);
+            }
+            if (controls.rotateCounterClockWiseKey.Contains(key))
+            {
+                inputs.Add(Input.RotateCounterClockWise);
+            }
+            if (controls.holdKey.Contains(key))
+            {
+                inputs.Add(Input.Hold);
+            }
+        }
 
+        return inputs;
+    }
+
+    //Returns if a type of input is pressed
+    public static bool GetKeyPressed(Input inputType, Controls controls)
+    {
+        if (GetInputsPressed(controls).Contains(inputType))
+        {
+            return true;
+        }
+        
+        return false;
     }
     
     //Check if key is only pressed on the current frame
@@ -41,15 +85,127 @@ public static class Util
     {
         return currentKeyboardState.IsKeyDown(key) && !previousKeyboardState.IsKeyDown(key);
     }
-
-    public static bool GetKeyLetGo(Keys key)
+    
+    //Returns a list of types of inputs based on the players control scheme
+    private static List<Input> GetInputsHeld(Controls controls)
     {
-        return !currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
-    }
+        List<Input> inputs = new List<Input>();
 
+        foreach (var key in currentKeyboardState.GetPressedKeys())
+        {
+            if (controls.leftKey.Contains(key))
+            {
+                inputs.Add(Input.Left);
+            }
+            if (controls.rightKey.Contains(key))
+            {
+                inputs.Add(Input.Right);
+            }
+            if (controls.softDropKey.Contains(key))
+            {
+                inputs.Add(Input.SoftDrop);
+            }
+            if (controls.hardDropKey.Contains(key))
+            {
+                inputs.Add(Input.HardDrop);
+            }
+            if (controls.rotateClockWiseKey.Contains(key))
+            {
+                inputs.Add(Input.RotateClockWise);
+            }
+            if (controls.rotateCounterClockWiseKey.Contains(key))
+            {
+                inputs.Add(Input.RotateCounterClockWise);
+            }
+            if (controls.holdKey.Contains(key))
+            {
+                inputs.Add(Input.Hold);
+            }
+        }
+
+        return inputs;
+    }
+    
+    //Returns if a type of input is held
+    public static bool GetKeyHeld(Input inputType, Controls controls)
+    {
+        if (GetInputsHeld(controls).Contains(inputType))
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
     public static bool GetKeyHeld(Keys key)
     {
         return currentKeyboardState.IsKeyDown(key);
+    }
+
+    private static List<Input> GetInputsLetGo(Controls controls)
+    {
+        List<Input> inputs = new List<Input>();
+        Keys[] currentKeysHeld = currentKeyboardState.GetPressedKeys();
+        Keys[] previousKeysHeld = previousKeyboardState.GetPressedKeys();
+        List<Keys> keysLetGo = new List<Keys>();
+
+        for (int i = 0; i < previousKeysHeld.Length; i++)
+        {
+            if (!currentKeysHeld.Contains(previousKeysHeld[i]))
+            {
+                keysLetGo.Add(previousKeysHeld[i]);
+            }
+        }
+
+        foreach (var key in keysLetGo)
+        {
+            if (controls.leftKey.Contains(key))
+            {
+                inputs.Add(Input.Left);
+            }
+            if (controls.rightKey.Contains(key))
+            {
+                inputs.Add(Input.Right);
+            }
+            if (controls.softDropKey.Contains(key))
+            {
+                inputs.Add(Input.SoftDrop);
+            }
+            if (controls.hardDropKey.Contains(key))
+            {
+                inputs.Add(Input.HardDrop);
+            }
+            if (controls.rotateClockWiseKey.Contains(key))
+            {
+                inputs.Add(Input.RotateClockWise);
+            }
+            if (controls.rotateCounterClockWiseKey.Contains(key))
+            {
+                inputs.Add(Input.RotateCounterClockWise);
+            }
+            if (controls.holdKey.Contains(key))
+            {
+                inputs.Add(Input.Hold);
+            }
+        }
+
+        return inputs;
+    }
+    
+    //Returns if a type of input is held
+    public static bool GetKeyLetGo(Input inputType, Controls controls)
+    {
+        if (GetInputsLetGo(controls).Contains(inputType))
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public static bool GetKeyLetGo(Keys key)
+    {
+        return !currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
     }
 
     //Shuffles the order of an array
@@ -80,4 +236,15 @@ public static class Util
 
         return value;
     }
+}
+
+public enum Input
+{
+    Left,
+    Right,
+    SoftDrop,
+    HardDrop,
+    RotateClockWise,
+    RotateCounterClockWise,
+    Hold
 }
