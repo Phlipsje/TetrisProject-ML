@@ -83,7 +83,7 @@ namespace TetrisProject
         {
             menu.LoadContent(Content);
             SfxManager.Load(Content);
-            MusicManager.Initialize(Content);
+            MusicManager.Load(Content);
         }
 
         protected override void Update(GameTime gameTime)
@@ -204,7 +204,8 @@ namespace TetrisProject
         
         public void UpdateVolume()
         {
-            SoundEffect.MasterVolume = (float)settings.masterVolume / 100 * settings.soundEffectVolume/100;
+            SoundEffect.MasterVolume = (float)settings.masterVolume / 100;
+            MusicManager.Initialize(settings);
         }
     }
 }
