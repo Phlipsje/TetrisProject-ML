@@ -154,7 +154,7 @@ namespace TetrisProject
                 }
                 else
                 {
-                    MusicManager.SetPitch(gameTime, 0, 1000);
+                    MusicManager.SetPitch(gameTime, 0, 50000);
                 }
             }
             else if (gameState == GameState.Pause)
