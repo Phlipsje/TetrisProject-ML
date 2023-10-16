@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -35,7 +36,14 @@ namespace TetrisProject
             graphics.PreferredBackBufferWidth = WindowWidth;
             graphics.PreferredBackBufferHeight = WindowHeight;
             graphics.ApplyChanges();
-            settings = new Settings();
+            if (File.Exists("Settings.conf"))
+            {
+                settings = Util.LoadSettingsFromFile("Settings.conf");
+            }
+            else
+            {
+                settings = new Settings();
+            }
             spriteBatch = new SpriteBatch(GraphicsDevice);
             renderTarget = new RenderTarget2D(GraphicsDevice, WorldWidth, WorldHeight);
             menu = new Menu(this, spriteBatch);
@@ -96,7 +104,7 @@ namespace TetrisProject
                         switch (menu.menuState)
                         {
                             case MenuState.MainMenu:
-                                Exit();
+                                QuitGame();
                                 break;
                             case MenuState.Lobby:
                                 menu.GoToMenu(MenuState.MainMenu);
@@ -113,7 +121,7 @@ namespace TetrisProject
                         }
                         break;
                     case GameState.Playing:
-                        if (tetrisGame.IsGameOver)
+                        if (tetrisGame.isGameOver)
                         {
 
                             break;
@@ -126,7 +134,7 @@ namespace TetrisProject
                         MusicManager.Normal(gameTime);
                         break;
                     default:
-                        Exit();
+                        QuitGame();
                         break;
                 }
             }
@@ -150,7 +158,7 @@ namespace TetrisProject
                     tetrisGame.LoadContent(Content);
                     MusicManager.PlaySong(MusicManager.ClassicTheme);
                 }
-                if (Util.GetKeyPressed(Keys.Enter) && tetrisGame.IsGameOver)
+                if (Util.GetKeyPressed(Keys.Enter) && tetrisGame.isGameOver)
                 {
                     menu.menuState = MenuState.MainMenu;
                     menu.menuIndex = 0;
@@ -160,9 +168,9 @@ namespace TetrisProject
                     return;
                 }
                 tetrisGame.Update(gameTime);
-                if (tetrisGame.IsGameOver)
+                if (tetrisGame.isGameOver)
                     MusicManager.SetPitch(gameTime, -1, 4000);
-                else if (tetrisGame.IsInStress && gameState != GameState.Pause)
+                else if (tetrisGame.isInStress && gameState != GameState.Pause)
                 {
                     MusicManager.SetPitch(gameTime, 0.5f, 250);
                 }
@@ -250,6 +258,12 @@ namespace TetrisProject
         {
             SoundEffect.MasterVolume = (float)settings.masterVolume / 100;
             MusicManager.Initialize(settings);
+        }
+
+        public void QuitGame()
+        {
+            Util.SaveObjectToFile(settings, "Settings.conf");
+            Exit();
         }
     }
 }

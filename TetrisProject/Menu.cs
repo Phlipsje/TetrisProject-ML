@@ -296,7 +296,7 @@ public class Menu
                         if (inputType == InputType.Select) GoToMenu(MenuState.Settings);
                         break;
                     case (byte)MainMenu.Quit:
-                        if (inputType == InputType.Select) main.Exit();
+                        if (inputType == InputType.Select) main.QuitGame();
                         break;
                 }
                 break;

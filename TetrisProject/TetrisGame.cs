@@ -20,11 +20,10 @@ public class TetrisGame
     private readonly double nextPieceWaitTimeMax = 0.2; //When the next piece appears after the previous one is locked in place
     private Piece holdPiece;
     private bool holdUsed; //Can only hold a piece if has been placed since last time hold has been used
-    public bool IsGameOver;
-    public bool IsInStress;
-    public int Score;
+    public bool isGameOver;
+    public bool isInStress;
+    public int score;
     public int level = 1;
-    public const int maxLevel = 15;
     private int clearedLines;
     private const double lineClearTextTimeMax = 1.4f;
     private double lineClearTextTime; //Amount of time a line clear text is shown on screen
@@ -65,7 +64,7 @@ public class TetrisGame
         field = new Field(this);
         FillQueue();
         NextPiece();
-        Score = 0;
+        score = 0;
         clearedLines = GetClearedLines(level);
     }
 
@@ -86,7 +85,7 @@ public class TetrisGame
     {
         lineClearTextTime -= gameTime.ElapsedGameTime.TotalSeconds;
         
-        if (IsGameOver)
+        if (isGameOver)
             return;
         if(activePiece == null)
         {
@@ -101,9 +100,9 @@ public class TetrisGame
     public void Draw(SpriteBatch spriteBatch)
     {
         field.Draw(spriteBatch);
-        if (IsGameOver)
+        if (isGameOver)
             drawGameOver(spriteBatch);
-        if (activePiece != null && !IsGameOver)
+        if (activePiece != null && !isGameOver)
         {
             field.DrawPiece(activePiece, spriteBatch); 
         }
@@ -132,7 +131,7 @@ public class TetrisGame
         
         //Draw score
         spriteBatch.DrawString(font, "SCORE", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 6), Color.White);
-        spriteBatch.DrawString(font, Score.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 7), Color.White);
+        spriteBatch.DrawString(font, score.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 7), Color.White);
         
         //Draw level
         spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 10), Color.White);
@@ -296,7 +295,7 @@ public class TetrisGame
 
     public void GameOver()
     {
-        IsGameOver = true;
+        isGameOver = true;
         field.PlayGameOverAnimation();
         field = new Field(this);
         Point lpos = new Point(3, 8);
@@ -329,13 +328,13 @@ public class TetrisGame
             case 0:
                 if (field.miniTSpin)
                 {
-                    Score += 100 * level;
+                    score += 100 * level;
                     lineClearType = "Mini-T-Spin";
                     clearedLines += (int)(1 * multiplier);
                 }
                 else if (field.tSpin)
                 {
-                    Score += 400 * level;
+                    score += 400 * level;
                     lineClearType = "T-Spin";
                     clearedLines += (int)(4 * multiplier);
                 }
@@ -350,19 +349,19 @@ public class TetrisGame
             case 1:
                 if (field.miniTSpin)
                 {
-                    Score += (int)(200 * level * multiplier);
+                    score += (int)(200 * level * multiplier);
                     lineClearType += "Mini-T-Spin Single";
                     clearedLines += (int)(2 * multiplier);
                 }
                 else if (field.tSpin)
                 {
-                    Score += 800 * level;
+                    score += 800 * level;
                     lineClearType += "T-Spin Single";
                     clearedLines += (int)(8 * multiplier);
                 }
                 else
                 {
-                    Score += 100 * level;
+                    score += 100 * level;
                     lineClearType = "Single";
                     clearedLines += 1;
                 }
@@ -375,13 +374,13 @@ public class TetrisGame
                 
                 if(field.tSpin || field.miniTSpin) //The conditions for a mini-t-spin double count as a t-spin double
                 {
-                    Score += (int)(1200 * level * multiplier);
+                    score += (int)(1200 * level * multiplier);
                     lineClearType += "T-Spin Double";
                     clearedLines += (int)(12 * multiplier);
                 }
                 else
                 {  
-                    Score += (int)(300 * level * multiplier);
+                    score += (int)(300 * level * multiplier);
                     lineClearType += "Double";
                     clearedLines += 3;
                     
@@ -394,13 +393,13 @@ public class TetrisGame
             case 3:
                 if (!field.tSpin)
                 {
-                    Score += (int)(500 * level * multiplier);
+                    score += (int)(500 * level * multiplier);
                     lineClearType += "Triple";
                     clearedLines += 5;
                 }
                 else
                 {
-                    Score += (int)(1600 * level * multiplier);
+                    score += (int)(1600 * level * multiplier);
                     lineClearType += "T-Spin Triple";
                     clearedLines += (int)(16 * multiplier);
                 }
@@ -410,7 +409,7 @@ public class TetrisGame
                 break;
             
             case 4:
-                Score += (int)(800 * level * multiplier);
+                score += (int)(800 * level * multiplier);
                 lineClearType += "Tetris";
                 clearedLines += (int)(8 * multiplier);
                 
@@ -422,7 +421,7 @@ public class TetrisGame
         //Extra bonus if player clears the entire field
         if (field.allClear)
         {
-            Score += 1000 * level;
+            score += 1000 * level;
             lineClearType = "All clear!";
             clearedLines += 10;
         }

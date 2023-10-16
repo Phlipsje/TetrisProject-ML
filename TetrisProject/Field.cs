@@ -98,11 +98,11 @@ public class Field //The field in which the pieces can be placed
 
         if (anyBlockAtTop)
         {
-            tetrisGame.IsInStress = true;
+            tetrisGame.isInStress = true;
         }
         else
         {
-            tetrisGame.IsInStress = false;
+            tetrisGame.isInStress = false;
         }
         
         // Generation Phase

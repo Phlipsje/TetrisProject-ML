@@ -327,7 +327,7 @@ public abstract class Piece
         while (!fieldReference.CollidesVertical(Hitbox, Position))
         {
             position.Y++;
-            tetrisGameReference.Score += 2; //Increase score by 2 per grid line that is dropped by hard dropping
+            tetrisGameReference.score += 2; //Increase score by 2 per grid line that is dropped by hard dropping
         }
 
         //Correct for piece now being stuck in block
@@ -472,7 +472,7 @@ public abstract class Piece
         //Increase score by 1 for each grid line dropped by soft dropping
         if (softDropped && GetHighestYPoint() == highestHeight)
         {
-            tetrisGameReference.Score++;
+            tetrisGameReference.score++;
         }
     }
 

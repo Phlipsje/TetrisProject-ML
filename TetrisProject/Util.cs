@@ -255,10 +255,10 @@ public static class Util
         return value;
     }
 
-    public static void SaveObjectToFile(object obj, string filename)
+    public static void SaveObjectToFile(object obj, string path)
     {
         string serializedText = JsonSerializer.Serialize(obj);
-        File.WriteAllText(filename, serializedText);
+        File.WriteAllText(path, serializedText);
     }
 
     public static Settings LoadSettingsFromFile(string filename)
