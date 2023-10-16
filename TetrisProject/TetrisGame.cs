@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -36,11 +37,13 @@ public class TetrisGame
     public Texture2D blockTexture; //Texture of a single block in a piece
     public Texture2D squareTexture; //Used for drawing rectangles with a single color
     public Texture2D[] explosionTextures;
+    private Texture2D holdBlockedTexture;
     private SpriteFont font;
     
     //File locations
     private const string blockTextureFileName = "BaseBlock";
     private const string squareTextureFileName = "Square";
+    private const string holdBlockedFileName = "HoldBlocked";
     
     public Point WindowSize
     {
@@ -72,6 +75,7 @@ public class TetrisGame
         squareTexture = content.Load<Texture2D>(squareTextureFileName);
         font = content.Load<SpriteFont>("Font");
         explosionTextures = new Texture2D[17];
+        holdBlockedTexture = content.Load<Texture2D>(holdBlockedFileName);
         for (int i = 0; i < 17; i++)
         {
             explosionTextures[i] = content.Load<Texture2D>($"eEffect/explosion{i}");
@@ -116,7 +120,14 @@ public class TetrisGame
         spriteBatch.DrawString(font, "HOLD", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize ), Color.White);
         if (holdPiece != null)
         {
-            DrawPiece(holdPiece, spriteBatch, new Point(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 5));
+            Point holdPosition = new Point(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 5);
+            DrawPiece(holdPiece, spriteBatch, holdPosition);
+            if (holdUsed)
+            {
+                Rectangle destinationRect =
+                    new Rectangle(holdPosition - new Point(0, 3 * field.blockSize), new Point(3 * field.blockSize, 3 * field.blockSize));
+                spriteBatch.Draw(holdBlockedTexture, destinationRect, Color.White);
+            }
         }
         
         //Draw score
