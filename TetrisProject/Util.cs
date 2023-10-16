@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -251,6 +253,30 @@ public static class Util
         }
 
         return value;
+    }
+
+    public static void SaveObjectToFile(object obj, string filename)
+    {
+        string serializedText = JsonSerializer.Serialize(obj);
+        File.WriteAllText(filename, serializedText);
+    }
+
+    public static Settings LoadSettingsFromFile(string filename)
+    {
+        string serializedText = File.ReadAllText(filename);
+        return JsonSerializer.Deserialize<Settings>(serializedText);
+    }
+
+    public static GameRules LoadGameRulesFromFile(string filename)
+    {
+        string serializedText = File.ReadAllText(filename);
+        return JsonSerializer.Deserialize<GameRules>(serializedText);
+    }
+    
+    public static Controls LoadControlsFromFile(string filename)
+    {
+        string serializedText = File.ReadAllText(filename);
+        return JsonSerializer.Deserialize<Controls>(serializedText);
     }
 }
 
