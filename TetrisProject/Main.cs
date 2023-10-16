@@ -113,6 +113,11 @@ namespace TetrisProject
                         }
                         break;
                     case GameState.Playing:
+                        if (tetrisGame.IsGameOver)
+                        {
+
+                            break;
+                        }
                         gameState = GameState.Pause;
                         MusicManager.SetPitch(gameTime);
                         break;
@@ -145,6 +150,15 @@ namespace TetrisProject
                     tetrisGame.LoadContent(Content);
                     MusicManager.PlaySong(MusicManager.ClassicTheme);
                 }
+                if (Util.GetKeyPressed(Keys.Enter) && tetrisGame.IsGameOver)
+                {
+                    menu.menuState = MenuState.MainMenu;
+                    menu.menuIndex = 0;
+                    gameState = GameState.Menu;
+                    tetrisGame = null;
+                    MusicManager.Stop(gameTime);
+                    return;
+                }
                 tetrisGame.Update(gameTime);
                 if (tetrisGame.IsGameOver)
                     MusicManager.SetPitch(gameTime, -1, 4000);
@@ -154,7 +168,7 @@ namespace TetrisProject
                 }
                 else
                 {
-                    MusicManager.SetPitch(gameTime, 0, 50000);
+                    MusicManager.SetPitch(gameTime, 0, 5000);
                 }
             }
             else if (gameState == GameState.Pause)
@@ -221,10 +235,15 @@ namespace TetrisProject
         private void drawPauseScreen()
         {
             string pauseString = "PAUSED";
-            Vector2 stringSize = menu.font.MeasureString(pauseString);
-            Vector2 stringPosition = new Vector2(WorldWidth - stringSize.X, WorldHeight - stringSize.Y) / 2;
-            spriteBatch.DrawString(menu.font, pauseString, stringPosition, Color.White);
-            
+            string pauseInfoString = "press backspace to quit";
+            Vector2 pauseStringSize = menu.font.MeasureString(pauseString);
+            Vector2 pauseInfoStringSize = menu.font.MeasureString(pauseInfoString);
+            Vector2 pauseStringPosition = new Vector2(WorldWidth - pauseStringSize.X,
+                WorldHeight - pauseStringSize.Y - pauseInfoStringSize.Y) / 2;
+            Vector2 pauseInfoStringPosition = new Vector2((WorldWidth - pauseInfoStringSize.X) / 2,
+                pauseStringPosition.Y + pauseInfoStringSize.Y);
+            spriteBatch.DrawString(menu.font, pauseString, pauseStringPosition, Color.White);
+            spriteBatch.DrawString(menu.font, pauseInfoString, pauseInfoStringPosition, Color.White);
         }
         
         public void UpdateVolume()

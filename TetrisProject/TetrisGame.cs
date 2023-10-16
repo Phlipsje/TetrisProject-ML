@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -96,6 +97,8 @@ public class TetrisGame
     public void Draw(SpriteBatch spriteBatch)
     {
         field.Draw(spriteBatch);
+        if (IsGameOver)
+            drawGameOver(spriteBatch);
         if (activePiece != null && !IsGameOver)
         {
             field.DrawPiece(activePiece, spriteBatch); 
@@ -151,6 +154,16 @@ public class TetrisGame
                 spriteBatch.Draw(blockTexture, blockRectangle, piece.Color);
             }
         }
+    }
+
+    private void drawGameOver(SpriteBatch spriteBatch)
+    {
+        string gameOverString = "Press enter";
+        Vector2 stringSize = font.MeasureString(gameOverString);
+        Vector2 stringPosition = new Vector2(field.fieldX, field.fieldY);
+        stringPosition.X += (field.blockSize * field.Width - stringSize.X) / 2;
+        stringPosition.Y += (field.blockSize * field.Height) * 0.75f;
+        spriteBatch.DrawString(font, gameOverString, stringPosition, Color.White);
     }
 
     //Get amount of clearedLines if you start at a certain level

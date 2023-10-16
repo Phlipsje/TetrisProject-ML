@@ -35,6 +35,7 @@ public static class MusicManager
         currentSong.Play();
         currentSong.Pitch = 0;
         targetPitch = 0;
+        originalPitch = 0;
         
         isRepeating = songIsRepeating;
     }
@@ -80,7 +81,7 @@ public static class MusicManager
     public static void SetPitch(GameTime gameTime,  float pitch = -1, double delay = 500)
     {
         // ReSharper disable once CompareOfFloatsByEqualityOperator
-        if (pitch == targetPitch)
+        if (pitch == targetPitch && delay != 0)
             return;
         targetPitch = pitch;
         originalPitch = currentSong.Pitch;
