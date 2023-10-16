@@ -90,15 +90,16 @@ public class Menu
 
     public void Draw(GameTime gameTime)
     {
-        if (menuState == MenuState.MapKeys)
-        {
-            selectingKeys.Update();
-            return;
-        }
-        
         //Background
         DrawBackground(gameTime);
         
+        if (menuState == MenuState.MapKeys)
+        {
+            
+            selectingKeys.Draw(spriteBatch, tile, font);
+            return;
+        }
+
         //Buttons
         switch (menuState)
         {
@@ -451,7 +452,7 @@ public class Menu
     }
 
     //List out an entire array as a string
-    private string ArrayListedAsString(Keys[] keys)
+    public string ArrayListedAsString(Keys[] keys)
     {
         string text = "[";
 

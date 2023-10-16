@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject;
@@ -85,6 +87,40 @@ public class SelectingKeys
             {
                 mappedKeys.Add(key);
             }
+        }
+    }
+
+    public void Draw(SpriteBatch spriteBatch, Texture2D tile, SpriteFont font)
+    {
+        spriteBatch.Draw(tile, new Rectangle(400, 200, 1120, 680), Color.Gray);
+        
+        spriteBatch.DrawString(font, InputTypeToString(edittingInputType), new Vector2(500, 300), Color.White);
+
+        spriteBatch.DrawString(font, menu.ArrayListedAsString(mappedKeys.ToArray()), new Vector2(500, 380), Color.White);
+        
+        spriteBatch.DrawString(font, "Press enter to confirm", new Vector2(500, 460), Color.White);
+    }
+
+    private string InputTypeToString(ControlsMenu inputType)
+    {
+        switch (inputType)
+        {
+            case ControlsMenu.MoveLeft:
+                return "Move Left";
+            case ControlsMenu.MoveRight:
+                return "Move Right";
+            case ControlsMenu.SoftDrop:
+                return "Soft Drop";
+            case ControlsMenu.HardDrop:
+                return "Hard Drop";
+            case ControlsMenu.RotateClockWise:
+                return "Rotate Clockwise";
+            case ControlsMenu.RotateCounterClockWise:
+                return "Rotate Counterclockwise";
+            case ControlsMenu.Hold:
+                return "Hold";
+            default:
+                return "";
         }
     }
 }
