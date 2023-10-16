@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -26,6 +27,8 @@ public class Menu
     public MenuState menuState; //The currently active menu
     public byte menuIndex; //What is selected in the menu
     private int edittingControlScheme; //The control scheme that is actively being adjusted (used for changing keybinds)
+    private string newProfileName = "";
+    public byte profileIndex;
     
     //Visual variables
     private Vector2 topLeftTopButtonPosition;
@@ -110,11 +113,14 @@ public class Menu
                 break;
             case MenuState.Lobby:
                 DrawButton("Start", 0);
-                DrawButton("Starting Level", 1);
-                DrawButton(main.settings.game.startingLevel.ToString(), 1, "Starting Level");
-                DrawButton("Gravity Multiplier", 2);
-                DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 2, "Gravity Multiplier");
-                DrawButton("Back", 3);
+                DrawButton("Gamemode", 1);
+                DrawButton("Profile", 2);
+                DrawButton(main.settings.controlProfiles[profileIndex].controlName, 2, "Profile");
+                DrawButton("Starting Level", 3);
+                DrawButton(main.settings.game.startingLevel.ToString(), 3, "Starting Level");
+                DrawButton("Gravity Multiplier", 4);
+                DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 4, "Gravity Multiplier");
+                DrawButton("Back", 5);
                 break;
             
             case MenuState.Settings:
@@ -135,6 +141,14 @@ public class Menu
                     if (i == main.settings.controlProfiles.Count)
                     {
                         DrawButton("Create Profile", i);
+                        if (newProfileName != "")
+                        {
+                            DrawButton(newProfileName, i, "Create Profile");
+                        }
+                        else
+                        {
+                            DrawButton("Enter name", i, "Create Profile");
+                        }
                         continue;
                     }
                     //Draw button at the bottom of the list
@@ -205,6 +219,12 @@ public class Menu
     #region Menu Movement
     private void MenuMovement()
     {
+        //Check if a key was pressed
+        if (Util.GetKeysPressed().Length == 0)
+        {
+            return;
+        }
+
         if (Util.GetKeyPressed(Keys.Up))
         {
             if (menuIndex != 0)
@@ -215,6 +235,8 @@ public class Menu
             {
                 menuIndex = (byte)(GetMenuLength() - 1);
             }
+
+            return;
         }
         
         if (Util.GetKeyPressed(Keys.Down))
@@ -225,22 +247,36 @@ public class Menu
             {
                 menuIndex = 0;
             }
+            
+            return;
         }
 
         if (Util.GetKeyPressed(Keys.Enter))
         {
             MenuFunction(InputType.Select);
+            return;
         }
         
         if (Util.GetKeyPressed(Keys.Left))
         {
             MenuFunction(InputType.MoveLeft);
+            return;
         }
         
         if (Util.GetKeyPressed(Keys.Right))
         {
             MenuFunction(InputType.MoveRight);
+            return;
         }
+        
+        if (Util.GetKeyPressed(Keys.Back))
+        {
+            MenuFunction(InputType.Back);
+            return;
+        }
+        
+        //Other key was pressed
+        MenuFunction(InputType.Text);
     }
     #endregion
 
@@ -269,6 +305,13 @@ public class Menu
                 {
                     case (byte)Lobby.Start:
                         if (inputType == InputType.Select) main.gameState = GameState.Playing;
+                        break;
+                    case (byte)Lobby.GameMode:
+                        break;
+                    case (byte)Lobby.Profile:
+                        if (inputType == InputType.Select) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
+                        if (inputType == InputType.MoveRight) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
+                        if (inputType == InputType.MoveLeft) profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex);
                         break;
                     case (byte)Lobby.StartingLevel:
                         if (inputType == InputType.Select) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
@@ -300,7 +343,11 @@ public class Menu
                         if (inputType == InputType.MoveLeft) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, -10, 0, 100); main.UpdateVolume();}
                         break;
                     case (byte)SettingsMenu.Controls:
-                        if(inputType == InputType.Select) GoToMenu(MenuState.ControlProfiles);
+                        if(inputType == InputType.Select) 
+                        {
+                            GoToMenu(MenuState.ControlProfiles);
+                            
+                        }
                         break;
                     case (byte)SettingsMenu.Back:
                         if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
@@ -315,6 +362,7 @@ public class Menu
                     if (menuIndex == GetMenuLength() - 3)
                     {
                         Controls newControls = new Controls();
+                        newControls.controlName = newProfileName;
                         main.settings.controlProfiles.Add(newControls);
                         edittingControlScheme = main.settings.controlProfiles.Count-1; //Add() adds to end of list, set control scheme to end of list
                         GoToMenu(MenuState.Controls);
@@ -336,6 +384,20 @@ public class Menu
                     //If not back button select the control scheme and go to menu page
                     edittingControlScheme = menuIndex;
                     GoToMenu(MenuState.Controls);
+                }
+
+                //If hovering over create profile and typing text
+                if (inputType == InputType.Text && menuIndex == GetMenuLength() - 3)
+                {
+                    //Add text to string, with a limit on what characters can be user
+                    newProfileName += FilterInput(Util.GetKeysPressed(), "abcdefghijklmnopqrstuvwxyz");
+                }
+
+                //If hovering over create profile and deleting text
+                if (inputType == InputType.Back && menuIndex == GetMenuLength() - 3)
+                {
+                    //Delete last letter of string
+                    newProfileName = newProfileName.Substring(0, newProfileName.Length - 1);
                 }
                 break;
             
@@ -360,8 +422,34 @@ public class Menu
     
     #region Extra functions
 
+    //Only parse allowed characters to string
+    private string FilterInput(Keys[] keys, string filter)
+    {
+        string text = "";
+        List<string> filterList = new List<string>();
+        for (int i = 0; i < filter.Length; i++)
+        {
+            filterList.Add(filter[i].ToString().ToUpper()); 
+        }
+
+        foreach (var key in keys)
+        {
+            if (filterList.Contains(key.ToString()))
+            {
+                text += key.ToString();
+            }
+        }
+
+        return text;
+    }
+
     public void GoToMenu(MenuState state)
     {
+        if (menuState == MenuState.ControlProfiles)
+        {
+            newProfileName = "";
+        }
+        
         menuState = state;
         menuIndex = 0;
         selectedHorizontalOffsets = new float[GetMenuLength()];
@@ -369,7 +457,7 @@ public class Menu
     }
     
     //Toggle to next in list
-    private byte ToggleNext(int[] array, byte index)
+    private byte ToggleNext<T>(T[] array, byte index)
     {
         if (index == array.Length - 1)
         {
@@ -378,9 +466,9 @@ public class Menu
 
         return (byte)(index + 1);
     }
-    
+
     //Toggle to previous in list
-    private byte TogglePrevious(int[] array, byte index)
+    private byte TogglePrevious<T>(T[] array, byte index)
     {
         if (index == 0)
         {
@@ -469,6 +557,24 @@ public class Menu
 
         return text;
     }
+    
+    private string ArrayListedAsString(List<Controls> profiles)
+    {
+        string text = "[";
+
+        for (int i = 0; i < profiles.Count; i++)
+        {
+            if (i > 0)
+            {
+                text += ", ";
+            }
+            text += profiles[i].controlName;
+        }
+
+        text += "]";
+
+        return text;
+    }
 
     //Gets the length of a button based on what text it holds
     private int GetButtonLength(string text)
@@ -511,6 +617,8 @@ public class Menu
         Select,
         MoveLeft,
         MoveRight,
+        Back,
+        Text,
     }
 }
 
@@ -534,6 +642,8 @@ public enum MainMenu
 public enum Lobby
 {
     Start,
+    GameMode,
+    Profile,
     StartingLevel,
     GravityMultiplier,
     Back,

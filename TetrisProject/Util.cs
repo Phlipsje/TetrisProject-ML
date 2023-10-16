@@ -208,6 +208,22 @@ public static class Util
         return !currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
     }
 
+    //Get all keys that are pressed
+    public static Keys[] GetKeysPressed()
+    {
+        List<Keys> keys = new List<Keys>();
+        
+        foreach (var key in currentKeyboardState.GetPressedKeys())
+        {
+            if (!previousKeyboardState.GetPressedKeys().Contains(key))
+            {
+                keys.Add(key);
+            }
+        }
+
+        return keys.ToArray();
+    }
+
     //Shuffles the order of an array
     public static Pieces[] ShuffleArray(Pieces[] array)
     {
