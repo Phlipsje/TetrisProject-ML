@@ -413,7 +413,7 @@ public class Menu
                 }
 
                 //If hovering over create profile and deleting text
-                if (inputType == InputType.Back && menuIndex == GetMenuLength() - 3)
+                if (inputType == InputType.Back && menuIndex == GetMenuLength() - 3 && newProfileName.Length != 0)
                 {
                     //Delete last letter of string
                     newProfileName = newProfileName.Substring(0, newProfileName.Length - 1);
