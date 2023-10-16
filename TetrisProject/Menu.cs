@@ -155,6 +155,7 @@ public class Menu
                     if (i == main.settings.controlProfiles.Count+1)
                     {
                         DrawButton("Delete Profile", i);
+                        DrawButton(main.settings.controlProfiles[profileIndex].controlName, i, "Delete Profile");
                         continue;
                     }
                     //Draw button at the bottom of the list
@@ -361,17 +362,35 @@ public class Menu
                     //Create new profile button
                     if (menuIndex == GetMenuLength() - 3)
                     {
-                        Controls newControls = new Controls();
-                        newControls.controlName = newProfileName;
-                        main.settings.controlProfiles.Add(newControls);
-                        edittingControlScheme = main.settings.controlProfiles.Count-1; //Add() adds to end of list, set control scheme to end of list
-                        GoToMenu(MenuState.Controls);
+                        //Only make new control profile if name is not empty
+                        if (newProfileName != "")
+                        {
+                            //Only make new control profile if name is not in use yet
+                            foreach (var profiles in main.settings.controlProfiles)
+                            {
+                                if (string.Equals(profiles.controlName, newProfileName, StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    return;
+                                }
+                            }
+                            
+                            Controls newControls = new Controls();
+                            newControls.controlName = newProfileName;
+                            main.settings.controlProfiles.Add(newControls);
+                            edittingControlScheme = main.settings.controlProfiles.Count-1; //Add() adds to end of list, set control scheme to end of list
+                            GoToMenu(MenuState.Controls);
+                        }
                         break;
                     }
                     //Delete profile button
                     if (menuIndex == GetMenuLength() - 2)
                     {
-                        //GoToMenu(MenuState.Settings);
+                        //Can't delete default
+                        if (profileIndex != 0)
+                        {
+                            main.settings.controlProfiles.RemoveAt(profileIndex);
+                        }
+                        GoToMenu(MenuState.ControlProfiles, (byte)(GetMenuLength() - 2));
                         break;
                     }
                     //Back button
@@ -399,6 +418,9 @@ public class Menu
                     //Delete last letter of string
                     newProfileName = newProfileName.Substring(0, newProfileName.Length - 1);
                 }
+
+                if (inputType == InputType.MoveLeft && menuIndex == GetMenuLength() - 2) { profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex);}
+                if (inputType == InputType.MoveRight && menuIndex == GetMenuLength() - 2) { profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);}
                 break;
             
             case MenuState.Controls:
@@ -443,15 +465,20 @@ public class Menu
         return text;
     }
 
-    public void GoToMenu(MenuState state)
+    public void GoToMenu(MenuState state, byte goToIndex = 0)
     {
         if (menuState == MenuState.ControlProfiles)
         {
             newProfileName = "";
+            profileIndex = 0;
+        }
+        else if(menuState == MenuState.Lobby)
+        {
+            profileIndex = 0;
         }
         
         menuState = state;
-        menuIndex = 0;
+        menuIndex = goToIndex;
         selectedHorizontalOffsets = new float[GetMenuLength()];
         selectedHorizontalOffsets[menuIndex] = selectedHorizontalOffsetTotal;
     }
