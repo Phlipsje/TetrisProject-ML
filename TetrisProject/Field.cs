@@ -41,7 +41,7 @@ public class Field //The field in which the pieces can be placed
     }
 
     //Prepare the field to be usable
-    public Field(TetrisGame tetrisGameReference)
+    public Field(TetrisGame tetrisGameReference, int startX = 760, int startY = 140)
     {
         tetrisGame = tetrisGameReference;
         
@@ -57,8 +57,8 @@ public class Field //The field in which the pieces can be placed
         blockSize = 40;
         fieldPixelWidth = width * blockSize;
         fieldPixelHeight = height * blockSize;
-        fieldX = (Main.WorldWidth-fieldPixelWidth)/2;
-        fieldY = (Main.WorldHeight-fieldPixelHeight)/2;
+        fieldX = startX;
+        fieldY = startY;
     }
 
     //All the methods that are called when a piece is locked into place (in the form of a flowchart check list)

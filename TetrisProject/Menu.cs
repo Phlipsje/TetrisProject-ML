@@ -26,16 +26,21 @@ public class Menu
     //Variables
     public MenuState menuState; //The currently active menu
     public byte menuIndex; //What is selected in the menu
-    private int edittingControlScheme; //The control scheme that is actively being adjusted (used for changing keybinds)
+    private int editingControlScheme; //The control scheme that is actively being adjusted (used for changing keybinds)
     private string newProfileName = "";
+    
+    //Toggles
     public byte profileIndex;
+    private readonly string[] gameModeNames = {"Standard", "Tug Of War"};
+    
+    public byte gameModeIndex;
     
     //Visual variables
-    private Vector2 topLeftTopButtonPosition;
-    private Vector2 buttonVerticalOffset;
-    private int selectedHorizontalOffsetTotal; //Applied to the button that is selected
+    private readonly Vector2 topLeftTopButtonPosition;
+    private readonly Vector2 buttonVerticalOffset;
+    private readonly int selectedHorizontalOffsetTotal; //Applied to the button that is selected
     private float[] selectedHorizontalOffsets; //Offset of each individual button
-    private float buttonAnimationTimeMax;
+    private readonly float buttonAnimationTimeMax;
 
     public Menu(Main main, SpriteBatch spriteBatch)
     {
@@ -113,7 +118,8 @@ public class Menu
                 break;
             case MenuState.Lobby:
                 DrawButton("Start", 0);
-                DrawButton("Gamemode", 1);
+                DrawButton("GameMode", 1);
+                DrawButton(gameModeNames[gameModeIndex], 1, "GameMode");
                 DrawButton("Profile", 2);
                 DrawButton(main.settings.controlProfiles[profileIndex].controlName, 2, "Profile");
                 DrawButton("Starting Level", 3);
@@ -171,7 +177,7 @@ public class Menu
                 break;
             
             case MenuState.Controls:
-                Controls profile = main.settings.controlProfiles[edittingControlScheme];
+                Controls profile = main.settings.controlProfiles[editingControlScheme];
                 DrawButton("Move Left", 0);
                 DrawButton(ArrayListedAsString(profile.leftKey), 0, "Move Left");
                 DrawButton("Move Right", 1);
@@ -308,6 +314,9 @@ public class Menu
                         if (inputType == InputType.Select) main.gameState = GameState.Playing;
                         break;
                     case (byte)Lobby.GameMode:
+                        if (inputType == InputType.Select) gameModeIndex = ToggleNext(main.settings.controlProfiles.ToArray(), gameModeIndex);
+                        if (inputType == InputType.MoveRight) gameModeIndex = ToggleNext(main.settings.controlProfiles.ToArray(), gameModeIndex);
+                        if (inputType == InputType.MoveLeft) gameModeIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), gameModeIndex);
                         break;
                     case (byte)Lobby.Profile:
                         if (inputType == InputType.Select) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
@@ -377,7 +386,7 @@ public class Menu
                             Controls newControls = new Controls();
                             newControls.controlName = newProfileName;
                             main.settings.controlProfiles.Add(newControls);
-                            edittingControlScheme = main.settings.controlProfiles.Count-1; //Add() adds to end of list, set control scheme to end of list
+                            editingControlScheme = main.settings.controlProfiles.Count-1; //Add() adds to end of list, set control scheme to end of list
                             GoToMenu(MenuState.Controls);
                         }
                         break;
@@ -401,7 +410,7 @@ public class Menu
                     }
 
                     //If not back button select the control scheme and go to menu page
-                    edittingControlScheme = menuIndex;
+                    editingControlScheme = menuIndex;
                     GoToMenu(MenuState.Controls);
                 }
 
@@ -434,7 +443,7 @@ public class Menu
                     }
                     
                     //If not back button go to selecting keybind
-                    selectingKeys = new SelectingKeys(main, this, edittingControlScheme, (ControlsMenu)menuIndex);
+                    selectingKeys = new SelectingKeys(main, this, editingControlScheme, (ControlsMenu)menuIndex);
                     GoToMenu(MenuState.MapKeys);
                 }
                 break;

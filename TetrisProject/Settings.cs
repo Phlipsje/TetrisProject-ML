@@ -13,9 +13,11 @@ public struct Settings
     public int masterVolume { get; set; }
     public int soundEffectVolume{ get; set; }
     public int musicVolume { get; set; }
+    
+    public List<Controls> controlProfiles { get; set; }
 
     public GameRules game;
-    public List<Controls> controlProfiles = new List<Controls>();
+    //public List<Controls> controlProfiles = new List<Controls>();
 
     public Settings()
     {
@@ -45,14 +47,14 @@ public struct GameRules
 
 public struct Controls
 {
-    public string controlName; //Maybe save this somewhere else
-    public Keys[] leftKey;
-    public Keys[] rightKey;
-    public Keys[] softDropKey;
-    public Keys[] hardDropKey;
-    public Keys[] rotateClockWiseKey;
-    public Keys[] rotateCounterClockWiseKey;
-    public Keys[] holdKey;
+    public string controlName { get; set; } //Maybe save this somewhere else
+    public Keys[] leftKey { get; set; }
+    public Keys[] rightKey { get; set; }
+    public Keys[] softDropKey { get; set; }
+    public Keys[] hardDropKey { get; set; }
+    public Keys[] rotateClockWiseKey { get; set; }
+    public Keys[] rotateCounterClockWiseKey { get; set; }
+    public Keys[] holdKey { get; set; }
     
     public Controls()
     {

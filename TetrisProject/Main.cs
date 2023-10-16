@@ -153,7 +153,7 @@ namespace TetrisProject
                 //Create a new game when play is pressed
                 if (tetrisGame == null)
                 {
-                    tetrisGame = new TetrisGame(this, settings, settings.controlProfiles[menu.profileIndex]);
+                    tetrisGame = new TetrisGame(this, settings, settings.controlProfiles[menu.profileIndex], (GameMode)menu.gameModeIndex);
                     tetrisGame.Instantiate(settings.game.startingLevel);
                     tetrisGame.LoadContent(Content);
                     MusicManager.PlaySong(MusicManager.ClassicTheme);

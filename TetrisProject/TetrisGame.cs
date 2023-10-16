@@ -31,6 +31,7 @@ public class TetrisGame
     private bool backToBack; //Check if a backToBack sequence is active
     private float multiplier = 1; //Based on backToBack (nothing or +0.5x total)
     public double gravityMultipler; //Can be changed in setting
+    private GameMode gameMode;
 
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -52,20 +53,26 @@ public class TetrisGame
     private Main main;
     public Controls controls;
 
-    public TetrisGame(Main main, Settings settings, Controls controls)
+    public TetrisGame(Main main, Settings settings, Controls controls, GameMode gameMode = GameMode.Standard)
     {
         this.main = main;
         this.controls = controls;
         gravityMultipler = settings.game.gravityMultiplier;
+        this.gameMode = gameMode;
     }
     public void Instantiate(int level)
     {
-        this.level = level;
-        field = new Field(this);
-        FillQueue();
-        NextPiece();
-        score = 0;
-        clearedLines = GetClearedLines(level);
+        switch (gameMode)
+        {
+            default:
+                this.level = level;
+                field = new Field(this);
+                FillQueue();
+                NextPiece();
+                score = 0;
+                clearedLines = GetClearedLines(level);
+                break;
+        }
     }
 
     public void LoadContent(ContentManager content)
@@ -453,4 +460,10 @@ public class TetrisGame
 
         return 0;
     }
+}
+
+public enum GameMode
+{
+    Standard,
+    TugOfWar,
 }
