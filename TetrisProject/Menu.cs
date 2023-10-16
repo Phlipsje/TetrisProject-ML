@@ -13,6 +13,7 @@ public class Menu
     //References
     private Main main;
     private SpriteBatch spriteBatch;
+    public SelectingKeys selectingKeys;
 
     //Textures
     private Texture2D buttonBegin;
@@ -24,7 +25,7 @@ public class Menu
     //Variables
     public MenuState menuState; //The currently active menu
     public byte menuIndex; //What is selected in the menu
-    private Controls edittingControlScheme; //The control scheme that is actively being adjusted (used for changing keybinds)
+    private int edittingControlScheme; //The control scheme that is actively being adjusted (used for changing keybinds)
     
     //Visual variables
     private Vector2 topLeftTopButtonPosition;
@@ -58,6 +59,11 @@ public class Menu
 
     public void Update(GameTime gameTime)
     {
+        if (menuState == MenuState.MapKeys)
+        {
+            selectingKeys.Update();
+            return;
+        }
         MenuMovement();
 
         AnimateMenu(gameTime.ElapsedGameTime.TotalSeconds);
@@ -84,6 +90,12 @@ public class Menu
 
     public void Draw(GameTime gameTime)
     {
+        if (menuState == MenuState.MapKeys)
+        {
+            selectingKeys.Update();
+            return;
+        }
+        
         //Background
         DrawBackground(gameTime);
         
@@ -143,20 +155,21 @@ public class Menu
                 break;
             
             case MenuState.Controls:
+                Controls profile = main.settings.controlProfiles[edittingControlScheme];
                 DrawButton("Move Left", 0);
-                DrawButton(ArrayListedAsString(edittingControlScheme.leftKey), 0, "Move Left");
+                DrawButton(ArrayListedAsString(profile.leftKey), 0, "Move Left");
                 DrawButton("Move Right", 1);
-                DrawButton(ArrayListedAsString(edittingControlScheme.rightKey), 1, "Move Right");
+                DrawButton(ArrayListedAsString(profile.rightKey), 1, "Move Right");
                 DrawButton("Soft Drop", 2);
-                DrawButton(ArrayListedAsString(edittingControlScheme.softDropKey), 2, "Soft Drop");
+                DrawButton(ArrayListedAsString(profile.softDropKey), 2, "Soft Drop");
                 DrawButton("Hard Drop", 3);
-                DrawButton(ArrayListedAsString(edittingControlScheme.hardDropKey), 3, "Hard Drop");
+                DrawButton(ArrayListedAsString(profile.hardDropKey), 3, "Hard Drop");
                 DrawButton("Rotate Clockwise", 4);
-                DrawButton(ArrayListedAsString(edittingControlScheme.rotateClockWiseKey), 4, "Rotate Clockwise");
+                DrawButton(ArrayListedAsString(profile.rotateClockWiseKey), 4, "Rotate Clockwise");
                 DrawButton("Rotate Counterclockwise", 5);
-                DrawButton(ArrayListedAsString(edittingControlScheme.rotateCounterClockWiseKey), 5, "Rotate Counterclockwise");
+                DrawButton(ArrayListedAsString(profile.rotateCounterClockWiseKey), 5, "Rotate Counterclockwise");
                 DrawButton("Hold", 6);
-                DrawButton(ArrayListedAsString(edittingControlScheme.holdKey), 6, "Hold");
+                DrawButton(ArrayListedAsString(profile.holdKey), 6, "Hold");
                 DrawButton("Back", 7);
 
                 break;
@@ -302,7 +315,7 @@ public class Menu
                     {
                         Controls newControls = new Controls();
                         main.settings.controlProfiles.Add(newControls);
-                        edittingControlScheme = newControls;
+                        edittingControlScheme = main.settings.controlProfiles.Count-1; //Add() adds to end of list, set control scheme to end of list
                         GoToMenu(MenuState.Controls);
                         break;
                     }
@@ -320,7 +333,7 @@ public class Menu
                     }
 
                     //If not back button select the control scheme and go to menu page
-                    edittingControlScheme = main.settings.controlProfiles[menuIndex];
+                    edittingControlScheme = menuIndex;
                     GoToMenu(MenuState.Controls);
                 }
                 break;
@@ -336,6 +349,7 @@ public class Menu
                     }
                     
                     //If not back button go to selecting keybind
+                    selectingKeys = new SelectingKeys(main, this, edittingControlScheme, (ControlsMenu)menuIndex);
                     GoToMenu(MenuState.MapKeys);
                 }
                 break;
@@ -402,6 +416,8 @@ public class Menu
                 return main.settings.controlProfiles.Count+3; //3 extra for create new, delete, and back button
             case MenuState.Controls:
                 return Enum.GetNames(typeof(ControlsMenu)).Length;
+            case MenuState.MapKeys:
+                return 20;
             default: //Error value
                 return 0;
         }
