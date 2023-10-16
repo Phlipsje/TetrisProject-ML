@@ -255,7 +255,19 @@ public static class Util
         return value;
     }
 
-    public static void SaveObjectToFile(object obj, string path)
+    public static void SaveSettingsToFile(Settings obj, string path)
+    {
+        string serializedText = JsonSerializer.Serialize<Settings>(obj);
+        File.WriteAllText(path, serializedText);
+    }
+    
+    public static void SaveGameRulesToFile(GameRules obj, string path)
+    {
+        string serializedText = JsonSerializer.Serialize(obj);
+        File.WriteAllText(path, serializedText);
+    }
+    
+    public static void SaveControlsToFile(Controls obj, string path)
     {
         string serializedText = JsonSerializer.Serialize(obj);
         File.WriteAllText(path, serializedText);

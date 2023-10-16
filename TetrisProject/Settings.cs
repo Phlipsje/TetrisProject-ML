@@ -1,16 +1,18 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject;
 
+[Serializable]
 public struct Settings
 {
     //All settings that can be adjusted
 
     //Volumes
-    public int masterVolume;
-    public int soundEffectVolume;
-    public int musicVolume;
+    public int masterVolume { get; set; }
+    public int soundEffectVolume{ get; set; }
+    public int musicVolume { get; set; }
 
     public GameRules game;
     public List<Controls> controlProfiles = new List<Controls>();

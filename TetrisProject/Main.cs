@@ -262,7 +262,7 @@ namespace TetrisProject
 
         public void QuitGame()
         {
-            Util.SaveObjectToFile(settings, "Settings.conf");
+            Util.SaveSettingsToFile(settings, "Settings.conf");
             Exit();
         }
     }
