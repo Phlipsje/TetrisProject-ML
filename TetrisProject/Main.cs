@@ -195,6 +195,10 @@ namespace TetrisProject
             {
                 tetrisGame.Draw(spriteBatch);
             }
+            else if (gameState == GameState.Pause)
+            {
+                drawPauseScreen();
+            }
             
             //Play animations
             AnimationManager.Draw(spriteBatch);
@@ -212,6 +216,15 @@ namespace TetrisProject
             spriteBatch.End();
             
             base.Draw(gameTime);
+        }
+
+        private void drawPauseScreen()
+        {
+            string pauseString = "PAUSED";
+            Vector2 stringSize = menu.font.MeasureString(pauseString);
+            Vector2 stringPosition = new Vector2(WorldWidth - stringSize.X, WorldHeight - stringSize.Y) / 2;
+            spriteBatch.DrawString(menu.font, pauseString, stringPosition, Color.White);
+            
         }
         
         public void UpdateVolume()

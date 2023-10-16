@@ -19,7 +19,7 @@ public class Menu
     private Texture2D buttonBegin;
     private Texture2D buttonMiddle;
     private Texture2D buttonEnd;
-    private SpriteFont font;
+    public SpriteFont font;
     private Texture2D tile;
     
     //Variables
