@@ -14,7 +14,7 @@ namespace TetrisProject
     {
         public GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        private TetrisGame tetrisGame;
+        private GameHandeler gameHandeler;
         private Menu menu;
         private RenderTarget2D renderTarget;
         public Settings settings;
@@ -47,7 +47,7 @@ namespace TetrisProject
             spriteBatch = new SpriteBatch(GraphicsDevice);
             renderTarget = new RenderTarget2D(GraphicsDevice, WorldWidth, WorldHeight);
             menu = new Menu(this, spriteBatch);
-            tetrisGame = null;
+            gameHandeler = null;
 
             gameState = GameState.Menu;
             
@@ -121,7 +121,7 @@ namespace TetrisProject
                         }
                         break;
                     case GameState.Playing:
-                        if (tetrisGame.isGameOver)
+                        if (gameHandeler.gameFinished)
                         {
 
                             break;
@@ -151,26 +151,32 @@ namespace TetrisProject
             else if(gameState == GameState.Playing)
             {
                 //Create a new game when play is pressed
-                if (tetrisGame == null)
+                if (gameHandeler == null)
                 {
-                    tetrisGame = new TetrisGame(this, settings, settings.controlProfiles[menu.profileIndex], (GameMode)menu.gameModeIndex);
-                    tetrisGame.Instantiate(settings.game.startingLevel);
-                    tetrisGame.LoadContent(Content);
+                    List<Controls> selectedControls = new ();
+                    if ((GameMode)menu.gameModeIndex == GameMode.Standard)
+                    {
+                        selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
+                    }
+                    
+                    gameHandeler = new GameHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
+                    gameHandeler.Instantiate();
+                    gameHandeler.LoadContent();
                     MusicManager.PlaySong(MusicManager.ClassicTheme);
                 }
-                if (Util.GetKeyPressed(Keys.Enter) && tetrisGame.isGameOver)
+                if (Util.GetKeyPressed(Keys.Enter) && gameHandeler.gameFinished)
                 {
                     menu.menuState = MenuState.MainMenu;
                     menu.menuIndex = 0;
                     gameState = GameState.Menu;
-                    tetrisGame = null;
+                    gameHandeler = null;
                     MusicManager.Stop(gameTime);
                     return;
                 }
-                tetrisGame.Update(gameTime);
-                if (tetrisGame.isGameOver)
+                gameHandeler.Update(gameTime);
+                if (gameHandeler.gameFinished)
                     MusicManager.SetPitch(gameTime, -1, 4000);
-                else if (tetrisGame.isInStress && gameState != GameState.Pause)
+                else if (gameHandeler.playerInStress && gameState != GameState.Pause)
                 {
                     MusicManager.SetPitch(gameTime, 0.5f, 250);
                 }
@@ -186,7 +192,7 @@ namespace TetrisProject
                     menu.menuState = MenuState.MainMenu;
                     menu.menuIndex = 0;
                     gameState = GameState.Menu;
-                    tetrisGame = null;
+                    gameHandeler = null;
                     MusicManager.Stop(gameTime);
                 }
             }
@@ -213,9 +219,9 @@ namespace TetrisProject
             {
                 menu.Draw(gameTime);
             }
-            else if (gameState == GameState.Playing && tetrisGame != null)
+            else if (gameState == GameState.Playing && gameHandeler != null)
             {
-                tetrisGame.Draw(spriteBatch);
+                gameHandeler.Draw(spriteBatch);
             }
             else if (gameState == GameState.Pause)
             {

@@ -45,17 +45,10 @@ public class TetrisGame
     private const string squareTextureFileName = "Square";
     private const string holdBlockedFileName = "HoldBlocked";
     
-    public Point WindowSize
-    {
-        get { return new Point(main.graphics.PreferredBackBufferWidth, main.graphics.PreferredBackBufferHeight); }
-    }
-    
-    private Main main;
     public Controls controls;
 
-    public TetrisGame(Main main, Settings settings, Controls controls, GameMode gameMode = GameMode.Standard)
+    public TetrisGame(Settings settings, Controls controls, GameMode gameMode = GameMode.Standard)
     {
-        this.main = main;
         this.controls = controls;
         gravityMultipler = settings.game.gravityMultiplier;
         this.gameMode = gameMode;
