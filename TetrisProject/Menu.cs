@@ -314,9 +314,9 @@ public class Menu
                         if (inputType == InputType.Select) main.gameState = GameState.Playing;
                         break;
                     case (byte)Lobby.GameMode:
-                        if (inputType == InputType.Select) gameModeIndex = ToggleNext(main.settings.controlProfiles.ToArray(), gameModeIndex);
-                        if (inputType == InputType.MoveRight) gameModeIndex = ToggleNext(main.settings.controlProfiles.ToArray(), gameModeIndex);
-                        if (inputType == InputType.MoveLeft) gameModeIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), gameModeIndex);
+                        if (inputType == InputType.Select) gameModeIndex = ToggleNext(gameModeNames, gameModeIndex);
+                        if (inputType == InputType.MoveRight) gameModeIndex = ToggleNext(gameModeNames, gameModeIndex);
+                        if (inputType == InputType.MoveLeft) gameModeIndex = TogglePrevious(gameModeNames, gameModeIndex);
                         break;
                     case (byte)Lobby.Profile:
                         if (inputType == InputType.Select) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);

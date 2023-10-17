@@ -9,8 +9,10 @@ public class GameHandeler
 {
     //Holds all the active running TetrisGame(s)
     private ContentManager content;
-    private List<TetrisGame> tetrisGames = new();
+    protected List<TetrisGame> tetrisGames = new();
     private Settings settings;
+
+    protected Texture2D squareTile;
 
     public bool gameFinished; //If a player has finished the other has won, for singleplayer same implementation as in TetrisGame
     public bool playerInStress; //If a player is in stress, run the appropriate code
@@ -19,16 +21,10 @@ public class GameHandeler
     {
         this.content = content;
         this.settings = settings;
-        
-        switch (gameMode)
+
+        if (gameMode == GameMode.Standard)
         {
-            case GameMode.Standard:
-                tetrisGames.Add(new TetrisGame(settings, controls[0], gameMode));
-                break;
-            case GameMode.TugOfWar:
-                tetrisGames.Add(new TetrisGame(settings, controls[0], gameMode, 0));
-                tetrisGames.Add(new TetrisGame(settings, controls[0], gameMode, 1));
-                break;
+            tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode));
         }
     }
 
@@ -42,13 +38,15 @@ public class GameHandeler
 
     public void LoadContent()
     {
+        squareTile = content.Load<Texture2D>("Square");
+        
         foreach (var tetrisGame in tetrisGames)
         {
             tetrisGame.LoadContent(content);
         }
     }
     
-    public void Update(GameTime gameTime)
+    public virtual void Update(GameTime gameTime)
     {
         foreach (var tetrisGame in tetrisGames)
         {
@@ -67,11 +65,17 @@ public class GameHandeler
         }
     }
 
-    public void Draw(SpriteBatch spriteBatch)
+    public virtual void Draw(SpriteBatch spriteBatch)
     {
         foreach (var tetrisGame in tetrisGames)
         {
             tetrisGame.Draw(spriteBatch);
         }
+    }
+
+    //Use this as a general event function to add extra functionality to other game modes
+    public virtual void PiecePlaced()
+    {
+        
     }
 }

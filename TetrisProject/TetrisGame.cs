@@ -24,7 +24,7 @@ public class TetrisGame
     public bool isInStress;
     public int score;
     public int level = 1;
-    private int clearedLines;
+    public int clearedLines;
     private const double lineClearTextTimeMax = 1.4f;
     private double lineClearTextTime; //Amount of time a line clear text is shown on screen
     private string lineClearType = "";  //What type of line clear to show on screen
@@ -47,9 +47,11 @@ public class TetrisGame
     private const string holdBlockedFileName = "HoldBlocked";
     
     public Controls controls;
+    private GameHandeler gameHandeler;
 
-    public TetrisGame(Settings settings, Controls controls, GameMode gameMode = GameMode.Standard, int instance = 0)
+    public TetrisGame(GameHandeler gameHandeler, Settings settings, Controls controls, GameMode gameMode = GameMode.Standard, int instance = 0)
     {
+        this.gameHandeler = gameHandeler;
         this.controls = controls;
         gravityMultipler = settings.game.gravityMultiplier;
         this.gameMode = gameMode;
@@ -99,6 +101,7 @@ public class TetrisGame
             return;
         if(activePiece == null)
         {
+            gameHandeler.PiecePlaced();
             GenerationPhase(gameTime.ElapsedGameTime.TotalSeconds);
         }
         else

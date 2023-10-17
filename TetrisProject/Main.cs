@@ -154,16 +154,19 @@ namespace TetrisProject
                 if (gameHandeler == null)
                 {
                     List<Controls> selectedControls = new ();
-                    if ((GameMode)menu.gameModeIndex == GameMode.Standard)
+                    switch ((GameMode)menu.gameModeIndex)
                     {
-                        selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
-                    }
-                    else //Temp, just for testing with same controls
-                    {
-                        selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
+                        default: //GameMode.Standard
+                            selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
+                            gameHandeler = new GameHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
+                            break;
+                        case GameMode.TugOfWar:
+                            selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
+                            selectedControls.Add(settings.controlProfiles[menu.profileIndex+1]);
+                            gameHandeler = new TugOfWarHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
+                            break;
                     }
                     
-                    gameHandeler = new GameHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
                     gameHandeler.Instantiate();
                     gameHandeler.LoadContent();
                     MusicManager.PlaySong(MusicManager.ClassicTheme);

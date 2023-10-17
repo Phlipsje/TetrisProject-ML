@@ -36,7 +36,6 @@ public abstract class Piece
     private double softDropTimer;
     private bool softDropped; //Check if soft dropped this frame
     private bool hardDropped; //Check if piece is being hard dropped
-    private bool lockDownTimerSet;
     private int maxMovementCounter;
     private int remainingMovementCounter; //Counts the amount of actions you can perform to extend the timer of the lock down phase
     private int highestHeight; //Check to see if remainingMovementCounter needs to be reset (when reaching new highest height (higher is lower on field))
