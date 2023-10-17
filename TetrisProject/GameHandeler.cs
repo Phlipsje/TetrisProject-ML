@@ -25,6 +25,10 @@ public class GameHandeler
             case GameMode.Standard:
                 tetrisGames.Add(new TetrisGame(settings, controls[0], gameMode));
                 break;
+            case GameMode.TugOfWar:
+                tetrisGames.Add(new TetrisGame(settings, controls[0], gameMode, 0));
+                tetrisGames.Add(new TetrisGame(settings, controls[0], gameMode, 1));
+                break;
         }
     }
 

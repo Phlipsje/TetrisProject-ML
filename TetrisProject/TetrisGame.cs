@@ -32,6 +32,7 @@ public class TetrisGame
     private float multiplier = 1; //Based on backToBack (nothing or +0.5x total)
     public double gravityMultipler; //Can be changed in setting
     private GameMode gameMode;
+    private int instance; //If this is player 0 or 1 (only relevant in multiplayer modes)
 
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -47,11 +48,12 @@ public class TetrisGame
     
     public Controls controls;
 
-    public TetrisGame(Settings settings, Controls controls, GameMode gameMode = GameMode.Standard)
+    public TetrisGame(Settings settings, Controls controls, GameMode gameMode = GameMode.Standard, int instance = 0)
     {
         this.controls = controls;
         gravityMultipler = settings.game.gravityMultiplier;
         this.gameMode = gameMode;
+        this.instance = instance;
     }
     public void Instantiate(int level)
     {
@@ -60,6 +62,14 @@ public class TetrisGame
             default:
                 this.level = level;
                 field = new Field(this);
+                FillQueue();
+                NextPiece();
+                score = 0;
+                clearedLines = GetClearedLines(level);
+                break;
+            case GameMode.TugOfWar:
+                this.level = level;
+                field = new Field(this, 320 + instance*800);
                 FillQueue();
                 NextPiece();
                 score = 0;

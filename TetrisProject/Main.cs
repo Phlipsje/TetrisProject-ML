@@ -158,6 +158,10 @@ namespace TetrisProject
                     {
                         selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
                     }
+                    else //Temp, just for testing with same controls
+                    {
+                        selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
+                    }
                     
                     gameHandeler = new GameHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
                     gameHandeler.Instantiate();
