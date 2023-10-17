@@ -8,12 +8,14 @@ namespace TetrisProject;
 
 public class TugOfWarHandeler : GameHandeler
 {
-    private const int linesToWin = 30;
+    private readonly int linesToWin;
     
     public TugOfWarHandeler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls) : base(content, gameMode, settings, controls)
     {
         tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode, 0));
         tetrisGames.Add(new TetrisGame(this, settings, controls[1], gameMode, 1));
+
+        linesToWin = settings.game.linesToWin;
     }
 
     public override void PiecePlaced()

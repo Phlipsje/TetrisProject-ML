@@ -106,7 +106,7 @@ namespace TetrisProject
                             case MenuState.MainMenu:
                                 QuitGame();
                                 break;
-                            case MenuState.Lobby:
+                            case MenuState.LobbyStandard:
                                 menu.GoToMenu(MenuState.MainMenu);
                                 break;
                             case MenuState.Settings:
@@ -162,7 +162,7 @@ namespace TetrisProject
                             break;
                         case GameMode.TugOfWar:
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
-                            selectedControls.Add(settings.controlProfiles[menu.profileIndex+1]);
+                            selectedControls.Add(settings.controlProfiles[menu.profileIndex2]);
                             gameHandeler = new TugOfWarHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
                             break;
                     }

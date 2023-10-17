@@ -31,6 +31,7 @@ public class Menu
     
     //Toggles
     public byte profileIndex;
+    public byte profileIndex2; //Only used in multiplayer game modes
     private readonly string[] gameModeNames = {"Standard", "Tug Of War"};
     
     public byte gameModeIndex;
@@ -113,20 +114,35 @@ public class Menu
         {
             case MenuState.MainMenu:
                 DrawButton("Play", 0);
+                DrawButton(gameModeNames[gameModeIndex], 0, "Play");
                 DrawButton("Settings", 1);
                 DrawButton("Quit", 2);
                 break;
-            case MenuState.Lobby:
+            
+            case MenuState.LobbyStandard:
                 DrawButton("Start", 0);
-                DrawButton("GameMode", 1);
-                DrawButton(gameModeNames[gameModeIndex], 1, "GameMode");
-                DrawButton("Profile", 2);
-                DrawButton(main.settings.controlProfiles[profileIndex].controlName, 2, "Profile");
-                DrawButton("Starting Level", 3);
-                DrawButton(main.settings.game.startingLevel.ToString(), 3, "Starting Level");
-                DrawButton("Gravity Multiplier", 4);
-                DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 4, "Gravity Multiplier");
-                DrawButton("Back", 5);
+                DrawButton("Profile", 1);
+                DrawButton(main.settings.controlProfiles[profileIndex].controlName, 1, "Profile");
+                DrawButton("Starting Level", 2);
+                DrawButton(main.settings.game.startingLevel.ToString(), 2, "Starting Level");
+                DrawButton("Gravity Multiplier", 3);
+                DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 3, "Gravity Multiplier");
+                DrawButton("Back", 4);
+                break;
+            
+            case MenuState.LobbyTugOfWar:
+                DrawButton("Start", 0);
+                DrawButton("Profile 1", 1);
+                DrawButton(main.settings.controlProfiles[profileIndex].controlName, 1, "Profile 1");
+                DrawButton("Profile 2", 2);
+                DrawButton(main.settings.controlProfiles[profileIndex2].controlName, 2, "Profile 2");
+                DrawButton("Lines to win", 3);
+                DrawButton(main.settings.game.linesToWin.ToString(), 3, "Lines to win");
+                DrawButton("Starting Level", 4);
+                DrawButton(main.settings.game.startingLevel.ToString(), 4, "Starting Level");
+                DrawButton("Gravity Multiplier", 5);
+                DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 5, "Gravity Multiplier");
+                DrawButton("Back", 6);
                 break;
             
             case MenuState.Settings:
@@ -296,7 +312,20 @@ public class Menu
                 switch (menuIndex)
                 {
                     case (byte)MainMenu.Play:
-                        if (inputType == InputType.Select) GoToMenu(MenuState.Lobby);
+                        if (inputType == InputType.Select)
+                        {
+                            switch (gameModeIndex)
+                            {
+                                default:
+                                    GoToMenu(MenuState.LobbyStandard);
+                                    break;
+                                case (byte)GameMode.TugOfWar:
+                                    GoToMenu(MenuState.LobbyTugOfWar);
+                                    break;
+                            }
+                        }
+                        if (inputType == InputType.MoveRight) gameModeIndex = ToggleNext(gameModeNames, gameModeIndex);
+                        if (inputType == InputType.MoveLeft) gameModeIndex = TogglePrevious(gameModeNames, gameModeIndex);
                         break;
                     case (byte)MainMenu.Settings:
                         if (inputType == InputType.Select) GoToMenu(MenuState.Settings);
@@ -307,33 +336,65 @@ public class Menu
                 }
                 break;
             
-            case MenuState.Lobby:
+            case MenuState.LobbyStandard:
                 switch (menuIndex)
                 {
-                    case (byte)Lobby.Start:
+                    case (byte)LobbyStandard.Start:
                         if (inputType == InputType.Select) main.gameState = GameState.Playing;
                         break;
-                    case (byte)Lobby.GameMode:
-                        if (inputType == InputType.Select) gameModeIndex = ToggleNext(gameModeNames, gameModeIndex);
-                        if (inputType == InputType.MoveRight) gameModeIndex = ToggleNext(gameModeNames, gameModeIndex);
-                        if (inputType == InputType.MoveLeft) gameModeIndex = TogglePrevious(gameModeNames, gameModeIndex);
-                        break;
-                    case (byte)Lobby.Profile:
+                    case (byte)LobbyStandard.Profile:
                         if (inputType == InputType.Select) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
                         if (inputType == InputType.MoveRight) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
                         if (inputType == InputType.MoveLeft) profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex);
                         break;
-                    case (byte)Lobby.StartingLevel:
+                    case (byte)LobbyStandard.StartingLevel:
                         if (inputType == InputType.Select) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
                         if (inputType == InputType.MoveRight) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
                         if (inputType == InputType.MoveLeft) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, -1, 1, 15);
                         break;
-                    case (byte)Lobby.GravityMultiplier:
+                    case (byte)LobbyStandard.GravityMultiplier:
                         if (inputType == InputType.Select) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
                         if (inputType == InputType.MoveRight) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
                         if (inputType == InputType.MoveLeft) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, -0.1, 0.1, 5);
                         break;
-                    case (byte)Lobby.Back:
+                    case (byte)LobbyStandard.Back:
+                        if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
+                        break;
+                }
+                break;
+            
+            case MenuState.LobbyTugOfWar:
+                switch (menuIndex)
+                {
+                    case (byte)LobbyTugOfWar.Start:
+                        if (inputType == InputType.Select) main.gameState = GameState.Playing;
+                        break;
+                    case (byte)LobbyTugOfWar.Profile1:
+                        if (inputType == InputType.Select) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
+                        if (inputType == InputType.MoveRight) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
+                        if (inputType == InputType.MoveLeft) profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex);
+                        break;
+                    case (byte)LobbyTugOfWar.Profile2:
+                        if (inputType == InputType.Select) profileIndex2 = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex2);
+                        if (inputType == InputType.MoveRight) profileIndex2 = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex2);
+                        if (inputType == InputType.MoveLeft) profileIndex2 = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex2);
+                        break;
+                    case (byte)LobbyTugOfWar.LinesToWin:
+                        if (inputType == InputType.Select) main.settings.game.linesToWin = Increment(main.settings.game.linesToWin, 1, 5, 50);
+                        if (inputType == InputType.MoveRight) main.settings.game.linesToWin = Increment(main.settings.game.linesToWin, 1, 5, 50);
+                        if (inputType == InputType.MoveLeft) main.settings.game.linesToWin = Increment(main.settings.game.linesToWin, -1, 5, 50);
+                        break;
+                    case (byte)LobbyTugOfWar.StartingLevel:
+                        if (inputType == InputType.Select) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
+                        if (inputType == InputType.MoveRight) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
+                        if (inputType == InputType.MoveLeft) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, -1, 1, 15);
+                        break;
+                    case (byte)LobbyTugOfWar.GravityMultiplier:
+                        if (inputType == InputType.Select) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
+                        if (inputType == InputType.MoveRight) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
+                        if (inputType == InputType.MoveLeft) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, -0.1, 0.1, 5);
+                        break;
+                    case (byte)LobbyTugOfWar.Back:
                         if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
                         break;
                 }
@@ -481,7 +542,7 @@ public class Menu
             newProfileName = "";
             profileIndex = 0;
         }
-        else if(menuState == MenuState.Lobby)
+        else if(menuState == MenuState.LobbyStandard)
         {
             profileIndex = 0;
         }
@@ -533,8 +594,10 @@ public class Menu
         {
             case MenuState.MainMenu:
                 return Enum.GetNames(typeof(MainMenu)).Length;
-            case MenuState.Lobby:
-                return Enum.GetNames(typeof(Lobby)).Length;
+            case MenuState.LobbyStandard:
+                return Enum.GetNames(typeof(LobbyStandard)).Length;
+            case MenuState.LobbyTugOfWar:
+                return Enum.GetNames(typeof(LobbyTugOfWar)).Length;
             case MenuState.Settings:
                 return Enum.GetNames(typeof(SettingsMenu)).Length;
             case MenuState.ControlProfiles:
@@ -542,7 +605,7 @@ public class Menu
             case MenuState.Controls:
                 return Enum.GetNames(typeof(ControlsMenu)).Length;
             case MenuState.MapKeys:
-                return 20;
+                return 8;
             default: //Error value
                 return 0;
         }
@@ -661,7 +724,8 @@ public class Menu
 public enum MenuState
 {
     MainMenu,
-    Lobby,
+    LobbyStandard,
+    LobbyTugOfWar,
     Settings,
     ControlProfiles,
     Controls,
@@ -675,11 +739,21 @@ public enum MainMenu
     Quit,
 }
 
-public enum Lobby
+public enum LobbyStandard
 {
     Start,
-    GameMode,
     Profile,
+    StartingLevel,
+    GravityMultiplier,
+    Back,
+}
+
+public enum LobbyTugOfWar
+{
+    Start,
+    Profile1,
+    Profile2,
+    LinesToWin,
     StartingLevel,
     GravityMultiplier,
     Back,
