@@ -112,7 +112,6 @@ public class TetrisGame
             return;
         if(activePiece == null)
         {
-            gameHandeler.PiecePlaced();
             GenerationPhase(gameTime.ElapsedGameTime.TotalSeconds);
         }
         else
@@ -255,6 +254,7 @@ public class TetrisGame
         }
         else
         {
+            gameHandeler.PiecePlaced(instance);
             NextPiece();
         }
     }

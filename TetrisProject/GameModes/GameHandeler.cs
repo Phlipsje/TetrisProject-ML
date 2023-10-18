@@ -78,7 +78,7 @@ public class GameHandeler
     }
 
     //Use this as a general event function to add extra functionality to other game modes
-    public virtual void PiecePlaced()
+    public virtual void PiecePlaced(int instance)
     {
         
     }

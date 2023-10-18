@@ -18,7 +18,7 @@ public class TugOfWarHandeler : GameHandeler
         linesToWin = settings.game.linesToWin;
     }
 
-    public override void PiecePlaced()
+    public override void PiecePlaced(int instance)
     {
         if (MathF.Abs(tetrisGames[0].clearedLines - tetrisGames[1].clearedLines) >= linesToWin)
         {
