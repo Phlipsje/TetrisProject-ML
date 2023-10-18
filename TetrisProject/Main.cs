@@ -164,7 +164,7 @@ namespace TetrisProject
                     {
                         default: //GameMode.Standard
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
-                            gameHandeler = new GameHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
+                            gameHandeler = new GameHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
                             break;
                         case GameMode.TugOfWar:
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
@@ -219,6 +219,11 @@ namespace TetrisProject
             SfxManager.Update();
             MusicManager.Update(gameTime);
             base.Update(gameTime);
+        }
+
+        public void UpdateHighScore(int score)
+        {
+            settings.highScore = MathHelper.Max(settings.highScore, score);
         }
 
         protected override void Draw(GameTime gameTime)

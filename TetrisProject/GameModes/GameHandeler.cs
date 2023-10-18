@@ -11,18 +11,19 @@ public class GameHandeler
     private ContentManager content;
     protected List<TetrisGame> tetrisGames = new();
     private Settings settings;
-    public Settings SettingsStruct { get; }
+    public Settings SettingsStruct => settings;
 
     protected Texture2D squareTile;
+    private Main mainReference;
 
     public bool gameFinished; //If a player has finished the other has won, for singleplayer same implementation as in TetrisGame
     public bool playerInStress; //If a player is in stress, run the appropriate code
 
-    public GameHandeler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls)
+    public GameHandeler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls, Main mainReference = null)
     {
         this.content = content;
         this.settings = settings;
-
+        this.mainReference = mainReference;
         if (gameMode == GameMode.Standard)
         {
             tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode));
@@ -52,6 +53,8 @@ public class GameHandeler
         foreach (var tetrisGame in tetrisGames)
         {
             tetrisGame.Update(gameTime);
+            if (tetrisGame.isGameOver && mainReference != null)
+                mainReference.UpdateHighScore(tetrisGame.score);
         }
 
         if (tetrisGames.Count > 1)

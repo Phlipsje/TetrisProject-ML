@@ -18,7 +18,7 @@ public struct Settings
 
     public GameRules game;
     //public List<Controls> controlProfiles = new List<Controls>();
-    public int highScore;
+    public int highScore { get; set; }
     public Settings()
     {
         masterVolume = 100;
