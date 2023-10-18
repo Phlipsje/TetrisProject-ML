@@ -138,13 +138,13 @@ public class Field //The field in which the pieces can be placed
         foreach (byte y in markedLines)
         {
             Vector2 rowPosition = new Vector2(fieldX, fieldY + blockSize * (y - height));
-            AnimationManager.PlayAnimation(new FadingRectangle(rowPosition, rowSize, tetrisGame, Color.Red, 
+            AnimationManager.PlayAnimation(new FadingRectangle(rowPosition, rowSize, Color.Red, 
                 tetrisGame.squareTexture), 0);
             for (int x = 0; x < width; x++)
             {
                 Vector2 blockPosition = new Vector2(fieldX + blockSize * x,
                     fieldY + blockSize * (y - height));
-                AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, tetrisGame, new Vector2(rng.Next(-200, 200), -800), 
+                AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, new Vector2(rng.Next(-200, 200), -800), 
                     tetrisGame.blockTexture, rng.Next(-4, 4), color: GetColor(GetBlock(x, y - height)),
                     size: new Vector2(blockSize, blockSize)), 4);
             }
@@ -362,7 +362,7 @@ public class Field //The field in which the pieces can be placed
     public void PlayGameOverAnimation()
     {
         Random rng = new Random();
-        AnimationManager.PlayAnimation(new ExplosionAnimation(new Vector2(fieldX, fieldY), tetrisGame, 
+        AnimationManager.PlayAnimation(new ExplosionAnimation(new Vector2(fieldX, fieldY), 
             new Vector2(blockSize * Width, blockSize * Height), tetrisGame.explosionTextures));
         for (int y = -Height;  y < Height; y++)
         {
@@ -372,7 +372,7 @@ public class Field //The field in which the pieces can be placed
                 {
                     Vector2 blockPosition = new Vector2(fieldX + blockSize * x,
                         fieldY + blockSize * y);
-                    AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, tetrisGame, new Vector2(rng.Next(-200, 200), -800), 
+                    AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, new Vector2(rng.Next(-200, 200), -800), 
                         tetrisGame.blockTexture, rng.Next(-4, 4), color: GetColor(GetBlock(x, y)),
                         size: new Vector2(blockSize, blockSize)), 0);
                 }

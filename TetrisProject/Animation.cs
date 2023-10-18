@@ -54,12 +54,10 @@ public abstract class Animation
     public bool CanBeDestroyed;
     protected Vector2 position;
     public Vector2 Position => position;
-    protected TetrisGame tetrisGame;
 
-    protected Animation(Vector2 startPosition, TetrisGame tetrisGame)
+    protected Animation(Vector2 startPosition)
     {
         this.position = startPosition;
-        this.tetrisGame = tetrisGame;
     }
 
     public abstract void Update(GameTime gameTime);
@@ -76,8 +74,8 @@ public class FallingBlockAnimation : Animation
     private float rotation;
     private float rotationSpeed;
     
-    public FallingBlockAnimation(Vector2 startPosition, TetrisGame tetrisGame, Vector2 startVelocity, Texture2D texture,
-        float rotationSpeed, Color? color = null, Vector2? size = null, float gravity = 2000) : base(startPosition, tetrisGame)
+    public FallingBlockAnimation(Vector2 startPosition, Vector2 startVelocity, Texture2D texture,
+        float rotationSpeed, Color? color = null, Vector2? size = null, float gravity = 2000) : base(startPosition)
     {
         velocity = startVelocity;
         // The syntax of this line: the value before the ?? if it is not null, else the value after the ??
@@ -112,7 +110,7 @@ public class FallingBlockAnimation : Animation
         private double? spawnTime;
         private int frameToDraw;
         private const int fps = 30;
-        public ExplosionAnimation(Vector2 startPosition, TetrisGame tetrisGame, Vector2 size, Texture2D[] textures) : base(startPosition, tetrisGame)
+        public ExplosionAnimation(Vector2 startPosition, Vector2 size, Texture2D[] textures) : base(startPosition)
         {
             this.size = size;
             this.textures = textures;
@@ -143,7 +141,6 @@ public class FadingRectangle : Animation
 {
     private Vector2 position;
     private Vector2 size;
-    private TetrisGame tetrisGame;
     private Color color;
     private Color originalColor;
     private double? startTime = null;
@@ -151,13 +148,12 @@ public class FadingRectangle : Animation
     private double timeAlive;
     private Texture2D texture;
     public FadingRectangle(
-        Vector2 startingPosition, Vector2 size, TetrisGame tetrisGame, Color startingColor,
+        Vector2 startingPosition, Vector2 size, Color startingColor,
         Texture2D texture, double timeAlive = 500) :
-        base(startingPosition, tetrisGame)
+        base(startingPosition)
     {
         position = startingPosition;
         this.size = size;
-        this.tetrisGame = tetrisGame;
         color = startingColor;
         originalColor = startingColor;
         this.texture = texture;

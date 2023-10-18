@@ -346,6 +346,10 @@ public abstract class Piece
             {
                 if (Hitbox[x, y])
                 {
+                    Vector2 pos = new Vector2(fieldReference.fieldX + fieldReference.blockSize * (position.X + x),
+                        fieldReference.fieldY + fieldReference.blockSize * (position.Y - y - 1));
+                    AnimationManager.PlayAnimation(new FadingRectangle(pos, new Vector2(fieldReference.blockSize, fieldReference.blockSize), 
+                        Color.White * 0.5f, tetrisGameReference.squareTexture), 0);
                     fieldReference.SetBlock(position.X + x,position.Y - y - 1,pieceType);
                     if (position.Y - y - 1 >= 0)
                         anyBlockBelowSkyline = true;
