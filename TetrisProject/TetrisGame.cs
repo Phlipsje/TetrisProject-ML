@@ -151,7 +151,7 @@ public class TetrisGame
         spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 11), Color.White);
         
         //Draw cleared lines
-        spriteBatch.DrawString(font, "CLEARED LINES", new Vector2(field.fieldX-field.blockSize * 10,field.fieldY + field.blockSize * 13), Color.White);
+        spriteBatch.DrawString(font, "LINES", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 13), Color.White);
         spriteBatch.DrawString(font, clearedLines.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 14), Color.White);
 
         //Draw line clear popup
