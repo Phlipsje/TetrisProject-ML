@@ -260,36 +260,20 @@ public static class Util
         string serializedText = JsonSerializer.Serialize<Settings>(obj);
         File.WriteAllText(path, serializedText);
     }
-    
-    public static void SaveGameRulesToFile(GameRules obj, string path)
-    {
-        string serializedText = JsonSerializer.Serialize(obj);
-        File.WriteAllText(path, serializedText);
-    }
-    
-    public static void SaveControlsToFile(Controls obj, string path)
-    {
-        string serializedText = JsonSerializer.Serialize(obj);
-        File.WriteAllText(path, serializedText);
-    }
 
     public static Settings LoadSettingsFromFile(string filename)
     {
         string serializedText = File.ReadAllText(filename);
-        return JsonSerializer.Deserialize<Settings>(serializedText);
+        try
+        {
+            return JsonSerializer.Deserialize<Settings>(serializedText);
+        }
+        catch (JsonException)
+        {
+            return new Settings();
+        }
     }
 
-    public static GameRules LoadGameRulesFromFile(string filename)
-    {
-        string serializedText = File.ReadAllText(filename);
-        return JsonSerializer.Deserialize<GameRules>(serializedText);
-    }
-    
-    public static Controls LoadControlsFromFile(string filename)
-    {
-        string serializedText = File.ReadAllText(filename);
-        return JsonSerializer.Deserialize<Controls>(serializedText);
-    }
 }
 
 public enum Input
