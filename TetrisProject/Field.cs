@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace TetrisProject;
 
@@ -131,15 +132,19 @@ public class Field //The field in which the pieces can be placed
     private void AnimationPhase(byte[] markedLines)
     {
         Random rng = new Random();
+        Vector2 rowSize = new Vector2(blockSize * width, blockSize);
         foreach (byte y in markedLines)
         {
+            Vector2 rowPosition = new Vector2(fieldX, fieldY + blockSize * (y - height));
+            AnimationManager.PlayAnimation(new FadingRectangle(rowPosition, rowSize, tetrisGame, Color.Red, 
+                tetrisGame.squareTexture), 0);
             for (int x = 0; x < width; x++)
             {
                 Vector2 blockPosition = new Vector2(fieldX + blockSize * x,
                     fieldY + blockSize * (y - height));
                 AnimationManager.PlayAnimation(new FallingBlockAnimation(blockPosition, tetrisGame, new Vector2(rng.Next(-200, 200), -800), 
                     tetrisGame.blockTexture, rng.Next(-4, 4), color: GetColor(GetBlock(x, y - height)),
-                    size: new Vector2(blockSize, blockSize)), 0);
+                    size: new Vector2(blockSize, blockSize)), 4);
             }
 
         }

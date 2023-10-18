@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Mime;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -21,6 +22,7 @@ public static class AnimationManager
 
     public static void PlayAnimation(Animation animation, int layer)
     {
+        layer = MathHelper.Min(layer, animations.Count);
         animations.Insert(layer, animation);
     }
 
@@ -135,4 +137,49 @@ public class FallingBlockAnimation : Animation
                 size.ToPoint());
             spriteBatch.Draw(textures[frameToDraw], drawRect, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
+}
+
+public class FadingRectangle : Animation
+{
+    private Vector2 position;
+    private Vector2 size;
+    private TetrisGame tetrisGame;
+    private Color color;
+    private Color originalColor;
+    private double? startTime = null;
+    private double? endTime = null;
+    private double timeAlive;
+    private Texture2D texture;
+    public FadingRectangle(
+        Vector2 startingPosition, Vector2 size, TetrisGame tetrisGame, Color startingColor,
+        Texture2D texture, double timeAlive = 500) :
+        base(startingPosition, tetrisGame)
+    {
+        position = startingPosition;
+        this.size = size;
+        this.tetrisGame = tetrisGame;
+        color = startingColor;
+        originalColor = startingColor;
+        this.texture = texture;
+        this.timeAlive = timeAlive;
+    }
+    
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        Rectangle destRect = new Rectangle(position.ToPoint(), size.ToPoint());
+        spriteBatch.Draw(texture, destRect, color);
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+        double time = gameTime.TotalGameTime.TotalMilliseconds;
+        if (startTime == null || endTime == null)
+        {
+            startTime = gameTime.TotalGameTime.TotalMilliseconds;
+            endTime = startTime + timeAlive;
+        }
+        color = originalColor * (1 - (float)((time - startTime) / (endTime - startTime)));
+    }
+    
+    
 }
