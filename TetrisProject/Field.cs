@@ -181,12 +181,12 @@ public class Field //The field in which the pieces can be placed
         //Move all rows above the cleared row down one
         //Because the lowest rows get the higher indices, this loop is a little unorthodox
         //
-        for (int i = line; i > 0 * 2; i--)
+        for (int i = line; i > 0; i--)
         {
             //Replace row with row above it
-            blockArray[i] = blockArray[i - 1];
+            blockArray[i] = blockArray[i - 1]; 
         }
-        //After a line is cleared, the top row will always be emty
+        //After a line is cleared, the top row will always be empty
         blockArray[0] = new Pieces[width];
         for (int j = 0; j < width; j++)
             blockArray[0][j] = Pieces.None;

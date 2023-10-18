@@ -29,8 +29,19 @@ namespace TetrisProject
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
+
+            //For anti aliasing
+            graphics.PreparingDeviceSettings += Graphics_PreparingDeviceSettings;
+            graphics.ApplyChanges();
         }
 
+        //Anti aliasing (X8)
+        private void Graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
+        {
+            graphics.PreferMultiSampling = true;
+            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 8;
+        }
+        
         protected override void Initialize()
         {
             graphics.PreferredBackBufferWidth = WindowWidth;
