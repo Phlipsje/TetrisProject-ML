@@ -38,7 +38,42 @@ public class VersusHandeler : GameHandeler
             garbageLine[i] = Pieces.Garbage;
         }
 
+        //Place the hole in the garbage line in a random spot
         garbageLine = Util.ShuffleArray(garbageLine);
+
+        //Remove lines from the garbage lines list is you cleared a line
+        if (instance == 1)
+        {
+            int count = linesCleared;
+            for (int i = 0; i < count; i++)
+            {
+                if (garbageLines0.Count > 0)
+                {
+                    garbageLines0.RemoveAt(garbageLines0.Count-1);
+                    linesCleared--;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            int count = linesCleared;
+            for (int i = 0; i < count; i++)
+            {
+                if (garbageLines1.Count > 0)
+                {
+                    garbageLines1.RemoveAt(garbageLines1.Count-1);
+                    linesCleared--;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
 
         //instance 1 targets 2 and 2 targets 1
         instance = (int)MathF.Abs(instance - 2);
