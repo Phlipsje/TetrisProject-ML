@@ -90,11 +90,9 @@ public class Field //The field in which the pieces can be placed
                 if (GetBlock(x, y) != Pieces.None)
                 {
                     anyBlockAtTop = true;
-                    continue;
+                    break;
                 }
             }
-            if (anyBlockAtTop)
-                continue;
         }
 
         if (anyBlockAtTop)
@@ -293,7 +291,7 @@ public class Field //The field in which the pieces can be placed
     }
     
     //Used to get a block in a more intuitive manner
-    public Pieces GetBlock(int x, int y)
+    private Pieces GetBlock(int x, int y)
     {
         if (x < 0 || x >= width || y >= height) //Return if out of bounds
         {

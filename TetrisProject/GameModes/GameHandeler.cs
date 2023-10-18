@@ -78,4 +78,9 @@ public class GameHandeler
     {
         
     }
+
+    public virtual void LineCleared()
+    {
+        
+    }
 }

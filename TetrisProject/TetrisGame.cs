@@ -77,6 +77,14 @@ public class TetrisGame
                 score = 0;
                 clearedLines = GetClearedLines(level);
                 break;
+            case GameMode.Versus:
+                this.level = level;
+                field = new Field(this, 320 + instance*800);
+                FillQueue();
+                NextPiece();
+                score = 0;
+                clearedLines = GetClearedLines(level);
+                break;
         }
     }
 
@@ -472,4 +480,5 @@ public enum GameMode
 {
     Standard,
     TugOfWar,
+    Versus,
 }

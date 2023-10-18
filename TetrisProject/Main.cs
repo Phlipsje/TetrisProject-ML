@@ -109,6 +109,12 @@ namespace TetrisProject
                             case MenuState.LobbyStandard:
                                 menu.GoToMenu(MenuState.MainMenu);
                                 break;
+                            case MenuState.LobbyTugOfWar:
+                                menu.GoToMenu(MenuState.MainMenu);
+                                break;
+                            case MenuState.LobbyVersus:
+                                menu.GoToMenu(MenuState.MainMenu);
+                                break;
                             case MenuState.Settings:
                                 menu.GoToMenu(MenuState.MainMenu);
                                 break;
@@ -165,6 +171,11 @@ namespace TetrisProject
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex2]);
                             gameHandeler = new TugOfWarHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
                             break;
+                        case GameMode.Versus:
+                            selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
+                            selectedControls.Add(settings.controlProfiles[menu.profileIndex2]);
+                            gameHandeler = new VersusHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
+                            break;
                     }
                     
                     gameHandeler.Instantiate();
@@ -203,8 +214,6 @@ namespace TetrisProject
                     MusicManager.Stop(gameTime);
                 }
             }
-
-            
             
             AnimationManager.Update(gameTime);
             SfxManager.Update();

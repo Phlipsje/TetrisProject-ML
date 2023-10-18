@@ -38,12 +38,14 @@ public struct GameRules
     public int startingLevel;
     public double gravityMultiplier;
     public int linesToWin;
+    public double garbageMultiplier;
 
     public GameRules()
     {
         startingLevel = 1;
         gravityMultiplier = 1;
         linesToWin = 30;
+        garbageMultiplier = 1;
     }
 }
 
