@@ -328,7 +328,7 @@ public class TetrisGame
     {
         isGameOver = true;
         field.PlayGameOverAnimation();
-        field = new Field(this);
+        field.Empty();
         Point lpos = new Point(3, 8);
         field.SetBlock(lpos.X, lpos.Y, Pieces.Ghost);
         field.SetBlock(lpos.X, lpos.Y + 1, Pieces.Ghost);
@@ -336,6 +336,11 @@ public class TetrisGame
         field.SetBlock(lpos.X, lpos.Y + 3, Pieces.Ghost);
         field.SetBlock(lpos.X + 1, lpos.Y + 3, Pieces.Ghost);
         field.SetBlock(lpos.X + 2, lpos.Y + 3, Pieces.Ghost);
+    }
+
+    private void emptyField()
+    {
+        
     }
 
     public void HandleScore(int rowsCleared)

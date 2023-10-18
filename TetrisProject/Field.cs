@@ -47,11 +47,7 @@ public class Field //The field in which the pieces can be placed
         tetrisGame = tetrisGameReference;
         
         //Data setup
-        blockArray = new Pieces[height*2][]; //Height of array is double of play height because modern Tetris has a buffer above the playfield
-        for (int i = 0; i < blockArray.GetLength(0); i++)
-        {
-            blockArray[i] = new Pieces[width];
-        }
+        Empty();
         
         //Visual setup
         drawGrid = false; //Adjust in settings later
@@ -60,6 +56,15 @@ public class Field //The field in which the pieces can be placed
         fieldPixelHeight = height * blockSize;
         fieldX = startX;
         fieldY = startY;
+    }
+
+    public void Empty()
+    {
+        blockArray = new Pieces[height*2][]; //Height of array is double of play height because modern Tetris has a buffer above the playfield
+        for (int i = 0; i < blockArray.GetLength(0); i++)
+        {
+            blockArray[i] = new Pieces[width];
+        }
     }
 
     //All the methods that are called when a piece is locked into place (in the form of a flowchart check list)
