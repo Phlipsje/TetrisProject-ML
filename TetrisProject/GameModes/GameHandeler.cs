@@ -11,6 +11,7 @@ public class GameHandeler
     private ContentManager content;
     protected List<TetrisGame> tetrisGames = new();
     private Settings settings;
+    public Settings SettingsStruct { get; }
 
     protected Texture2D squareTile;
 

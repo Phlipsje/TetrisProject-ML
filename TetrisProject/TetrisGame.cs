@@ -33,6 +33,7 @@ public class TetrisGame
     public double gravityMultipler; //Can be changed in setting
     private GameMode gameMode;
     private int instance; //If this is player 0 or 1 (only relevant in multiplayer modes)
+    public readonly bool drawHighScore;
 
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -49,13 +50,14 @@ public class TetrisGame
     public Controls controls;
     private GameHandeler gameHandeler;
 
-    public TetrisGame(GameHandeler gameHandeler, Settings settings, Controls controls, GameMode gameMode = GameMode.Standard, int instance = 0)
+    public TetrisGame(GameHandeler gameHandeler, Settings settings, Controls controls, GameMode gameMode = GameMode.Standard, int instance = 0, bool drawHighScore = true)
     {
         this.gameHandeler = gameHandeler;
         this.controls = controls;
         gravityMultipler = settings.game.gravityMultiplier;
         this.gameMode = gameMode;
         this.instance = instance;
+        this.drawHighScore = drawHighScore;
     }
     public void Instantiate(int level)
     {
@@ -154,13 +156,21 @@ public class TetrisGame
         spriteBatch.DrawString(font, "SCORE", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 6), Color.White);
         spriteBatch.DrawString(font, score.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 7), Color.White);
         
+        //Draw high score
+        if (drawHighScore)
+        {
+            spriteBatch.DrawString(font, "BEST", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 9), Color.White);
+            spriteBatch.DrawString(font, gameHandeler.SettingsStruct.highScore.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 10), Color.White);
+        }
+        
+        
         //Draw level
-        spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 10), Color.White);
-        spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 11), Color.White);
+        spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 13), Color.White);
+        spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 14), Color.White);
         
         //Draw cleared lines
-        spriteBatch.DrawString(font, "LINES", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 13), Color.White);
-        spriteBatch.DrawString(font, clearedLines.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 14), Color.White);
+        spriteBatch.DrawString(font, "LINES", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 16), Color.White);
+        spriteBatch.DrawString(font, clearedLines.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 17), Color.White);
 
         //Draw line clear popup
         if (lineClearTextTime > 0 && lineClearType != null && lineClearType != "B2B ")

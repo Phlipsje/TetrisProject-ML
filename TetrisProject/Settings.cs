@@ -18,12 +18,13 @@ public struct Settings
 
     public GameRules game;
     //public List<Controls> controlProfiles = new List<Controls>();
-
+    public int highScore;
     public Settings()
     {
         masterVolume = 100;
         soundEffectVolume = 100;
         musicVolume = 100;
+        highScore = 0;
 
         game = new GameRules();
         controlProfiles = new List<Controls>();
