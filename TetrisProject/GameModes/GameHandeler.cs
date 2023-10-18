@@ -54,7 +54,7 @@ public class GameHandeler
         {
             tetrisGame.Update(gameTime);
             if (tetrisGame.isGameOver && mainReference != null)
-                mainReference.UpdateHighScore(tetrisGame.score);
+                mainReference.SaveSettings(tetrisGame.score);
         }
 
         if (tetrisGames.Count > 1)

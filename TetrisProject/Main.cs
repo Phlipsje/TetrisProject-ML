@@ -231,10 +231,11 @@ namespace TetrisProject
             MusicManager.Update(gameTime);
             base.Update(gameTime);
         }
-
-        public void UpdateHighScore(int score)
+        
+        public void SaveSettings(int newScore = 0)
         {
-            settings.highScore = MathHelper.Max(settings.highScore, score);
+            settings.highScore = MathHelper.Max(settings.highScore, newScore);
+            Util.SaveSettingsToFile(settings, "Settings.conf");
         }
 
         protected override void Draw(GameTime gameTime)

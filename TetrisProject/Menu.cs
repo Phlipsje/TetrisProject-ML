@@ -592,6 +592,7 @@ public class Menu
 
     public void GoToMenu(MenuState state, byte goToIndex = 0)
     {
+        main.SaveSettings();
         if (menuState == MenuState.ControlProfiles)
         {
             newProfileName = "";
