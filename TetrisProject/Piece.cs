@@ -609,7 +609,8 @@ public enum Pieces
     Z,
     L,
     J,
-    Ghost
+    Ghost,
+    Garbage
 }
 
 #region Piece types

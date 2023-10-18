@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace TetrisProject;
 
@@ -16,7 +15,7 @@ public class Field //The field in which the pieces can be placed
     //Data variables
     private const byte width = 10;
     private const byte height = 20;
-    private Pieces[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
+    public Pieces[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
     public bool miniTSpin; //Check if a mini-t-spin has been made
     public bool tSpin; //Check if a t-spin has been made
     public bool allClear; //Check if the entire field is wiped after clearing a row
@@ -76,11 +75,11 @@ public class Field //The field in which the pieces can be placed
         //    tetrisGame, new Vector2(100, -800), tetrisGame.blockTexture, -2));
         
         // Eliminate Phase
-        ClearLines(rowsMarkedForDestruction);
+        int scoringLines = ClearLines(rowsMarkedForDestruction);
         
         //Completion Phase
         // This may be used for alternative game modes and such
-        tetrisGame.HandleScore(rowsMarkedForDestruction.Length);
+        tetrisGame.HandleScore(scoringLines);
 
         bool anyBlockAtTop = false;
         for (int x = 0; x < Width; x++)
@@ -149,12 +148,17 @@ public class Field //The field in which the pieces can be placed
     }
 
     //Handles clearing multiple lines at once
-    private void ClearLines(byte[] lines)
+    private int ClearLines(byte[] lines)
     {
+        int nonGarbageLines = 0;
         //Make sure lines are sorted top to bottom
         
         foreach (byte line in lines)
         {
+            if (blockArray[line][0] != Pieces.Garbage && blockArray[line][1] != Pieces.Garbage)
+            {
+                nonGarbageLines++;
+            }
             ClearSingleLine(line);
         }
 
@@ -162,6 +166,8 @@ public class Field //The field in which the pieces can be placed
         {
             allClear = CheckAllClear();
         }
+
+        return nonGarbageLines;
     }
     
     //Handles clearing a line
@@ -223,6 +229,8 @@ public class Field //The field in which the pieces can be placed
                 return Color.Blue;
             case Pieces.Ghost:
                 return Color.White * 0.5f;
+            case Pieces.Garbage:
+                return Color.Gray;
             default:
                 return Color.Green;
         }

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace TetrisProject;
+namespace TetrisProject; 
 
 public class VersusHandeler : GameHandeler
 {
@@ -12,8 +12,8 @@ public class VersusHandeler : GameHandeler
     
     public VersusHandeler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls) : base(content, gameMode, settings, controls)
     {
-        tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode, 0));
-        tetrisGames.Add(new TetrisGame(this, settings, controls[1], gameMode, 1));
+        tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode, 1, false));
+        tetrisGames.Add(new TetrisGame(this, settings, controls[1], gameMode, 2, false));
 
         linesToWin = settings.game.linesToWin;
     }
@@ -29,9 +29,39 @@ public class VersusHandeler : GameHandeler
         }
     }
 
-    public override void LineCleared()
+    public override void LineCleared(int linesCleared, int instance)
     {
+        //If no line is cleared then return
+        if (linesCleared == 0)
+        {
+            return;
+        }
         
+        //Create garbage line
+        Pieces[] garbageLine = new Pieces[tetrisGames[0].Field.Width];
+        garbageLine[0] = Pieces.None;
+        for (int i = 1; i < garbageLine.Length; i++)
+        {
+            garbageLine[i] = Pieces.Garbage;
+        }
+
+        garbageLine = Util.ShuffleArray(garbageLine);
+
+        //instance 1 targets 2 and 2 targets 1
+        instance = (int)MathF.Abs(instance - 2);
+        
+        //Add line to opponent
+        for (int i = 0; i < tetrisGames[instance].Field.blockArray.Length; i++)
+        {
+            if (i + linesCleared < tetrisGames[instance].Field.blockArray.Length)
+            {
+                tetrisGames[instance].Field.blockArray[i] = tetrisGames[instance].Field.blockArray[i + linesCleared];
+            }
+            else
+            {
+                tetrisGames[instance].Field.blockArray[i] = garbageLine;
+            }
+        }
     }
 
     public override void Draw(SpriteBatch spriteBatch)

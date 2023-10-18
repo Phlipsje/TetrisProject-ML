@@ -12,8 +12,8 @@ public class TugOfWarHandeler : GameHandeler
     
     public TugOfWarHandeler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls) : base(content, gameMode, settings, controls)
     {
-        tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode, 0));
-        tetrisGames.Add(new TetrisGame(this, settings, controls[1], gameMode, 1));
+        tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode, 1, false));
+        tetrisGames.Add(new TetrisGame(this, settings, controls[1], gameMode, 2, false));
 
         linesToWin = settings.game.linesToWin;
     }

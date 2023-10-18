@@ -13,6 +13,7 @@ public class TetrisGame
 {
     //The in-match game logic
     private Field field; //The field in which the game is being played
+    public Field Field => field;
     private Piece activePiece; //The currently being controlled piece
     private List<Pieces> pieceQueue = new(); //Which pieces come next
     private int nextPieceLength = 5; //The amount of pieces shown in the next piece line
@@ -73,7 +74,7 @@ public class TetrisGame
                 break;
             case GameMode.TugOfWar:
                 this.level = level;
-                field = new Field(this, 320 + instance*800);
+                field = new Field(this, 320 + (instance-1)*800);
                 FillQueue();
                 NextPiece();
                 score = 0;
@@ -81,7 +82,7 @@ public class TetrisGame
                 break;
             case GameMode.Versus:
                 this.level = level;
-                field = new Field(this, 320 + instance*800);
+                field = new Field(this, 320 + (instance-1)*800);
                 FillQueue();
                 NextPiece();
                 score = 0;
@@ -340,6 +341,7 @@ public class TetrisGame
 
     public void HandleScore(int rowsCleared)
     {
+        int previousScore = score;
         //Update time to show clear text on screen
         lineClearTextTime = lineClearTextTimeMax;
         
@@ -460,6 +462,7 @@ public class TetrisGame
         
         //Update level
         level = CalculateLevel();
+        gameHandeler.LineCleared((score-previousScore)/100, instance);
     }
 
     private int CalculateLevel()
