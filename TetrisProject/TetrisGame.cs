@@ -339,9 +339,24 @@ public class TetrisGame
         field.SetBlock(lpos.X + 2, lpos.Y + 3, Pieces.Ghost);
     }
 
-    private void emptyField()
+    public void Win()
     {
+        isGameOver = true;
+        field.PlayGameOverAnimation();
+        field.Empty();
+        Point wpos = new Point(2, 8);
         
+        field.SetBlock(wpos.X, wpos.Y, Pieces.Ghost);
+        field.SetBlock(wpos.X, wpos.Y + 1, Pieces.Ghost);
+        field.SetBlock(wpos.X, wpos.Y + 2, Pieces.Ghost);
+        field.SetBlock(wpos.X + 1, wpos.Y + 3, Pieces.Ghost);
+        field.SetBlock(wpos.X + 2, wpos.Y + 2, Pieces.Ghost);
+        field.SetBlock(wpos.X + 2, wpos.Y + 1, Pieces.Ghost);
+        field.SetBlock(wpos.X + 2, wpos.Y, Pieces.Ghost);
+        field.SetBlock(wpos.X + 3, wpos.Y + 3, Pieces.Ghost);
+        field.SetBlock(wpos.X + 4, wpos.Y + 2, Pieces.Ghost);
+        field.SetBlock(wpos.X + 4, wpos.Y + 1, Pieces.Ghost);
+        field.SetBlock(wpos.X + 4, wpos.Y, Pieces.Ghost);
     }
 
     public void HandleScore(int rowsCleared)

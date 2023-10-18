@@ -22,11 +22,27 @@ public class TugOfWarHandeler : GameHandeler
     {
         if (MathF.Abs(tetrisGames[0].clearedLines - tetrisGames[1].clearedLines) >= linesToWin)
         {
-            foreach (var tetrisGame in tetrisGames)
+            if (tetrisGames[0].score > tetrisGames[1].score)
             {
-                tetrisGame.GameOver();
+                tetrisGames[0].Win();
+                tetrisGames[1].GameOver();
+            }
+            else
+            {
+                tetrisGames[1].Win();
+                tetrisGames[0].GameOver();
             }
         }
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+        if (tetrisGames[0].isGameOver && !tetrisGames[1].isGameOver)
+            tetrisGames[1].Win();
+        else if (tetrisGames[1].isGameOver && !tetrisGames[0].isGameOver)
+            tetrisGames[0].Win();
+        ;
     }
 
     public override void Draw(SpriteBatch spriteBatch)
