@@ -17,11 +17,13 @@ public static class MusicManager
     private static double targetPitchChangeTime = 1; // the time when the pitch should be fully change
     private static double PitchChangeStartTime = 1; // the time when the pitch started to change
     public static SoundEffect ClassicTheme;
+    public static SoundEffect ModernTheme;
     private static Settings settings;
     
     public static void Load(ContentManager content)
     {
         ClassicTheme = content.Load<SoundEffect>("music/TetrisTheme");
+        ModernTheme = content.Load<SoundEffect>("music/modern");
     }
 
     public static void Initialize(Settings settingsStruct)

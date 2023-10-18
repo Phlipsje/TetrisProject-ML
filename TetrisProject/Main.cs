@@ -191,7 +191,7 @@ namespace TetrisProject
                     
                     gameHandeler.Instantiate();
                     gameHandeler.LoadContent();
-                    MusicManager.PlaySong(MusicManager.ClassicTheme);
+                    MusicManager.PlaySong(MusicManager.ModernTheme);
                 }
                 if (Util.GetKeyPressed(Keys.Enter) && gameHandeler.gameFinished)
                 {

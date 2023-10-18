@@ -23,7 +23,7 @@ public struct Settings
     {
         masterVolume = 100;
         soundEffectVolume = 100;
-        musicVolume = 100;
+        musicVolume = 70;
         highScore = 0;
 
         game = new GameRules();

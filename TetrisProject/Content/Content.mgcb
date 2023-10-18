@@ -284,6 +284,12 @@
 /processorParam:TextureFormat=Color
 /build:HoldBlocked.png
 
+#begin music/modern.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:music/modern.wav
+
 #begin music/TetrisTheme.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
