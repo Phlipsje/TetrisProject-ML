@@ -163,13 +163,15 @@ public class Menu
             case MenuState.Settings:
                 DrawButton("Master Volume", 0);
                 DrawButton($"{main.settings.masterVolume}%", 0, "Master Volume");
-                DrawButton("Sfx Volume", 1);
-                DrawButton($"{main.settings.soundEffectVolume}%", 1, "Sfx Volume");
+                DrawButton("Music Volume", 1);
+                DrawButton($"{main.settings.musicVolume}%", 1, "Music Volume");
+                DrawButton("Sfx Volume", 2);
+                DrawButton($"{main.settings.soundEffectVolume}%", 2, "Sfx Volume");
                 string musicMode = main.settings.useClassicMusic ? "Classic" : "Modern";
-                DrawButton("Music", 2);
-                DrawButton(musicMode, 2, "Music");
-                DrawButton("Controls", 3);
-                DrawButton("Back", 4);
+                DrawButton("Music", 3);
+                DrawButton(musicMode, 3, "Music");
+                DrawButton("Controls", 4);
+                DrawButton("Back", 5);
                 break;
             
             case MenuState.ControlProfiles:
@@ -422,41 +424,41 @@ public class Menu
                 break;
             
             case MenuState.LobbyVersus:
-                            switch (menuIndex)
-                            {
-                                case (byte)LobbyVersus.Start:
-                                    if (inputType == InputType.Select) main.gameState = GameState.Playing;
-                                    break;
-                                case (byte)LobbyVersus.Profile1:
-                                    if (inputType == InputType.Select) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
-                                    if (inputType == InputType.MoveRight) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
-                                    if (inputType == InputType.MoveLeft) profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex);
-                                    break;
-                                case (byte)LobbyVersus.Profile2:
-                                    if (inputType == InputType.Select) profileIndex2 = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex2);
-                                    if (inputType == InputType.MoveRight) profileIndex2 = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex2);
-                                    if (inputType == InputType.MoveLeft) profileIndex2 = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex2);
-                                    break;
-                                case (byte)LobbyVersus.GarbageMultiplier:
-                                    if (inputType == InputType.Select) main.settings.game.garbageMultiplier = Increment(main.settings.game.garbageMultiplier, 0.1, 0.1, 5);
-                                    if (inputType == InputType.MoveRight) main.settings.game.garbageMultiplier = Increment(main.settings.game.garbageMultiplier, 0.1, 0.1, 5);
-                                    if (inputType == InputType.MoveLeft) main.settings.game.garbageMultiplier = Increment(main.settings.game.garbageMultiplier, -0.1, 0.1, 5);
-                                    break;
-                                case (byte)LobbyVersus.StartingLevel:
-                                    if (inputType == InputType.Select) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
-                                    if (inputType == InputType.MoveRight) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
-                                    if (inputType == InputType.MoveLeft) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, -1, 1, 15);
-                                    break;
-                                case (byte)LobbyVersus.GravityMultiplier:
-                                    if (inputType == InputType.Select) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
-                                    if (inputType == InputType.MoveRight) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
-                                    if (inputType == InputType.MoveLeft) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, -0.1, 0.1, 5);
-                                    break;
-                                case (byte)LobbyVersus.Back:
-                                    if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
-                                    break;
-                            }
+                    switch (menuIndex)
+                    {
+                        case (byte)LobbyVersus.Start:
+                            if (inputType == InputType.Select) main.gameState = GameState.Playing;
                             break;
+                        case (byte)LobbyVersus.Profile1:
+                            if (inputType == InputType.Select) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
+                            if (inputType == InputType.MoveRight) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
+                            if (inputType == InputType.MoveLeft) profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex);
+                            break;
+                        case (byte)LobbyVersus.Profile2:
+                            if (inputType == InputType.Select) profileIndex2 = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex2);
+                            if (inputType == InputType.MoveRight) profileIndex2 = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex2);
+                            if (inputType == InputType.MoveLeft) profileIndex2 = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex2);
+                            break;
+                        case (byte)LobbyVersus.GarbageMultiplier:
+                            if (inputType == InputType.Select) main.settings.game.garbageMultiplier = Increment(main.settings.game.garbageMultiplier, 0.1, 0.1, 5);
+                            if (inputType == InputType.MoveRight) main.settings.game.garbageMultiplier = Increment(main.settings.game.garbageMultiplier, 0.1, 0.1, 5);
+                            if (inputType == InputType.MoveLeft) main.settings.game.garbageMultiplier = Increment(main.settings.game.garbageMultiplier, -0.1, 0.1, 5);
+                            break;
+                        case (byte)LobbyVersus.StartingLevel:
+                            if (inputType == InputType.Select) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
+                            if (inputType == InputType.MoveRight) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
+                            if (inputType == InputType.MoveLeft) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, -1, 1, 15);
+                            break;
+                        case (byte)LobbyVersus.GravityMultiplier:
+                            if (inputType == InputType.Select) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
+                            if (inputType == InputType.MoveRight) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
+                            if (inputType == InputType.MoveLeft) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, -0.1, 0.1, 5);
+                            break;
+                        case (byte)LobbyVersus.Back:
+                            if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
+                            break;
+                    }
+                    break;
             
             case MenuState.Settings:
                 switch (menuIndex)
@@ -466,13 +468,20 @@ public class Menu
                         if (inputType == InputType.MoveRight) { main.settings.masterVolume = Increment(main.settings.masterVolume, 10, 0, 100); main.UpdateVolume();}
                         if (inputType == InputType.MoveLeft) { main.settings.masterVolume = Increment(main.settings.masterVolume, -10, 0, 100); main.UpdateVolume();}
                         break;
+                    case (byte)SettingsMenu.MusicVolume:
+                        if (inputType == InputType.Select) { main.settings.musicVolume = Increment(main.settings.musicVolume,  10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.MoveRight) { main.settings.musicVolume = Increment(main.settings.musicVolume, 10, 0, 100); main.UpdateVolume();}
+                        if (inputType == InputType.MoveLeft) { main.settings.musicVolume = Increment(main.settings.musicVolume, -10, 0, 100); main.UpdateVolume();}
+                        break;
                     case (byte)SettingsMenu.SfxVolume:
                         if (inputType == InputType.Select) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
                         if (inputType == InputType.MoveRight) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
                         if (inputType == InputType.MoveLeft) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, -10, 0, 100); main.UpdateVolume();}
                         break;
                     case (byte)SettingsMenu.Music:
-                        if (inputType == InputType.Select) {main.settings.useClassicMusic = !main.settings.useClassicMusic;}
+                        if (inputType == InputType.Select || 
+                            inputType == InputType.MoveLeft || 
+                            inputType == InputType.MoveRight) {main.settings.useClassicMusic = !main.settings.useClassicMusic;}
                         break;
                     case (byte)SettingsMenu.Controls:
                         if(inputType == InputType.Select) 
@@ -839,6 +848,7 @@ public enum LobbyVersus
 public enum SettingsMenu
 {
     MasterVolume,
+    MusicVolume,
     SfxVolume,
     Music,
     Controls,
