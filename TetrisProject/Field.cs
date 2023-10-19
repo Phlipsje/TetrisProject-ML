@@ -26,8 +26,9 @@ public class Field //The field in which the pieces can be placed
     public int fieldPixelHeight; //How many pixels high
     public int fieldX; //X value of top left of field
     public int fieldY; //Y value of top left of field
-    // These are needed for the animations, as they already calculate their actual position (also in fullscreen)
-
+    public int fieldHeightOffset;
+    public int fieldCoverSideWidth;
+    
     private bool drawGrid;
 
     public byte Width
@@ -50,11 +51,13 @@ public class Field //The field in which the pieces can be placed
         
         //Visual setup
         drawGrid = false; //Adjust in settings later
-        blockSize = 40;
+        blockSize = 32;
         fieldPixelWidth = width * blockSize;
         fieldPixelHeight = height * blockSize;
         fieldX = startX;
         fieldY = startY;
+        fieldHeightOffset = blockSize * 2;
+        fieldCoverSideWidth = 160;
     }
 
     public void Empty()
@@ -244,9 +247,21 @@ public class Field //The field in which the pieces can be placed
     //Draw all the already placed pieces
     public void Draw(SpriteBatch spriteBatch)
     {
-        //Draw field
+        //TODO Adjust in settings later
+        Color coverTheme = Color.Red;
         
-        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, fieldPixelHeight), Color.LightGray * 0.5f); //Temp values
+        //Draw field background
+        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY - fieldHeightOffset, fieldPixelWidth, fieldPixelHeight + fieldHeightOffset), Color.Black * 0.1f);
+        
+        //Draw field cover
+        spriteBatch.Draw(tetrisGame.coverLeftTexture, new Vector2(fieldX-tetrisGame.coverLeftTexture.Width, fieldY - fieldHeightOffset), coverTheme);
+        spriteBatch.Draw(tetrisGame.coverMiddleTexture, new Rectangle(fieldX, fieldY - fieldHeightOffset, fieldPixelWidth, tetrisGame.coverMiddleTexture.Height), coverTheme);
+        spriteBatch.Draw(tetrisGame.coverRightTexture, new Vector2(fieldX+fieldPixelWidth, fieldY - fieldHeightOffset), coverTheme);
+        
+        //TODO change color or hide when not relevant
+        //Starting line
+        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, 10), coverTheme * 0.8f);
+        
         //Draw blocks
         //For loops for getting blocks in sequence
         for (int i = 0; i < blockArray.GetLength(0); i++)
@@ -262,7 +277,7 @@ public class Field //The field in which the pieces can be placed
                 if (drawGrid && i < height)
                 {
                     //Draws grid cells to make movement and position more clear
-                    spriteBatch.Draw(tetrisGame.blockTexture, blockRectangle, Color.DarkGray); //TODO Change texture
+                    spriteBatch.Draw(tetrisGame.blockTexture, blockRectangle, Color.DarkGray);
                 }
                 
                 //Draw block

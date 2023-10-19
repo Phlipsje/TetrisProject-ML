@@ -40,13 +40,17 @@ public class TetrisGame
     public Texture2D blockTexture; //Texture of a single block in a piece
     public Texture2D squareTexture; //Used for drawing rectangles with a single color
     public Texture2D[] explosionTextures;
-    private Texture2D holdBlockedTexture;
+    public Texture2D coverLeftTexture;
+    public Texture2D coverMiddleTexture;
+    public Texture2D coverRightTexture;
     private SpriteFont font;
     
     //File locations
-    private const string blockTextureFileName = "BaseBlock";
+    private const string blockTextureFileName = "Bigger Base Block";
     private const string squareTextureFileName = "Square";
-    private const string holdBlockedFileName = "HoldBlocked";
+    private const string coverLeftFileName = "Tetris Cover Left";
+    private const string coverMiddleFileName = "Tetris Cover Middle";
+    private const string coverRightFileName = "Tetris Cover Right";
     
     public Controls controls;
     private GameHandeler gameHandeler;
@@ -97,7 +101,9 @@ public class TetrisGame
         squareTexture = content.Load<Texture2D>(squareTextureFileName);
         font = content.Load<SpriteFont>("Font");
         explosionTextures = new Texture2D[17];
-        holdBlockedTexture = content.Load<Texture2D>(holdBlockedFileName);
+        coverLeftTexture = content.Load<Texture2D>(coverLeftFileName);
+        coverMiddleTexture = content.Load<Texture2D>(coverMiddleFileName);
+        coverRightTexture = content.Load<Texture2D>(coverRightFileName);
         for (int i = 0; i < 17; i++)
         {
             explosionTextures[i] = content.Load<Texture2D>($"eEffect/explosion{i}");
@@ -131,46 +137,52 @@ public class TetrisGame
         }
 
         //Draw next pieces
-        Point nextPieceTopLeft = new Point(field.fieldX + field.fieldPixelWidth + field.blockSize, field.fieldY);
-        spriteBatch.DrawString(font, "NEXT", new Vector2(nextPieceTopLeft.X, nextPieceTopLeft.Y), Color.White);
+        Point nextPieceTopLeft = new Point(field.fieldX + field.fieldPixelWidth + 12, field.fieldY - 12);
+        spriteBatch.DrawString(font, "NEXT", new Vector2(nextPieceTopLeft.X, field.fieldY-field.fieldHeightOffset), Color.White);
         for (int i = 0; i < 5; i++)
         {
-            DrawPiece(GetNextPiece(pieceQueue[i]), spriteBatch, nextPieceTopLeft + new Point(0, (i+1)*field.blockSize*4));
+            DrawPiece(GetNextPiece(pieceQueue[i]), spriteBatch, nextPieceTopLeft + new Point(0, (i+1)* (field.blockSize*2+24)));
         }
 
         //Draw hold piece
-        spriteBatch.DrawString(font, "HOLD", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize ), Color.White);
-        if (holdPiece != null)
+        if (holdPiece == null)
         {
-            Point holdPosition = new Point(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 5);
-            DrawPiece(holdPiece, spriteBatch, holdPosition);
+            spriteBatch.DrawString(font, "HOLD", new Vector2(field.fieldX-field.fieldCoverSideWidth + 26,field.fieldY -field.fieldHeightOffset + 20), Color.White);
+        }
+        else //A piece is being held
+        {
+            Point holdPosition = new Point(field.fieldX-field.fieldCoverSideWidth + 12,field.fieldY + 18);
+
             if (holdUsed)
             {
-                Rectangle destinationRect =
-                    new Rectangle(holdPosition - new Point(0, 3 * field.blockSize), new Point(3 * field.blockSize, 3 * field.blockSize));
-                spriteBatch.Draw(holdBlockedTexture, destinationRect, Color.White);
+                DrawPiece(holdPiece, spriteBatch, holdPosition, true);
+            }
+            else
+            {
+                DrawPiece(holdPiece, spriteBatch, holdPosition);
             }
         }
-        
-        //Draw score
-        spriteBatch.DrawString(font, "SCORE", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 6), Color.White);
-        spriteBatch.DrawString(font, score.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 7), Color.White);
+
+        int textVerticalSpacing = 40;
         
         //Draw high score
         if (drawHighScore)
         {
-            spriteBatch.DrawString(font, "BEST", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 9), Color.White);
-            spriteBatch.DrawString(font, gameHandeler.SettingsStruct.highScore.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 10), Color.White);
+            spriteBatch.DrawString(font, "BEST", new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing), Color.White);
+            spriteBatch.DrawString(font, gameHandeler.SettingsStruct.highScore.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*2), Color.White);
         }
         
-        
+        //Draw score
+        spriteBatch.DrawString(font, "SCORE", new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*3.5f), Color.White);
+        spriteBatch.DrawString(font, score.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*4.5f), Color.White);
+
         //Draw level
-        spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 13), Color.White);
-        spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 14), Color.White);
+        spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*6), Color.White);
+        spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*7), Color.White);
         
         //Draw cleared lines
-        spriteBatch.DrawString(font, "LINES", new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 16), Color.White);
-        spriteBatch.DrawString(font, clearedLines.ToString(), new Vector2(field.fieldX-field.blockSize * 4,field.fieldY + field.blockSize * 17), Color.White);
+        spriteBatch.DrawString(font, "LINES", new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*8.5f), Color.White);
+        spriteBatch.DrawString(font, clearedLines.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*9.5f), Color.White);
 
         //Draw line clear popup
         if (lineClearTextTime > 0 && lineClearType != null && lineClearType != "B2B ")
@@ -179,8 +191,16 @@ public class TetrisGame
         }
     }
     
-    public void DrawPiece(Piece piece, SpriteBatch spriteBatch, Point position)
+    public void DrawPiece(Piece piece, SpriteBatch spriteBatch, Point position, bool greyOut = false)
     {
+        //GreyOut is used to show that hold cannot be used
+        Color pieceColor = piece.Color;
+
+        if (greyOut)
+        {
+            pieceColor = Color.Gray;
+        }
+        
         for (int y = 0; y < Piece.hitboxSize; y++)
         {
             for (int x =  0; x < Piece.hitboxSize; x++)
@@ -192,7 +212,7 @@ public class TetrisGame
                 //Draw individual block of a piece
                 Rectangle blockRectangle =
                     new Rectangle(position.X + field.blockSize * x, position.Y + field.blockSize * -y, field.blockSize, field.blockSize);
-                spriteBatch.Draw(blockTexture, blockRectangle, piece.Color);
+                spriteBatch.Draw(blockTexture, blockRectangle, pieceColor);
             }
         }
     }
