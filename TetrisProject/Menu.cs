@@ -165,8 +165,11 @@ public class Menu
                 DrawButton($"{main.settings.masterVolume}%", 0, "Master Volume");
                 DrawButton("Sfx Volume", 1);
                 DrawButton($"{main.settings.soundEffectVolume}%", 1, "Sfx Volume");
-                DrawButton("Controls", 2);
-                DrawButton("Back", 3);
+                string musicMode = main.settings.useClassicMusic ? "Classic" : "Modern";
+                DrawButton("Music", 2);
+                DrawButton(musicMode, 2, "Music");
+                DrawButton("Controls", 3);
+                DrawButton("Back", 4);
                 break;
             
             case MenuState.ControlProfiles:
@@ -467,6 +470,9 @@ public class Menu
                         if (inputType == InputType.Select) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
                         if (inputType == InputType.MoveRight) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, 10, 0, 100); main.UpdateVolume();}
                         if (inputType == InputType.MoveLeft) { main.settings.soundEffectVolume = Increment(main.settings.soundEffectVolume, -10, 0, 100); main.UpdateVolume();}
+                        break;
+                    case (byte)SettingsMenu.Music:
+                        if (inputType == InputType.Select) {main.settings.useClassicMusic = !main.settings.useClassicMusic;}
                         break;
                     case (byte)SettingsMenu.Controls:
                         if(inputType == InputType.Select) 
@@ -834,6 +840,7 @@ public enum SettingsMenu
 {
     MasterVolume,
     SfxVolume,
+    Music,
     Controls,
     Back,
 }

@@ -13,6 +13,8 @@ public struct Settings
     public int masterVolume { get; set; }
     public int soundEffectVolume{ get; set; }
     public int musicVolume { get; set; }
+    public bool useClassicMusic { get; set; }
+    
     
     public List<Controls> controlProfiles { get; set; }
 
@@ -24,6 +26,7 @@ public struct Settings
         masterVolume = 100;
         soundEffectVolume = 100;
         musicVolume = 70;
+        useClassicMusic = false;
         highScore = 0;
 
         game = new GameRules();

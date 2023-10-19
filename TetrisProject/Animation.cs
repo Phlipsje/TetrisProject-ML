@@ -139,7 +139,6 @@ public class FallingBlockAnimation : Animation
 
 public class FadingRectangle : Animation
 {
-    private Vector2 position;
     private Vector2 size;
     private Color color;
     private Color originalColor;
