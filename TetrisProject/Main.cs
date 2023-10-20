@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -18,8 +19,12 @@ namespace TetrisProject
         private Menu menu;
         private RenderTarget2D renderTarget;
         public Settings settings;
-        public int WindowWidth = 800;
-        public int WindowHeight = 450;
+        private const int startingWindowWidth = 800;
+        private const int startingWindowHeight = 450;
+        private const int fullscreenWindowWidth = 1920;
+        private const int fullscreenWindowHeight = 1080;
+        public int WindowWidth => graphics.PreferredBackBufferWidth;
+        public int WindowHeight => graphics.PreferredBackBufferHeight;
         public const int WorldWidth = 1920;
         public const int WorldHeight = 1080;
         public GameState gameState;
@@ -41,11 +46,24 @@ namespace TetrisProject
             graphics.PreferMultiSampling = true;
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 8;
         }
+
+        protected void OnResize(Object sender, EventArgs e)
+        {
+            if ((graphics.PreferredBackBufferWidth != graphics.GraphicsDevice.Viewport.Width) ||
+                (graphics.PreferredBackBufferHeight != graphics.GraphicsDevice.Viewport.Height))
+            {
+                graphics.PreferredBackBufferWidth = graphics.GraphicsDevice.Viewport.Width;
+                graphics.PreferredBackBufferHeight = (int)Math.Round(WindowWidth * ((double)startingWindowHeight / startingWindowWidth));
+                graphics.ApplyChanges();
+            }
+        }
         
         protected override void Initialize()
         {
-            graphics.PreferredBackBufferWidth = WindowWidth;
-            graphics.PreferredBackBufferHeight = WindowHeight;
+            graphics.PreferredBackBufferWidth = startingWindowWidth;
+            graphics.PreferredBackBufferHeight = startingWindowHeight;
+            Window.ClientSizeChanged += OnResize;
+            Window.AllowUserResizing = true;
             graphics.ApplyChanges();
             if (File.Exists("Settings.conf"))
             {
@@ -69,10 +87,8 @@ namespace TetrisProject
 
         public void EnterFullScreen()
         {
-            WindowWidth = 1920;
-            WindowHeight = 1080;
-            graphics.PreferredBackBufferWidth = WindowWidth;
-            graphics.PreferredBackBufferHeight = WindowHeight;
+            graphics.PreferredBackBufferWidth = fullscreenWindowWidth;
+            graphics.PreferredBackBufferHeight = fullscreenWindowHeight;
             graphics.ApplyChanges();
             graphics.IsFullScreen = true;
             graphics.ApplyChanges();
@@ -80,13 +96,10 @@ namespace TetrisProject
         
         public void ExitFullScreen()
         {
-            WindowWidth = 800;
-            WindowHeight = 450;
-            
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
-            graphics.PreferredBackBufferWidth = WindowWidth;
-            graphics.PreferredBackBufferHeight = WindowHeight;
+            graphics.PreferredBackBufferWidth = startingWindowWidth;
+            graphics.PreferredBackBufferHeight = startingWindowHeight;
             graphics.ApplyChanges();
         }
 
@@ -275,6 +288,7 @@ namespace TetrisProject
 
             //Resize renderTarget to the application window
             spriteBatch.Begin();
+            Debug.WriteLine($"{WindowWidth}, {WindowHeight}");
             Rectangle destinationRectangle = new Rectangle(0, 0, WindowWidth, WindowHeight);
             spriteBatch.Draw(renderTarget, destinationRectangle, Color.White);
             spriteBatch.End();

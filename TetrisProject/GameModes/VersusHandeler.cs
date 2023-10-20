@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 
 namespace TetrisProject; 
@@ -144,5 +145,14 @@ public class VersusHandeler : GameHandeler
             
             
         }
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+        base.Update(gameTime);
+        if (tetrisGames[0].isGameOver && !tetrisGames[1].isGameOver)
+            tetrisGames[1].Win();
+        else if (tetrisGames[1].isGameOver && !tetrisGames[0].isGameOver)
+            tetrisGames[0].Win();
     }
 }
