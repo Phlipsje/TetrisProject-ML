@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -144,6 +145,13 @@ public class Menu
                 DrawButton("Gravity Multiplier", 5);
                 DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 5, "Gravity Multiplier");
                 DrawButton("Back", 6);
+                
+                //Check for conflicting keybinds
+                if (CheckConflictingKeybinds(main.settings.controlProfiles[profileIndex],
+                        main.settings.controlProfiles[profileIndex2]))
+                {
+                    spriteBatch.DrawString(font, "Warning: There are conflicting keybinds", new Vector2(620, 62), Color.Red);
+                }
                 break;
             
             case MenuState.LobbyVersus:
@@ -159,6 +167,13 @@ public class Menu
                 DrawButton("Gravity Multiplier", 5);
                 DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 5, "Gravity Multiplier");
                 DrawButton("Back", 6);
+
+                //Check for conflicting keybinds
+                if (CheckConflictingKeybinds(main.settings.controlProfiles[profileIndex],
+                        main.settings.controlProfiles[profileIndex2]))
+                {
+                    spriteBatch.DrawString(font, "Warning: There are conflicting keybinds", new Vector2(620, 62), Color.Red);
+                }
                 break;
             
             case MenuState.Settings:
@@ -768,23 +783,40 @@ public class Menu
 
         return text;
     }
-    
-    private string ArrayListedAsString(List<Controls> profiles)
-    {
-        string text = "[";
 
-        for (int i = 0; i < profiles.Count; i++)
+    private bool CheckConflictingKeybinds(Controls controls1, Controls controls2)
+    {
+        //Get all controls from first control profile
+        List<Keys> allKeysControls1 = new();
+        allKeysControls1.AddRange(controls1.leftKey.ToList());
+        allKeysControls1.AddRange(controls1.rightKey.ToList());
+        allKeysControls1.AddRange(controls1.softDropKey.ToList());
+        allKeysControls1.AddRange(controls1.hardDropKey.ToList());
+        allKeysControls1.AddRange(controls1.rotateClockWiseKey.ToList());
+        allKeysControls1.AddRange(controls1.rotateCounterClockWiseKey.ToList());
+        allKeysControls1.AddRange(controls1.holdKey.ToList());
+        
+        //Get all controls from second control profile
+        List<Keys> allKeysControls2 = new();
+        allKeysControls2.AddRange(controls2.leftKey.ToList());
+        allKeysControls2.AddRange(controls2.rightKey.ToList());
+        allKeysControls2.AddRange(controls2.softDropKey.ToList());
+        allKeysControls2.AddRange(controls2.hardDropKey.ToList());
+        allKeysControls2.AddRange(controls2.rotateClockWiseKey.ToList());
+        allKeysControls2.AddRange(controls2.rotateCounterClockWiseKey.ToList());
+        allKeysControls2.AddRange(controls2.holdKey.ToList());
+
+        //Check for matches
+        foreach (var key in allKeysControls1)
         {
-            if (i > 0)
+            if (allKeysControls2.Contains(key))
             {
-                text += ", ";
+                return true;
             }
-            text += profiles[i].controlName;
         }
 
-        text += "]";
-
-        return text;
+        //If no matches return false
+        return false;
     }
 
     //Gets the length of a button based on what text it holds
