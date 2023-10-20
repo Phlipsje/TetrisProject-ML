@@ -92,9 +92,9 @@ public class TetrisGame
             case GameMode.Versus:
                 this.level = level;
                 if (instance == 1)
-                    field = new Field(this, Color.Red, startX: 160);
+                    field = new Field(this, Color.Red, startX: 320 + 50, startY: 200);
                 else
-                    field = new Field(this, Color.Blue, startX: 356);
+                    field = new Field(this, Color.Blue, startX: 1280 - 50, startY: 200);
                 FillQueue();
                 NextPiece();
                 score = 0;
