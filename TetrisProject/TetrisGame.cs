@@ -35,6 +35,7 @@ public class TetrisGame
     private GameMode gameMode;
     private int instance; //If this is player 0 or 1 (only relevant in multiplayer modes)
     public readonly bool drawHighScore;
+    private Settings settings;
 
     //Sprites
     public Texture2D blockTexture; //Texture of a single block in a piece
@@ -57,6 +58,7 @@ public class TetrisGame
 
     public TetrisGame(GameHandeler gameHandeler, Settings settings, Controls controls, GameMode gameMode = GameMode.Standard, int instance = 0, bool drawHighScore = true)
     {
+        this.settings = settings;
         this.gameHandeler = gameHandeler;
         this.controls = controls;
         gravityMultipler = settings.game.gravityMultiplier;
@@ -70,7 +72,7 @@ public class TetrisGame
         {
             default:
                 this.level = level;
-                field = new Field(this);
+                field = new Field(this, Color.Red, startY: 200);
                 FillQueue();
                 NextPiece();
                 score = 0;
@@ -78,7 +80,10 @@ public class TetrisGame
                 break;
             case GameMode.TugOfWar:
                 this.level = level;
-                field = new Field(this, 320 + (instance-1)*800);
+                if (instance == 1)
+                    field = new Field(this, Color.Red, startX: 320 + 50, startY: 200);
+                else
+                    field = new Field(this, Color.Blue, startX: 1280 - 50, startY: 200);
                 FillQueue();
                 NextPiece();
                 score = 0;
@@ -86,7 +91,10 @@ public class TetrisGame
                 break;
             case GameMode.Versus:
                 this.level = level;
-                field = new Field(this, 320 + (instance-1)*800);
+                if (instance == 1)
+                    field = new Field(this, Color.Red, startX: 160);
+                else
+                    field = new Field(this, Color.Blue, startX: 356);
                 FillQueue();
                 NextPiece();
                 score = 0;

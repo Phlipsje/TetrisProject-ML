@@ -28,6 +28,7 @@ public class Field //The field in which the pieces can be placed
     public int fieldY; //Y value of top left of field
     public int fieldHeightOffset;
     public int fieldCoverSideWidth;
+    private Color themeColor;
     
     private bool drawGrid;
 
@@ -42,10 +43,10 @@ public class Field //The field in which the pieces can be placed
     }
 
     //Prepare the field to be usable
-    public Field(TetrisGame tetrisGameReference, int startX = 760, int startY = 140)
+    public Field(TetrisGame tetrisGameReference, Color themeColor, int startX = 760, int startY = 140)
     {
         tetrisGame = tetrisGameReference;
-        
+        this.themeColor = themeColor;
         //Data setup
         Empty();
         
@@ -247,20 +248,18 @@ public class Field //The field in which the pieces can be placed
     //Draw all the already placed pieces
     public void Draw(SpriteBatch spriteBatch)
     {
-        //TODO Adjust in settings later
-        Color coverTheme = Color.Red;
         
         //Draw field background
         spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY - fieldHeightOffset, fieldPixelWidth, fieldPixelHeight + fieldHeightOffset), Color.Black * 0.1f);
         
         //Draw field cover
-        spriteBatch.Draw(tetrisGame.coverLeftTexture, new Vector2(fieldX-tetrisGame.coverLeftTexture.Width, fieldY - fieldHeightOffset), coverTheme);
-        spriteBatch.Draw(tetrisGame.coverMiddleTexture, new Rectangle(fieldX, fieldY - fieldHeightOffset, fieldPixelWidth, tetrisGame.coverMiddleTexture.Height), coverTheme);
-        spriteBatch.Draw(tetrisGame.coverRightTexture, new Vector2(fieldX+fieldPixelWidth, fieldY - fieldHeightOffset), coverTheme);
+        spriteBatch.Draw(tetrisGame.coverLeftTexture, new Vector2(fieldX-tetrisGame.coverLeftTexture.Width, fieldY - fieldHeightOffset), themeColor);
+        spriteBatch.Draw(tetrisGame.coverMiddleTexture, new Rectangle(fieldX, fieldY - fieldHeightOffset, fieldPixelWidth, tetrisGame.coverMiddleTexture.Height), themeColor);
+        spriteBatch.Draw(tetrisGame.coverRightTexture, new Vector2(fieldX+fieldPixelWidth, fieldY - fieldHeightOffset), themeColor);
         
         //TODO change color or hide when not relevant
         //Starting line
-        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, 10), coverTheme * 0.8f);
+        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, 10), themeColor * 0.8f);
         
         //Draw blocks
         //For loops for getting blocks in sequence
