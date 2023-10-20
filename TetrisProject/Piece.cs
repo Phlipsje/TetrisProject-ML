@@ -46,6 +46,7 @@ public abstract class Piece
     private bool lastActionIsRotation; //Check if the last action before locking in is a rotation (to signal the possibility of a t-spin/mini-t-spin)
     private bool lockedDown;
     private Input lastMovementInputPressed;
+    public Point startingPosition;
     
     private Field fieldReference;
     private TetrisGame tetrisGameReference;
@@ -116,7 +117,8 @@ public abstract class Piece
         this.fieldReference = fieldReference;
         this.tetrisGameReference = tetrisGameReference;
         this.controls = controls;
-        position = new Point(3, 0);
+        startingPosition = new Point(fieldReference.Width/2-2, 0);
+        position = startingPosition;
         hitboxes = new bool[4][,];
         rotationIndex = 0;
         lockDownMaxTime = 0.5;

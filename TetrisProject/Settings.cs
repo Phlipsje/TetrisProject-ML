@@ -43,6 +43,7 @@ public struct GameRules
     public double gravityMultiplier;
     public int linesToWin;
     public double garbageMultiplier;
+    public byte width;
 
     public GameRules()
     {
@@ -50,6 +51,7 @@ public struct GameRules
         gravityMultiplier = 1;
         linesToWin = 30;
         garbageMultiplier = 1;
+        width = 10;
     }
 }
 

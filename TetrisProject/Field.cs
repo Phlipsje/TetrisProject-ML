@@ -13,7 +13,7 @@ public class Field //The field in which the pieces can be placed
     private TetrisGame tetrisGame;
     
     //Data variables
-    private const byte width = 10;
+    private byte width;
     private const byte height = 20;
     public Pieces[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
     public bool miniTSpin; //Check if a mini-t-spin has been made
@@ -43,10 +43,11 @@ public class Field //The field in which the pieces can be placed
     }
 
     //Prepare the field to be usable
-    public Field(TetrisGame tetrisGameReference, Color themeColor, int startX = 760, int startY = 140)
+    public Field(TetrisGame tetrisGameReference, Color themeColor, byte width = 10, int startX = 760, int startY = 140)
     {
         tetrisGame = tetrisGameReference;
         this.themeColor = themeColor;
+        this.width = width;
         //Data setup
         Empty();
         

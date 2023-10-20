@@ -129,7 +129,9 @@ public class Menu
                 DrawButton(main.settings.game.startingLevel.ToString(), 2, "Starting Level");
                 DrawButton("Gravity Multiplier", 3);
                 DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 3, "Gravity Multiplier");
-                DrawButton("Back", 4);
+                DrawButton("Width", 4);
+                DrawButton(main.settings.game.width.ToString(), 4, "Width");
+                DrawButton("Back", 5);
                 break;
             
             case MenuState.LobbyTugOfWar:
@@ -144,7 +146,9 @@ public class Menu
                 DrawButton(main.settings.game.startingLevel.ToString(), 4, "Starting Level");
                 DrawButton("Gravity Multiplier", 5);
                 DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 5, "Gravity Multiplier");
-                DrawButton("Back", 6);
+                DrawButton("Width", 6);
+                DrawButton(main.settings.game.width.ToString(), 6, "Width");
+                DrawButton("Back", 7);
                 
                 //Check for conflicting keybinds
                 if (CheckConflictingKeybinds(main.settings.controlProfiles[profileIndex],
@@ -166,7 +170,9 @@ public class Menu
                 DrawButton(main.settings.game.startingLevel.ToString(), 4, "Starting Level");
                 DrawButton("Gravity Multiplier", 5);
                 DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 5, "Gravity Multiplier");
-                DrawButton("Back", 6);
+                DrawButton("Width", 6);
+                DrawButton(main.settings.game.width.ToString(), 6, "Width");
+                DrawButton("Back", 7);
 
                 //Check for conflicting keybinds
                 if (CheckConflictingKeybinds(main.settings.controlProfiles[profileIndex],
@@ -396,6 +402,11 @@ public class Menu
                         if (inputType == InputType.MoveRight) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
                         if (inputType == InputType.MoveLeft) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, -0.1, 0.1, 5);
                         break;
+                    case (byte)LobbyStandard.Width:
+                        if (inputType == InputType.Select) main.settings.game.width = (byte)Increment(main.settings.game.width, 1, 4, 12);
+                        if (inputType == InputType.MoveRight) main.settings.game.width = (byte)Increment(main.settings.game.width, 1, 4, 12);
+                        if (inputType == InputType.MoveLeft) main.settings.game.width = (byte)Increment(main.settings.game.width, -1, 4, 12);
+                        break;
                     case (byte)LobbyStandard.Back:
                         if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
                         break;
@@ -433,6 +444,11 @@ public class Menu
                         if (inputType == InputType.MoveRight) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
                         if (inputType == InputType.MoveLeft) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, -0.1, 0.1, 5);
                         break;
+                    case (byte)LobbyTugOfWar.Width:
+                        if (inputType == InputType.Select) main.settings.game.width = (byte)Increment(main.settings.game.width, 1, 4, 12);
+                        if (inputType == InputType.MoveRight) main.settings.game.width = (byte)Increment(main.settings.game.width, 1, 4, 12);
+                        if (inputType == InputType.MoveLeft) main.settings.game.width = (byte)Increment(main.settings.game.width, -1, 4, 12);
+                        break;
                     case (byte)LobbyTugOfWar.Back:
                         if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
                         break;
@@ -469,6 +485,11 @@ public class Menu
                             if (inputType == InputType.Select) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
                             if (inputType == InputType.MoveRight) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
                             if (inputType == InputType.MoveLeft) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, -0.1, 0.1, 5);
+                            break;
+                        case (byte)LobbyVersus.Width:
+                            if (inputType == InputType.Select) main.settings.game.width = (byte)Increment(main.settings.game.width, 1, 4, 12);
+                            if (inputType == InputType.MoveRight) main.settings.game.width = (byte)Increment(main.settings.game.width, 1, 4, 12);
+                            if (inputType == InputType.MoveLeft) main.settings.game.width = (byte)Increment(main.settings.game.width, -1, 4, 12);
                             break;
                         case (byte)LobbyVersus.Back:
                             if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
@@ -890,6 +911,7 @@ public enum LobbyStandard
     Profile,
     StartingLevel,
     GravityMultiplier,
+    Width,
     Back,
 }
 
@@ -901,6 +923,7 @@ public enum LobbyTugOfWar
     LinesToWin,
     StartingLevel,
     GravityMultiplier,
+    Width,
     Back,
 }
 
@@ -912,6 +935,7 @@ public enum LobbyVersus
     GarbageMultiplier,
     StartingLevel,
     GravityMultiplier,
+    Width,
     Back,
 }
 
@@ -929,7 +953,7 @@ public enum ControlsMenu
 {
     MoveLeft,
     MoveRight,
-    SoftDrop,
+    SoftDrop, 
     HardDrop,
     RotateClockWise,
     RotateCounterClockWise,

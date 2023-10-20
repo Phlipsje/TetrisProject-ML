@@ -72,7 +72,7 @@ public class TetrisGame
         {
             default:
                 this.level = level;
-                field = new Field(this, Color.Red, startY: 200);
+                field = new Field(this, Color.Red, settings.game.width, startY: 200);
                 FillQueue();
                 NextPiece();
                 score = 0;
@@ -81,9 +81,9 @@ public class TetrisGame
             case GameMode.TugOfWar:
                 this.level = level;
                 if (instance == 1)
-                    field = new Field(this, Color.Red, startX: 320 + 50, startY: 200);
+                    field = new Field(this, Color.Red, settings.game.width, startX: 320 + 50, startY: 200);
                 else
-                    field = new Field(this, Color.Blue, startX: 1280 - 50, startY: 200);
+                    field = new Field(this, Color.Blue, settings.game.width, startX: 1280 - 50, startY: 200);
                 FillQueue();
                 NextPiece();
                 score = 0;
@@ -92,9 +92,9 @@ public class TetrisGame
             case GameMode.Versus:
                 this.level = level;
                 if (instance == 1)
-                    field = new Field(this, Color.Red, startX: 320 + 50, startY: 200);
+                    field = new Field(this, Color.Red, settings.game.width, startX: 320 + 50, startY: 200);
                 else
-                    field = new Field(this, Color.Blue, startX: 1280 - 50, startY: 200);
+                    field = new Field(this, Color.Blue, settings.game.width, startX: 1280 - 50, startY: 200);
                 FillQueue();
                 NextPiece();
                 score = 0;
@@ -263,7 +263,7 @@ public class TetrisGame
             piece.RotationIndex = 0;
             //Take hold piece out and make it the active piece
             activePiece = holdPiece;
-            activePiece.Position = new Point(3, 0);
+            activePiece.Position = activePiece.startingPosition;
             activePiece.RotationIndex = 0;
             
             //Have the old active piece become the new held piece
