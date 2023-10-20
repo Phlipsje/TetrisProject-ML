@@ -28,6 +28,7 @@ public class Menu
     public byte menuIndex; //What is selected in the menu
     private int editingControlScheme; //The control scheme that is actively being adjusted (used for changing keybinds)
     private string newProfileName = "";
+    private const int maxAmountOfProfiles = 8;
     
     //Toggles
     public byte profileIndex;
@@ -484,11 +485,7 @@ public class Menu
                             inputType == InputType.MoveRight) {main.settings.useClassicMusic = !main.settings.useClassicMusic;}
                         break;
                     case (byte)SettingsMenu.Controls:
-                        if(inputType == InputType.Select) 
-                        {
-                            GoToMenu(MenuState.ControlProfiles);
-                            
-                        }
+                        if(inputType == InputType.Select) GoToMenu(MenuState.ControlProfiles);
                         break;
                     case (byte)SettingsMenu.Back:
                         if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
@@ -503,7 +500,7 @@ public class Menu
                     if (menuIndex == GetMenuLength() - 3)
                     {
                         //Only make new control profile if name is not empty
-                        if (newProfileName != "")
+                        if (newProfileName != "" && main.settings.controlProfiles.Count < maxAmountOfProfiles)
                         {
                             //Only make new control profile if name is not in use yet
                             foreach (var profiles in main.settings.controlProfiles)
@@ -559,8 +556,13 @@ public class Menu
                     newProfileName = newProfileName.Substring(0, newProfileName.Length - 1);
                 }
 
-                if (inputType == InputType.MoveLeft && menuIndex == GetMenuLength() - 2) { profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex);}
-                if (inputType == InputType.MoveRight && menuIndex == GetMenuLength() - 2) { profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);}
+                //Only be able to toggle through list profiles if there is more than 1, because otherwise edge case causes error
+                if (main.settings.controlProfiles.Count > 1)
+                {
+                    if (inputType == InputType.MoveLeft && menuIndex == GetMenuLength() - 2) { profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex);}
+                    if (inputType == InputType.MoveRight && menuIndex == GetMenuLength() - 2) { profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);}
+                }
+
                 break;
             
             case MenuState.Controls:
@@ -608,10 +610,15 @@ public class Menu
     public void GoToMenu(MenuState state, byte goToIndex = 0)
     {
         main.SaveSettings();
-        if (menuState == MenuState.ControlProfiles)
+        if (menuState is MenuState.ControlProfiles or MenuState.Settings)
         {
             newProfileName = "";
             profileIndex = 0;
+            //Don't show default profile in delete list
+            if (main.settings.controlProfiles.Count > 1)
+            {
+                profileIndex = 1;
+            }
         }
         else if(menuState == MenuState.LobbyStandard || menuState == MenuState.LobbyTugOfWar || menuState == MenuState.LobbyVersus)
         {
@@ -628,6 +635,16 @@ public class Menu
     //Toggle to next in list
     private byte ToggleNext<T>(T[] array, byte index)
     {
+        //If on delete profile
+        if (menuState == MenuState.ControlProfiles && menuIndex == GetMenuLength() - 2)
+        {
+            //Skip default profile
+            if (index == array.Length - 1)
+            {
+                return 1;
+            }
+        }
+        
         if (index == array.Length - 1)
         {
             return 0;
@@ -639,6 +656,16 @@ public class Menu
     //Toggle to previous in list
     private byte TogglePrevious<T>(T[] array, byte index)
     {
+        //If on delete profile
+        if (menuState == MenuState.ControlProfiles && menuIndex == GetMenuLength() - 2)
+        {
+            //Skip default profile
+            if (index == 1)
+            {
+                return (byte)(array.Length-1);
+            }
+        }
+        
         if (index == 0)
         {
             return (byte)(array.Length - 1);

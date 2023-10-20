@@ -898,7 +898,7 @@ public class GhostPiece : Piece
         Position = piece.Position;
         Hitboxes = pieceReference.Hitboxes;
         rotationIndex = pieceReference.RotationIndex;
-        Color = pieceReference.Color * 0.25f;
+        Color = pieceReference.Color * 0.5f;
         pieceType = Pieces.Ghost;
     
         while (!fieldReference.CollidesVertical(Hitbox, Position))
