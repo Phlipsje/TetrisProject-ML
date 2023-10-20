@@ -626,8 +626,19 @@ public class Menu
             profileIndex2 = 0;
         }
         
+        //Don't reset index if in controls, because this is way nicer when changing the entire list as is typically done
+        if (menuState != MenuState.Controls)
+        {
+            menuIndex = goToIndex;
+        }
+        
         menuState = state;
-        menuIndex = goToIndex;
+        
+        //Extra check to avoid some edge case errors
+        if (menuState == MenuState.ControlProfiles)
+        {
+            menuIndex = goToIndex;
+        }
         selectedHorizontalOffsets = new float[GetMenuLength()];
         selectedHorizontalOffsets[menuIndex] = selectedHorizontalOffsetTotal;
     }
