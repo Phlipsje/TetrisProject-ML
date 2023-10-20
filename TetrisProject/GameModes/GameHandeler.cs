@@ -83,7 +83,7 @@ public class GameHandeler
         
     }
 
-    public virtual void LineCleared(int linesCleared, int instance)
+    public virtual void LineCleared(int linesCleared, int multiplayerLinesCleared, int instance)
     {
         
     }

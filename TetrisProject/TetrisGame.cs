@@ -389,6 +389,8 @@ public class TetrisGame
 
     public void HandleScore(int rowsCleared)
     {
+        //In multiplayer the amount of cleared lines awarded differs
+        int multiplayerClearedLines = 0;
         int previousScore = score;
         //Update time to show clear text on screen
         lineClearTextTime = lineClearTextTimeMax;
@@ -396,6 +398,7 @@ public class TetrisGame
         if (backToBack)
         {
             lineClearType = "B2B ";
+            multiplayerClearedLines = 1;
         }
         else
         {
@@ -436,6 +439,7 @@ public class TetrisGame
                 }
                 else if (field.tSpin)
                 {
+                    multiplayerClearedLines += 2;
                     score += 800 * level;
                     lineClearType += "T-Spin Single";
                     clearedLines += (int)(8 * multiplier);
@@ -455,12 +459,14 @@ public class TetrisGame
                 
                 if(field.tSpin || field.miniTSpin) //The conditions for a mini-t-spin double count as a t-spin double
                 {
+                    multiplayerClearedLines += 4;
                     score += (int)(1200 * level * multiplier);
                     lineClearType += "T-Spin Double";
                     clearedLines += (int)(12 * multiplier);
                 }
                 else
-                {  
+                {
+                    multiplayerClearedLines += 1;
                     score += (int)(300 * level * multiplier);
                     lineClearType += "Double";
                     clearedLines += 3;
@@ -474,12 +480,14 @@ public class TetrisGame
             case 3:
                 if (!field.tSpin)
                 {
+                    multiplayerClearedLines += 2;
                     score += (int)(500 * level * multiplier);
                     lineClearType += "Triple";
                     clearedLines += 5;
                 }
                 else
                 {
+                    multiplayerClearedLines += 6;
                     score += (int)(1600 * level * multiplier);
                     lineClearType += "T-Spin Triple";
                     clearedLines += (int)(16 * multiplier);
@@ -490,6 +498,7 @@ public class TetrisGame
                 break;
             
             case 4:
+                multiplayerClearedLines += 4;
                 score += (int)(800 * level * multiplier);
                 lineClearType += "Tetris";
                 clearedLines += (int)(8 * multiplier);
@@ -502,6 +511,7 @@ public class TetrisGame
         //Extra bonus if player clears the entire field
         if (field.allClear)
         {
+            multiplayerClearedLines += 5;
             score += 1000 * level;
             lineClearType = "All clear!";
             clearedLines += 10;
@@ -510,7 +520,7 @@ public class TetrisGame
         
         //Update level
         level = CalculateLevel();
-        gameHandeler.LineCleared((score-previousScore)/100, instance);
+        gameHandeler.LineCleared((score-previousScore)/100, multiplayerClearedLines, instance);
     }
 
     private int CalculateLevel()

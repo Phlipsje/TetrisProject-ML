@@ -19,16 +19,16 @@ public class VersusHandeler : GameHandeler
     }
 
     //Runs when one of 2 players cleared a line
-    public override void LineCleared(int linesCleared, int instance)
+    public override void LineCleared(int linesCleared, int multiplayerLinesCleared, int instance)
     {
         //If no line is cleared then return
-        if (linesCleared == 0)
+        if (multiplayerLinesCleared == 0)
         {
             return;
         } 
 
         //Multiply the lines cleared by the multiplier defined in settings
-        linesCleared = (int)MathF.Floor(linesCleared * (float)garbageMultiplier);
+        multiplayerLinesCleared = (int)MathF.Floor(multiplayerLinesCleared * (float)garbageMultiplier);
         
         //Create garbage line
         Pieces[] garbageLine = new Pieces[tetrisGames[0].Field.Width];
@@ -44,13 +44,13 @@ public class VersusHandeler : GameHandeler
         //Remove lines from the garbage lines list is you cleared a line
         if (instance == 1)
         {
-            int count = linesCleared;
+            int count = multiplayerLinesCleared;
             for (int i = 0; i < count; i++)
             {
                 if (garbageLines0.Count > 0)
                 {
                     garbageLines0.RemoveAt(garbageLines0.Count-1);
-                    linesCleared--;
+                    multiplayerLinesCleared--;
                 }
                 else
                 {
@@ -60,13 +60,13 @@ public class VersusHandeler : GameHandeler
         }
         else
         {
-            int count = linesCleared;
+            int count = multiplayerLinesCleared;
             for (int i = 0; i < count; i++)
             {
                 if (garbageLines1.Count > 0)
                 {
                     garbageLines1.RemoveAt(garbageLines1.Count-1);
-                    linesCleared--;
+                    multiplayerLinesCleared--;
                 }
                 else
                 {
@@ -81,14 +81,14 @@ public class VersusHandeler : GameHandeler
         //Add to list of garbage lines
         if (instance == 0)
         {
-            for (int i = 0; i < linesCleared; i++)
+            for (int i = 0; i < multiplayerLinesCleared; i++)
             {
                 garbageLines0.Add(garbageLine);
             }
         }
         else
         {
-            for (int i = 0; i < linesCleared; i++)
+            for (int i = 0; i < multiplayerLinesCleared; i++)
             {
                 garbageLines1.Add(garbageLine);
             }
