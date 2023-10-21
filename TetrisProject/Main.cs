@@ -65,6 +65,12 @@ namespace TetrisProject
             Window.ClientSizeChanged += OnResize;
             Window.AllowUserResizing = true;
             graphics.ApplyChanges();
+            
+            EnterFullScreen();
+            
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            menu = new Menu(this, spriteBatch);
+
             if (File.Exists("Settings.conf"))
             {
                 settings = Util.LoadSettingsFromFile("Settings.conf");
@@ -72,10 +78,10 @@ namespace TetrisProject
             else
             {
                 settings = new Settings();
+                menu.menuState = MenuState.Explainer;
             }
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            
             renderTarget = new RenderTarget2D(GraphicsDevice, WorldWidth, WorldHeight);
-            menu = new Menu(this, spriteBatch);
             gameHandeler = null;
 
             gameState = GameState.Menu;
@@ -85,7 +91,7 @@ namespace TetrisProject
             base.Initialize();
         }
 
-        public void EnterFullScreen()
+        private void EnterFullScreen()
         {
             graphics.PreferredBackBufferWidth = fullscreenWindowWidth;
             graphics.PreferredBackBufferHeight = fullscreenWindowHeight;
@@ -94,7 +100,7 @@ namespace TetrisProject
             graphics.ApplyChanges();
         }
         
-        public void ExitFullScreen()
+        private void ExitFullScreen()
         {
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
@@ -103,7 +109,7 @@ namespace TetrisProject
             graphics.ApplyChanges();
         }
 
-        public void ToggleFullScreen()
+        private void ToggleFullScreen()
         {
             if(graphics.IsFullScreen)
                 ExitFullScreen();

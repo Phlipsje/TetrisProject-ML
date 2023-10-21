@@ -65,7 +65,8 @@ public class Menu
         font = content.Load<SpriteFont>("Font");
         tile = content.Load<Texture2D>("Square");
         
-        GoToMenu(MenuState.MainMenu);
+        if(menuState != MenuState.Explainer)
+            GoToMenu(MenuState.MainMenu);
     }
 
     public void Update(GameTime gameTime)
@@ -114,6 +115,27 @@ public class Menu
         //Buttons
         switch (menuState)
         {
+            case MenuState.Explainer:
+                int textVerticalSpacing = 40;
+                //Text background
+                spriteBatch.Draw(tile, new Rectangle(30, 30, Main.WorldWidth-60,  76+textVerticalSpacing*12+20), Color.Black);
+                
+                //Text wall
+                spriteBatch.DrawString(font, "Hey, looks like you're new around here", new Vector2(50, 50), Color.White);
+                spriteBatch.DrawString(font, "This is our take on modern Tetris", new Vector2(50, 50 + textVerticalSpacing), Color.White);
+                spriteBatch.DrawString(font, "Press f11 to toggle fullscreen", new Vector2(50, 50 + textVerticalSpacing*2), Color.White);
+                spriteBatch.DrawString(font, "Use the up and down arrow keys to move through the menu", new Vector2(50, 50 + textVerticalSpacing*3), Color.White);
+                spriteBatch.DrawString(font, "You can press enter to select a button", new Vector2(50, 50 + textVerticalSpacing*4), Color.White);
+                spriteBatch.DrawString(font, "Use the left and right arrow keys to cycle through values", new Vector2(50, 50 + textVerticalSpacing*5), Color.White);
+                spriteBatch.DrawString(font, "You can press escape to move back one menu", new Vector2(50, 50 + textVerticalSpacing*6), Color.White);
+                spriteBatch.DrawString(font, "If you don't like the controls, create a profile", new Vector2(50, 50 + textVerticalSpacing*7), Color.White);
+                spriteBatch.DrawString(font, "Profiles store your controls to easily be able to play how you want", new Vector2(50, 50 + textVerticalSpacing*8), Color.White);
+                spriteBatch.DrawString(font, "Profiles also allow you to assign multiple keys to one action", new Vector2(50, 50 + textVerticalSpacing*9), Color.White);
+                spriteBatch.DrawString(font, "Customize the settings and profiles as much as you want", new Vector2(50, 50 + textVerticalSpacing*10), Color.White);
+                spriteBatch.DrawString(font, "Your settings and profiles are saved on closing the game", new Vector2(50, 50 + textVerticalSpacing*11), Color.White);
+                spriteBatch.DrawString(font, "Now let's get to playing, press enter to close this message", new Vector2(50, 50 + textVerticalSpacing*12), Color.White);
+                break;
+            
             case MenuState.MainMenu:
                 DrawButton("Play", 0);
                 DrawButton(gameModeNames[gameModeIndex], 0, "Play");
@@ -350,6 +372,13 @@ public class Menu
     {
         switch (menuState)
         {
+            case MenuState.Explainer:
+                if (inputType == InputType.Select)
+                {
+                    GoToMenu(MenuState.MainMenu);
+                }
+                break;
+            
             case MenuState.MainMenu:
                 switch (menuIndex)
                 {
@@ -896,6 +925,7 @@ public enum MenuState
     ControlProfiles,
     Controls,
     MapKeys,
+    Explainer,
 }
 
 public enum MainMenu
