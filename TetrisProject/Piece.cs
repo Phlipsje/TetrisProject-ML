@@ -413,7 +413,7 @@ public abstract class Piece
                 fieldReference.miniTSpin = true;
             }
         }
-        
+
         fieldReference.FieldControlFlow(); //Pattern Phase
     }
 

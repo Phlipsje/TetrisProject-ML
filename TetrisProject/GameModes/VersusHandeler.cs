@@ -25,8 +25,12 @@ public class VersusHandeler : GameHandeler
         //If no line is cleared then return
         if (multiplayerLinesCleared == 0)
         {
+            //Update values
+            tetrisGames[0].blocksBeingAdded = garbageLines0.Count;
+            tetrisGames[1].blocksBeingAdded = garbageLines1.Count;
+            
             return;
-        } 
+        }
 
         //Multiply the lines cleared by the multiplier defined in settings
         multiplayerLinesCleared = (int)MathF.Floor(multiplayerLinesCleared * (float)garbageMultiplier);
@@ -94,6 +98,9 @@ public class VersusHandeler : GameHandeler
                 garbageLines1.Add(garbageLine);
             }
         }
+        
+        tetrisGames[0].blocksBeingAdded = garbageLines0.Count;
+        tetrisGames[1].blocksBeingAdded = garbageLines1.Count;
     }
 
     public override void PiecePlaced(int instance)
@@ -152,8 +159,5 @@ public class VersusHandeler : GameHandeler
             tetrisGames[1].Win();
         else if (tetrisGames[1].isGameOver && !tetrisGames[0].isGameOver)
             tetrisGames[0].Win();
-        
-        tetrisGames[0].blocksBeingAdded = garbageLines0.Count;
-        tetrisGames[1].blocksBeingAdded = garbageLines1.Count;
     }
 }

@@ -28,7 +28,7 @@ public class Field //The field in which the pieces can be placed
     public int fieldY; //Y value of top left of field
     public int fieldHeightOffset;
     public int fieldCoverSideWidth;
-    private int fieldReceiveWidth;
+    public int fieldReceiveWidth;
     private Color themeColor;
     
     private bool drawGrid;
@@ -87,14 +87,11 @@ public class Field //The field in which the pieces can be placed
         
         //Animate Phase
         AnimationPhase(rowsMarkedForDestruction);
-        //AnimationManager.PlayAnimation(new FallingBlockAnimation(new Vector2(200, 100), 
-        //    tetrisGame, new Vector2(100, -800), tetrisGame.blockTexture, -2));
         
         // Eliminate Phase
         int scoringLines = ClearLines(rowsMarkedForDestruction);
         
         //Completion Phase
-        // This may be used for alternative game modes and such
         tetrisGame.HandleScore(scoringLines);
 
         bool anyBlockAtTop = false;

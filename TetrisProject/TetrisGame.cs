@@ -161,11 +161,11 @@ public class TetrisGame
         //Draw hold piece
         if (holdPiece == null)
         {
-            spriteBatch.DrawString(font, "HOLD", new Vector2(field.fieldX-field.fieldCoverSideWidth + 26,field.fieldY -field.fieldHeightOffset + 20), Color.White);
+            spriteBatch.DrawString(font, "HOLD", new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 26,field.fieldY -field.fieldHeightOffset + 20), Color.White);
         }
         else //A piece is being held
         {
-            Point holdPosition = new Point(field.fieldX-field.fieldCoverSideWidth + 12,field.fieldY + 18);
+            Point holdPosition = new Point(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 12,field.fieldY + 18);
 
             if (holdUsed)
             {
@@ -182,21 +182,21 @@ public class TetrisGame
         //Draw high score
         if (drawHighScore)
         {
-            spriteBatch.DrawString(font, "BEST", new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing), Color.White);
-            spriteBatch.DrawString(font, gameHandeler.SettingsStruct.highScore.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*2), Color.White);
+            spriteBatch.DrawString(font, "BEST", new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing), Color.White);
+            spriteBatch.DrawString(font, gameHandeler.SettingsStruct.highScore.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing*2), Color.White);
         }
         
         //Draw score
-        spriteBatch.DrawString(font, "SCORE", new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*3.5f), Color.White);
-        spriteBatch.DrawString(font, score.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*4.5f), Color.White);
+        spriteBatch.DrawString(font, "SCORE", new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing*3.5f), Color.White);
+        spriteBatch.DrawString(font, score.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing*4.5f), Color.White);
 
         //Draw level
-        spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*6), Color.White);
-        spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*7), Color.White);
+        spriteBatch.DrawString(font, "LEVEL", new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing*6), Color.White);
+        spriteBatch.DrawString(font, level.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing*7), Color.White);
         
         //Draw cleared lines
-        spriteBatch.DrawString(font, "LINES", new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*8.5f), Color.White);
-        spriteBatch.DrawString(font, clearedLines.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth + 10,field.fieldY + textVerticalSpacing*9.5f), Color.White);
+        spriteBatch.DrawString(font, "LINES", new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing*8.5f), Color.White);
+        spriteBatch.DrawString(font, clearedLines.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing*9.5f), Color.White);
 
         //Draw line clear popup
         if (lineClearTextTime > 0 && lineClearType != null && lineClearType != "B2B ")
@@ -403,7 +403,7 @@ public class TetrisGame
         //Update time to show clear text on screen
         lineClearTextTime = lineClearTextTimeMax;
         
-        if (backToBack)
+        if (backToBack && rowsCleared > 0)
         {
             lineClearType = "B2B ";
             multiplayerClearedLines = 1;
