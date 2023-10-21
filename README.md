@@ -41,7 +41,7 @@ Lines cleared, Current score, High score, Level (7. Game Information, page 7)
 Hold queue (8. Hold queue, page 7)
 Lock down flexibility (2.5.4 Lock down, page 8 and 5.7 Extended placement lock down, page 17)
 'Balanced' random generation (3.3 Random generation, page 9)
-Dynamic starting location (3.4 Starting location & orientation, page 9) (our version also works with different width boards, hence 'dynamic')
+Dynamic starting location (3.4 Starting location & orientation, page 9) (our version also works with different width matrices, hence 'dynamic')
 Auto repeat (5.2 Auto repeat, page 16)
 Super Rotation System (5.3 Rotation, page 16 and A1.4 Super Rotation System, page 36) (This is different from NES tetris rotation)
 Hard drop (5.4 Hard drop, page 16)
@@ -59,5 +59,8 @@ Action notifications (13.1.5 Action notifications, page 30)
 Correct flow of checks in code (Appendix A The tetris engine, page 33) (Includes all the Phases as listed with exeption of the iterate phase as it has no usage in our version)
 Split screen multiplayer (Appendix B Multiplayer, page 79)
 
+(No longer referencing the design document)
 Tug of war variant, this is our custom made multiplayer mode (versus being the official). 
 You both play your own game and the first person to have cleared 30 (unless changed in settings) lines more that the opponent wins (indicated by the bar above the screens).
+The ability to change the width of the matrix/board.
+An entire menu of which all features will now be listed:
