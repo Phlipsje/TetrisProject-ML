@@ -358,7 +358,7 @@ public class TetrisGame
         isGameOver = true;
         field.PlayGameOverAnimation();
         field.Empty();
-        Point lpos = new Point(3, 8);
+        Point lpos = new Point((field.Width - 4) / 2 , 8);
         field.SetBlock(lpos.X, lpos.Y, Pieces.Ghost);
         field.SetBlock(lpos.X, lpos.Y + 1, Pieces.Ghost);
         field.SetBlock(lpos.X, lpos.Y + 2, Pieces.Ghost);
