@@ -10,7 +10,7 @@ public class TugOfWarHandeler : GameHandeler
 {
     private readonly int linesToWin;
     
-    public TugOfWarHandeler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls) : base(content, gameMode, settings, controls)
+    public TugOfWarHandeler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls, Main mainRefrence) : base(content, gameMode, settings, controls, mainRefrence)
     {
         tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode, 1, false));
         tetrisGames.Add(new TetrisGame(this, settings, controls[1], gameMode, 2, false));

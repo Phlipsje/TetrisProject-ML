@@ -57,7 +57,7 @@ public class TetrisGame
     private const string coverReceiveBarFileName = "Tetris Cover Receive Bar";
     
     public Controls controls;
-    private GameHandeler gameHandeler;
+    public GameHandeler gameHandeler;
 
     public TetrisGame(GameHandeler gameHandeler, Settings settings, Controls controls, GameMode gameMode = GameMode.Standard, int instance = 0, bool drawHighScore = true)
     {

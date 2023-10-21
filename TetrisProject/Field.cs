@@ -145,6 +145,8 @@ public class Field //The field in which the pieces can be placed
     private void AnimationPhase(byte[] markedLines)
     {
         Random rng = new Random();
+        if(markedLines.Length == 4)
+            tetrisGame.gameHandeler.mainReference.StartScreenShake();
         Vector2 rowSize = new Vector2(blockSize * width, blockSize);
         foreach (byte y in markedLines)
         {

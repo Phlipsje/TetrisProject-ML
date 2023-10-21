@@ -128,11 +128,11 @@ public class Menu
                 spriteBatch.DrawString(font, "You can press enter to select a button", new Vector2(50, 50 + textVerticalSpacing*4), Color.White);
                 spriteBatch.DrawString(font, "Use the left and right arrow keys to cycle through values", new Vector2(50, 50 + textVerticalSpacing*5), Color.White);
                 spriteBatch.DrawString(font, "You can press escape to move back one menu", new Vector2(50, 50 + textVerticalSpacing*6), Color.White);
-                spriteBatch.DrawString(font, "If you don't like the controls, create a profile", new Vector2(50, 50 + textVerticalSpacing*7), Color.White);
+                spriteBatch.DrawString(font, "If you don't like the default controls, create a profile", new Vector2(50, 50 + textVerticalSpacing*7), Color.White);
                 spriteBatch.DrawString(font, "Profiles store your controls to easily be able to play how you want", new Vector2(50, 50 + textVerticalSpacing*8), Color.White);
                 spriteBatch.DrawString(font, "Profiles also allow you to assign multiple keys to one action", new Vector2(50, 50 + textVerticalSpacing*9), Color.White);
                 spriteBatch.DrawString(font, "Customize the settings and profiles as much as you want", new Vector2(50, 50 + textVerticalSpacing*10), Color.White);
-                spriteBatch.DrawString(font, "Your settings and profiles are saved on closing the game", new Vector2(50, 50 + textVerticalSpacing*11), Color.White);
+                spriteBatch.DrawString(font, "Your settings and profiles are saved automatically", new Vector2(50, 50 + textVerticalSpacing*11), Color.White);
                 spriteBatch.DrawString(font, "Now let's get to playing, press enter to close this message", new Vector2(50, 50 + textVerticalSpacing*12), Color.White);
                 break;
             

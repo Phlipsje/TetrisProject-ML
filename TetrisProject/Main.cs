@@ -28,6 +28,7 @@ namespace TetrisProject
         public const int WorldWidth = 1920;
         public const int WorldHeight = 1080;
         public GameState gameState;
+        private Double screenShakeTimer = 0;
 
         public Main()
         {
@@ -199,12 +200,12 @@ namespace TetrisProject
                         case GameMode.TugOfWar:
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex2]);
-                            gameHandeler = new TugOfWarHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
+                            gameHandeler = new TugOfWarHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
                             break;
                         case GameMode.Versus:
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex2]);
-                            gameHandeler = new VersusHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls);
+                            gameHandeler = new VersusHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
                             break;
                     }
                     
@@ -293,9 +294,16 @@ namespace TetrisProject
             GraphicsDevice.SetRenderTarget(null);
 
             //Resize renderTarget to the application window
+            screenShakeTimer -= gameTime.ElapsedGameTime.TotalMilliseconds;
             spriteBatch.Begin();
-            Debug.WriteLine($"{WindowWidth}, {WindowHeight}");
-            Rectangle destinationRectangle = new Rectangle(0, 0, WindowWidth, WindowHeight);
+            Rectangle destinationRectangle;
+            if (screenShakeTimer <= 0)
+                destinationRectangle = new Rectangle(0, 0, WindowWidth, WindowHeight);
+            else
+            {
+                Random rng = new Random();
+                destinationRectangle = new Rectangle(rng.Next(-10, 10), rng.Next(-10, 10), WindowWidth, WindowHeight);
+            }
             spriteBatch.Draw(renderTarget, destinationRectangle, Color.White);
             spriteBatch.End();
             
@@ -314,6 +322,11 @@ namespace TetrisProject
                 pauseStringPosition.Y + pauseInfoStringSize.Y);
             spriteBatch.DrawString(menu.font, pauseString, pauseStringPosition, Color.White);
             spriteBatch.DrawString(menu.font, pauseInfoString, pauseInfoStringPosition, Color.White);
+        }
+
+        public void StartScreenShake(double length = 500)
+        {
+            screenShakeTimer = length;
         }
         
         public void UpdateVolume()

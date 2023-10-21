@@ -14,7 +14,9 @@ public class GameHandeler
     public Settings SettingsStruct => settings;
 
     protected Texture2D squareTile;
-    private Main mainReference;
+    private Texture2D background;
+    private Rectangle backgroundRect;
+    public Main mainReference;
 
     public bool gameFinished; //If a player has finished the other has won, for singleplayer same implementation as in TetrisGame
     public bool playerInStress; //If a player is in stress, run the appropriate code
@@ -24,6 +26,8 @@ public class GameHandeler
         this.content = content;
         this.settings = settings;
         this.mainReference = mainReference;
+        background = content.Load<Texture2D>("background");
+        backgroundRect = new Rectangle(0, 0, Main.WorldWidth, Main.WorldHeight);
         if (gameMode == GameMode.Standard)
         {
             tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode));
@@ -71,6 +75,7 @@ public class GameHandeler
 
     public virtual void Draw(SpriteBatch spriteBatch)
     {
+        spriteBatch.Draw(background, backgroundRect, Color.White);
         foreach (var tetrisGame in tetrisGames)
         {
             tetrisGame.Draw(spriteBatch);
