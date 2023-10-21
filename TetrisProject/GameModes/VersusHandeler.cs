@@ -142,8 +142,6 @@ public class VersusHandeler : GameHandeler
             {
                 break;
             }
-            
-            
         }
     }
 
@@ -154,5 +152,8 @@ public class VersusHandeler : GameHandeler
             tetrisGames[1].Win();
         else if (tetrisGames[1].isGameOver && !tetrisGames[0].isGameOver)
             tetrisGames[0].Win();
+        
+        tetrisGames[0].blocksBeingAdded = garbageLines0.Count;
+        tetrisGames[1].blocksBeingAdded = garbageLines1.Count;
     }
 }

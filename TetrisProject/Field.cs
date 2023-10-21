@@ -23,11 +23,12 @@ public class Field //The field in which the pieces can be placed
     //Visual variables
     public int blockSize; //How large a block is 
     public int fieldPixelWidth; //How many pixels wide
-    public int fieldPixelHeight; //How many pixels high
+    private int fieldPixelHeight; //How many pixels high
     public int fieldX; //X value of top left of field
     public int fieldY; //Y value of top left of field
     public int fieldHeightOffset;
     public int fieldCoverSideWidth;
+    private int fieldReceiveWidth;
     private Color themeColor;
     
     private bool drawGrid;
@@ -43,7 +44,7 @@ public class Field //The field in which the pieces can be placed
     }
 
     //Prepare the field to be usable
-    public Field(TetrisGame tetrisGameReference, Color themeColor, byte width = 10, int startX = 760, int startY = 140)
+    public Field(TetrisGame tetrisGameReference, Color themeColor, byte width = 10, int startX = 760, int startY = 140, bool receiveBarActive = false)
     {
         tetrisGame = tetrisGameReference;
         this.themeColor = themeColor;
@@ -60,6 +61,11 @@ public class Field //The field in which the pieces can be placed
         fieldY = startY;
         fieldHeightOffset = blockSize * 2;
         fieldCoverSideWidth = 160;
+        fieldReceiveWidth = 0;
+        if (receiveBarActive)
+        {
+            fieldReceiveWidth = 36;
+        }
     }
 
     public void Empty()
@@ -254,13 +260,23 @@ public class Field //The field in which the pieces can be placed
         spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY - fieldHeightOffset, fieldPixelWidth, fieldPixelHeight + fieldHeightOffset), Color.Black * 0.1f);
         
         //Draw field cover
-        spriteBatch.Draw(tetrisGame.coverLeftTexture, new Vector2(fieldX-tetrisGame.coverLeftTexture.Width, fieldY - fieldHeightOffset), themeColor);
+        if (fieldReceiveWidth != 0) //Receive bar is active
+        {
+            spriteBatch.Draw(tetrisGame.coverReceiveBarTexture, new Vector2(fieldX-fieldReceiveWidth, fieldY-fieldHeightOffset), themeColor);
+        }
+        spriteBatch.Draw(tetrisGame.coverLeftTexture, new Vector2(fieldX-tetrisGame.coverLeftTexture.Width - fieldReceiveWidth, fieldY - fieldHeightOffset), themeColor);
         spriteBatch.Draw(tetrisGame.coverMiddleTexture, new Rectangle(fieldX, fieldY - fieldHeightOffset, fieldPixelWidth, tetrisGame.coverMiddleTexture.Height), themeColor);
         spriteBatch.Draw(tetrisGame.coverRightTexture, new Vector2(fieldX+fieldPixelWidth, fieldY - fieldHeightOffset), themeColor);
         
         //TODO change color or hide when not relevant
         //Starting line
         spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, 10), themeColor * 0.8f);
+        
+        //Receive bar blocks
+        for (int i = 0; i < tetrisGame.blocksBeingAdded; i++)
+        {
+            spriteBatch.Draw(tetrisGame.blockTexture, new Vector2(fieldX-fieldReceiveWidth, fieldY+(height-i-1)*blockSize), GetColor(Pieces.Ghost));
+        }
         
         //Draw blocks
         //For loops for getting blocks in sequence

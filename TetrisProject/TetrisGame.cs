@@ -34,7 +34,8 @@ public class TetrisGame
     public double gravityMultipler; //Can be changed in setting
     private GameMode gameMode;
     private int instance; //If this is player 0 or 1 (only relevant in multiplayer modes)
-    public readonly bool drawHighScore;
+    private readonly bool drawHighScore;
+    public int blocksBeingAdded = 0;
     private Settings settings;
 
     //Sprites
@@ -44,6 +45,7 @@ public class TetrisGame
     public Texture2D coverLeftTexture;
     public Texture2D coverMiddleTexture;
     public Texture2D coverRightTexture;
+    public Texture2D coverReceiveBarTexture;
     private SpriteFont font;
     
     //File locations
@@ -52,6 +54,7 @@ public class TetrisGame
     private const string coverLeftFileName = "Tetris Cover Left";
     private const string coverMiddleFileName = "Tetris Cover Middle";
     private const string coverRightFileName = "Tetris Cover Right";
+    private const string coverReceiveBarFileName = "Tetris Cover Receive Bar";
     
     public Controls controls;
     private GameHandeler gameHandeler;
@@ -92,9 +95,9 @@ public class TetrisGame
             case GameMode.Versus:
                 this.level = level;
                 if (instance == 1)
-                    field = new Field(this, Color.Red, settings.game.width, startX: 320 + 50, startY: 200);
+                    field = new Field(this, Color.Red, settings.game.width, startX: 320 + 50, startY: 200, true);
                 else
-                    field = new Field(this, Color.Blue, settings.game.width, startX: 1280 - 50, startY: 200);
+                    field = new Field(this, Color.Blue, settings.game.width, startX: 1280 - 50, startY: 200, true);
                 FillQueue();
                 NextPiece();
                 score = 0;
@@ -112,6 +115,7 @@ public class TetrisGame
         coverLeftTexture = content.Load<Texture2D>(coverLeftFileName);
         coverMiddleTexture = content.Load<Texture2D>(coverMiddleFileName);
         coverRightTexture = content.Load<Texture2D>(coverRightFileName);
+        coverReceiveBarTexture = content.Load<Texture2D>(coverReceiveBarFileName);
         for (int i = 0; i < 17; i++)
         {
             explosionTextures[i] = content.Load<Texture2D>($"eEffect/explosion{i}");
