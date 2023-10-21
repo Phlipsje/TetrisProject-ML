@@ -53,7 +53,7 @@ public class GameHandeler
         foreach (var tetrisGame in tetrisGames)
         {
             tetrisGame.Update(gameTime);
-            if (tetrisGame.isGameOver && mainReference != null)
+            if (tetrisGame.isGameOver && tetrisGames.Count == 1 && tetrisGame.Field.Width == 10 && mainReference != null)
                 mainReference.SaveSettings(tetrisGame.score);
         }
 
