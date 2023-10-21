@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using Microsoft.Xna.Framework;
@@ -25,6 +26,7 @@ public class TetrisGame
     public bool isInStress;
     public int score;
     public int level = 1;
+    private int levelLastFrame = 1;
     public int clearedLines;
     private const double lineClearTextTimeMax = 1.4f;
     private double lineClearTextTime; //Amount of time a line clear text is shown on screen
@@ -526,6 +528,9 @@ public class TetrisGame
         
         //Update level
         level = CalculateLevel();
+        if (level != levelLastFrame)
+            gameHandeler.ScreenFlash();
+        levelLastFrame = level;
         gameHandeler.LineCleared((score-previousScore)/100, multiplayerClearedLines, instance);
     }
 

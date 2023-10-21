@@ -60,7 +60,6 @@ public static class MusicManager
         else
         {
             currentSong.Pitch = targetPitch;
-            Debug.WriteLine("normal");
         }
     }
 

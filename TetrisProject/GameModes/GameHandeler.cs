@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,6 +19,9 @@ public class GameHandeler
     private Texture2D background;
     private Rectangle backgroundRect;
     public Main mainReference;
+
+    private double screenFlashTimer;
+    private double totalScreenFlashTime = 500;
 
     public bool gameFinished; //If a player has finished the other has won, for singleplayer same implementation as in TetrisGame
     public bool playerInStress; //If a player is in stress, run the appropriate code
@@ -54,6 +59,7 @@ public class GameHandeler
     
     public virtual void Update(GameTime gameTime)
     {
+        screenFlashTimer = Math.Max(screenFlashTimer - gameTime.ElapsedGameTime.TotalMilliseconds, 0.0);
         foreach (var tetrisGame in tetrisGames)
         {
             tetrisGame.Update(gameTime);
@@ -76,10 +82,16 @@ public class GameHandeler
     public virtual void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Draw(background, backgroundRect, Color.White);
+        spriteBatch.Draw(squareTile, backgroundRect, Color.White * ((float)(screenFlashTimer / totalScreenFlashTime)));
         foreach (var tetrisGame in tetrisGames)
         {
             tetrisGame.Draw(spriteBatch);
         }
+    }
+
+    public void ScreenFlash(double length = 500)
+    {
+        screenFlashTimer = length;
     }
 
     //Use this as a general event function to add extra functionality to other game modes
