@@ -266,7 +266,7 @@ namespace TetrisProject
             //Tell the GraphicsDevice that the spriteBatch is targeted at renderTarget
             GraphicsDevice.SetRenderTarget(renderTarget);
             
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             //Draw what is on screen
             spriteBatch.Begin();

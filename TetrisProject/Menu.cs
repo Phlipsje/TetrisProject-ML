@@ -118,7 +118,7 @@ public class Menu
             case MenuState.Explainer:
                 int textVerticalSpacing = 40;
                 //Text background
-                spriteBatch.Draw(tile, new Rectangle(30, 30, Main.WorldWidth-60,  76+textVerticalSpacing*12+20), Color.Black);
+                spriteBatch.Draw(tile, new Rectangle(30, 30, Main.WorldWidth-60,  76+textVerticalSpacing*20+20), Color.Black);
                 
                 //Text wall
                 spriteBatch.DrawString(font, "Hey, looks like you're new around here", new Vector2(50, 50), Color.White);
@@ -133,7 +133,14 @@ public class Menu
                 spriteBatch.DrawString(font, "Profiles also allow you to assign multiple keys to one action", new Vector2(50, 50 + textVerticalSpacing*9), Color.White);
                 spriteBatch.DrawString(font, "Customize the settings and profiles as much as you want", new Vector2(50, 50 + textVerticalSpacing*10), Color.White);
                 spriteBatch.DrawString(font, "Your settings and profiles are saved automatically", new Vector2(50, 50 + textVerticalSpacing*11), Color.White);
-                spriteBatch.DrawString(font, "Now let's get to playing, press enter to close this message", new Vector2(50, 50 + textVerticalSpacing*12), Color.White);
+                spriteBatch.DrawString(font, "The default controls are as follows", new Vector2(50, 50 + textVerticalSpacing*12), Color.White);
+                spriteBatch.DrawString(font, "Movement + soft drop: arrow keys or A/S/D", new Vector2(50, 50 + textVerticalSpacing*13), Color.White);
+                spriteBatch.DrawString(font, "Clockwise rotation: Up arrow/X/E", new Vector2(50, 50 + textVerticalSpacing*14), Color.White);
+                spriteBatch.DrawString(font, "Counterclockwise rotation: Z/Q", new Vector2(50, 50 + textVerticalSpacing*15), Color.White);
+                spriteBatch.DrawString(font, "Hard drop: space", new Vector2(50, 50 + textVerticalSpacing*16), Color.White);
+                spriteBatch.DrawString(font, "Hold: shift", new Vector2(50, 50 + textVerticalSpacing*17), Color.White);
+                spriteBatch.DrawString(font, "Pause: escape", new Vector2(50, 50 + textVerticalSpacing*18), Color.White);
+                spriteBatch.DrawString(font, "Now let's get to playing, press enter to close this message", new Vector2(50, 50 + textVerticalSpacing*19), Color.White);
                 break;
             
             case MenuState.MainMenu:
@@ -233,7 +240,7 @@ public class Menu
                         }
                         else
                         {
-                            DrawButton("Enter name", i, "Create Profile");
+                            DrawButton("Start typing to enter name", i, "Create Profile");
                         }
                         continue;
                     }
