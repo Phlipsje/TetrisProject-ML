@@ -31,6 +31,7 @@ public static class MusicManager
         settings = settingsStruct;
     }
     
+    //Song is a sound effect, because monogame de-syncs songs when added as type song
     public static void PlaySong(SoundEffect song, bool songIsRepeating = true)
     {
         currentSong = song.CreateInstance();
@@ -44,13 +45,21 @@ public static class MusicManager
 
     public static void Update(GameTime gameTime)
     {
+        //Return if no song is playing
         if (currentSong == null)
             return;
+        
+        //Play if song is repeating and has reached the end
         if (currentSong.State == SoundState.Stopped && isRepeating)
             currentSong.Play();
+        
+        //Volume is based on settings value
         currentSong.Volume = (float)settings.musicVolume/100;
+        
         if (gameTime.TotalGameTime.TotalMilliseconds == 0)
             return; // this could crash if this is 0 as some point so I'l do this just to be safe
+        
+        //Change pitch when necessary
         if (gameTime.TotalGameTime.TotalMilliseconds < targetPitchChangeTime)
         {
             double timeElapsed = gameTime.TotalGameTime.TotalMilliseconds - PitchChangeStartTime;
@@ -63,7 +72,7 @@ public static class MusicManager
         }
     }
 
-    public static void Stop(GameTime gameTime)
+    public static void Stop()
     {
         currentSong.Stop();
         isRepeating = false;
@@ -81,15 +90,18 @@ public static class MusicManager
 
     public static void SetPitch(GameTime gameTime,  float pitch = -1, double delay = 500)
     {
-        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        //Pitch is float, but == works because float is explicitly set
         if (pitch == targetPitch && delay != 0)
             return;
+        
+        //Setup values to gradually change pitch in Update()
         targetPitch = pitch;
         originalPitch = currentSong.Pitch;
         PitchChangeStartTime = gameTime.TotalGameTime.TotalMilliseconds;
         targetPitchChangeTime = gameTime.TotalGameTime.TotalMilliseconds + delay;
     }
 
+    //Change pitch back to normal
     public static void Normal(GameTime gameTime, double delay = 1000)
     {
         targetPitch = 0;

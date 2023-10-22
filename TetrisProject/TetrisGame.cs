@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject;
 
@@ -22,11 +18,11 @@ public class TetrisGame
     private readonly double nextPieceWaitTimeMax = 0.2; //When the next piece appears after the previous one is locked in place
     private Piece holdPiece;
     private bool holdUsed; //Can only hold a piece if has been placed since last time hold has been used
-    public bool isGameOver;
-    public bool isInStress;
+    public bool isGameOver; //Check if game is finished
+    public bool isInStress; //Check if a player is close to a game over
     public int score;
     public int level = 1;
-    private int levelLastFrame = 1;
+    private int levelLastFrame = 1; //Used for level up check
     public int clearedLines;
     private const double lineClearTextTimeMax = 1.4f;
     private double lineClearTextTime; //Amount of time a line clear text is shown on screen
@@ -75,37 +71,29 @@ public class TetrisGame
     {
         switch (gameMode)
         {
+            //Different positions for games in different gamemodes
             default:
-                this.level = level;
                 field = new Field(this, Color.Red, settings.game.width, startY: 200);
-                FillQueue();
-                NextPiece();
-                score = 0;
-                clearedLines = GetClearedLines(level);
                 break;
             case GameMode.TugOfWar:
-                this.level = level;
                 if (instance == 1)
                     field = new Field(this, Color.Red, settings.game.width, startX: 320 + 50, startY: 200);
                 else
                     field = new Field(this, Color.Blue, settings.game.width, startX: 1280 - 50, startY: 200);
-                FillQueue();
-                NextPiece();
-                score = 0;
-                clearedLines = GetClearedLines(level);
                 break;
             case GameMode.Versus:
-                this.level = level;
                 if (instance == 1)
                     field = new Field(this, Color.Red, settings.game.width, startX: 320 + 50, startY: 200, true);
                 else
                     field = new Field(this, Color.Blue, settings.game.width, startX: 1280 - 50, startY: 200, true);
-                FillQueue();
-                NextPiece();
-                score = 0;
-                clearedLines = GetClearedLines(level);
                 break;
         }
+        
+        this.level = level;
+        FillQueue();
+        NextPiece();
+        score = 0;
+        clearedLines = GetClearedLines(level);
 
         levelLastFrame = level;
     }
@@ -132,8 +120,10 @@ public class TetrisGame
         
         if (isGameOver)
             return;
+        
         if(activePiece == null)
         {
+            //Create piece is non exists
             GenerationPhase(gameTime.ElapsedGameTime.TotalSeconds);
         }
         else
@@ -144,9 +134,14 @@ public class TetrisGame
     
     public void Draw(SpriteBatch spriteBatch)
     {
+        //Draw field (including cover around it)
         field.Draw(spriteBatch);
+        
+        //Draw game over screen
         if (isGameOver)
-            drawGameOver(spriteBatch);
+            DrawGameOver(spriteBatch);
+        
+        //Draw piece
         if (activePiece != null && !isGameOver)
         {
             field.DrawPiece(activePiece, spriteBatch); 
@@ -163,12 +158,14 @@ public class TetrisGame
         //Draw hold piece
         if (holdPiece == null)
         {
+            //Hold text in place of hold piece when nothing has been held yet
             spriteBatch.DrawString(font, "HOLD", new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 26,field.fieldY -field.fieldHeightOffset + 20), Color.White);
         }
         else //A piece is being held
         {
             Point holdPosition = new Point(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 12,field.fieldY + 18);
 
+            //Color the held piece gray until a piece has been locked down (holdUsed reset on lock down)
             if (holdUsed)
             {
                 DrawPiece(holdPiece, spriteBatch, holdPosition, true);
@@ -207,7 +204,7 @@ public class TetrisGame
         }
     }
     
-    public void DrawPiece(Piece piece, SpriteBatch spriteBatch, Point position, bool greyOut = false)
+    private void DrawPiece(Piece piece, SpriteBatch spriteBatch, Point position, bool greyOut = false)
     {
         //GreyOut is used to show that hold cannot be used
         Color pieceColor = piece.Color;
@@ -217,6 +214,7 @@ public class TetrisGame
             pieceColor = Color.Gray;
         }
         
+        //Use 4x4 matrix and draw out each block with true in that part of matrix
         for (int y = 0; y < Piece.hitboxSize; y++)
         {
             for (int x =  0; x < Piece.hitboxSize; x++)
@@ -233,7 +231,7 @@ public class TetrisGame
         }
     }
 
-    private void drawGameOver(SpriteBatch spriteBatch)
+    private void DrawGameOver(SpriteBatch spriteBatch)
     {
         string gameOverString = "Press enter";
         Vector2 stringSize = font.MeasureString(gameOverString);
@@ -256,6 +254,7 @@ public class TetrisGame
         return lines;
     }
 
+    //What happens when you press the hold key button
     public void HoldPiece(Piece piece)
     {
         if (holdPiece == null)
@@ -281,11 +280,11 @@ public class TetrisGame
         }
     }
     
-    #region Phases
-
+    //Check if a new piece should be spawned in
     private void GenerationPhase(double timeElapsed)
     {
-        if (nextPieceWaitTime > 0) //Check if the next piece should be spawned in
+        //Check if the next piece should be spawned in
+        if (nextPieceWaitTime > 0) 
         {
             nextPieceWaitTime -= timeElapsed;
         }
@@ -295,7 +294,6 @@ public class TetrisGame
             NextPiece();
         }
     }
-    #endregion
 
     //Called by Piece.cs to start the process of creating the next piece
     public void RequestPiece()
@@ -308,8 +306,11 @@ public class TetrisGame
     //Adds new pieces to the list of pieces the player has to use
     private void FillQueue()
     {
+        //Create 1 of every type of piece and shuffles the order, this is pseudo random while still feeling random and not resulting in 'bad luck'
         Pieces[] pieceOrder = { Pieces.Block, Pieces.Line, Pieces.T, Pieces.S, Pieces.Z, Pieces.L, Pieces.J };
-        pieceOrder = Util.ShuffleArray(pieceOrder); //Shuffles the array
+        
+        //Shuffle the array
+        pieceOrder = Util.ShuffleArray(pieceOrder); 
 
         foreach (var pieceByteValue in pieceOrder)
         {
@@ -317,11 +318,13 @@ public class TetrisGame
         }
     }
 
+    //Get the next piece
     private void NextPiece()
     {
         activePiece = GetNextPiece(pieceQueue[0]);
         pieceQueue.RemoveAt(0);
 
+        //Fill queue if end of queue would be in sight in next pieces list
         if (pieceQueue.Count < nextPieceLength+1)
         {
             FillQueue();
@@ -367,42 +370,53 @@ public class TetrisGame
         isGameOver = true;
         field.PlayGameOverAnimation();
         field.Empty();
-        Point lpos = new Point((field.Width - 4) / 2 , 8);
-        field.SetBlock(lpos.X, lpos.Y, Pieces.Ghost);
-        field.SetBlock(lpos.X, lpos.Y + 1, Pieces.Ghost);
-        field.SetBlock(lpos.X, lpos.Y + 2, Pieces.Ghost);
-        field.SetBlock(lpos.X, lpos.Y + 3, Pieces.Ghost);
-        field.SetBlock(lpos.X + 1, lpos.Y + 3, Pieces.Ghost);
-        field.SetBlock(lpos.X + 2, lpos.Y + 3, Pieces.Ghost);
+        
+        //Draw the L on screen
+        Point positionOfL = new Point((field.Width - 4) / 2 , 8);
+        field.SetBlock(positionOfL.X, positionOfL.Y, Pieces.Ghost);
+        field.SetBlock(positionOfL.X, positionOfL.Y + 1, Pieces.Ghost);
+        field.SetBlock(positionOfL.X, positionOfL.Y + 2, Pieces.Ghost);
+        field.SetBlock(positionOfL.X, positionOfL.Y + 3, Pieces.Ghost);
+        field.SetBlock(positionOfL.X + 1, positionOfL.Y + 3, Pieces.Ghost);
+        field.SetBlock(positionOfL.X + 2, positionOfL.Y + 3, Pieces.Ghost);
     }
 
+    //Only used in multiplayer modes
     public void Win()
     {
         isGameOver = true;
         field.PlayGameOverAnimation();
         field.Empty();
+        
+        //Can't be drawn if field is too thin
         if (field.Width < 5)
             return;
-        Point wpos = new Point((field.Width - 5) / 2, 8);
         
-        field.SetBlock(wpos.X, wpos.Y, Pieces.Ghost);
-        field.SetBlock(wpos.X, wpos.Y + 1, Pieces.Ghost);
-        field.SetBlock(wpos.X, wpos.Y + 2, Pieces.Ghost);
-        field.SetBlock(wpos.X + 1, wpos.Y + 3, Pieces.Ghost);
-        field.SetBlock(wpos.X + 2, wpos.Y + 2, Pieces.Ghost);
-        field.SetBlock(wpos.X + 2, wpos.Y + 1, Pieces.Ghost);
-        field.SetBlock(wpos.X + 2, wpos.Y, Pieces.Ghost);
-        field.SetBlock(wpos.X + 3, wpos.Y + 3, Pieces.Ghost);
-        field.SetBlock(wpos.X + 4, wpos.Y + 2, Pieces.Ghost);
-        field.SetBlock(wpos.X + 4, wpos.Y + 1, Pieces.Ghost);
-        field.SetBlock(wpos.X + 4, wpos.Y, Pieces.Ghost);
+        //Draw the W on screen
+        Point positionOfW = new Point((field.Width - 5) / 2, 8);
+        
+        field.SetBlock(positionOfW.X, positionOfW.Y, Pieces.Ghost);
+        field.SetBlock(positionOfW.X, positionOfW.Y + 1, Pieces.Ghost);
+        field.SetBlock(positionOfW.X, positionOfW.Y + 2, Pieces.Ghost);
+        field.SetBlock(positionOfW.X + 1, positionOfW.Y + 3, Pieces.Ghost);
+        field.SetBlock(positionOfW.X + 2, positionOfW.Y + 2, Pieces.Ghost);
+        field.SetBlock(positionOfW.X + 2, positionOfW.Y + 1, Pieces.Ghost);
+        field.SetBlock(positionOfW.X + 2, positionOfW.Y, Pieces.Ghost);
+        field.SetBlock(positionOfW.X + 3, positionOfW.Y + 3, Pieces.Ghost);
+        field.SetBlock(positionOfW.X + 4, positionOfW.Y + 2, Pieces.Ghost);
+        field.SetBlock(positionOfW.X + 4, positionOfW.Y + 1, Pieces.Ghost);
+        field.SetBlock(positionOfW.X + 4, positionOfW.Y, Pieces.Ghost);
     }
 
+    //Updating scoring and lines cleared (according to variable goal system)
     public void HandleScore(int rowsCleared)
     {
         //In multiplayer the amount of cleared lines awarded differs
         int multiplayerClearedLines = 0;
-        int previousScore = score;
+        
+        //Used to check how many lines have been added
+        int previousLinesCleared = clearedLines;
+        
         //Update time to show clear text on screen
         lineClearTextTime = lineClearTextTimeMax;
         
@@ -509,6 +523,7 @@ public class TetrisGame
                 break;
             
             case 4:
+                //T-spins not possible with 4 lines cleared
                 multiplayerClearedLines += 4;
                 score += (int)(800 * level * multiplier);
                 lineClearType += "Tetris";
@@ -531,20 +546,26 @@ public class TetrisGame
         
         //Update level
         level = CalculateLevel();
+        
+        //Flash screen on level up
         if (level != levelLastFrame)
             gameHandler.ScreenFlash();
         levelLastFrame = level;
-        gameHandler.LineCleared((score-previousScore)/100, multiplayerClearedLines, instance);
+        
+        //Call event in game handler
+        gameHandler.LineCleared(clearedLines-previousLinesCleared, multiplayerClearedLines, instance);
     }
 
     private int CalculateLevel()
     {
-        if (clearedLines >= 525) //Over max level
+        //Check if over the max level
+        if (clearedLines >= 525) 
         {
             return 15;
         }
         int clearedLinesRemaining = clearedLines;
 
+        //Calculate what level player is at based on lines cleared
         for (int i = 1; i <= 15; i++)
         {
             if (clearedLinesRemaining >= i * 5)

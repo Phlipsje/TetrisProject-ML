@@ -8,7 +8,7 @@ namespace TetrisProject;
 
 public static class AnimationManager
 {
-    private static List<Animation> animations = new List<Animation>();
+    private static List<Animation> animations = new ();
 
     public static void Reset()
     {
@@ -30,7 +30,10 @@ public static class AnimationManager
     {
         for (int i = 0; i < animations.Count; i++)
         {
+            //Run Update() on all animations
             animations[i].Update(gameTime);
+            
+            //Remove finished animations
             if (animations[i].CanBeDestroyed)
             {
                 animations.RemoveAt(i);
@@ -53,11 +56,10 @@ public abstract class Animation
 {
     public bool CanBeDestroyed;
     protected Vector2 position;
-    public Vector2 Position => position;
 
     protected Animation(Vector2 startPosition)
     {
-        this.position = startPosition;
+        position = startPosition;
     }
 
     public abstract void Update(GameTime gameTime);
@@ -77,10 +79,11 @@ public class FallingBlockAnimation : Animation
     public FallingBlockAnimation(Vector2 startPosition, Vector2 startVelocity, Texture2D texture,
         float rotationSpeed, Color? color = null, Vector2? size = null, float gravity = 2000) : base(startPosition)
     {
-        velocity = startVelocity;
         // The syntax of this line: the value before the ?? if it is not null, else the value after the ??
         this.size = size ?? new Vector2(texture.Width, texture.Height);
         this.color = color ?? Color.White;
+        
+        velocity = startVelocity;
         this.gravity = gravity;
         this.texture = texture;
         this.rotationSpeed = rotationSpeed;
@@ -88,17 +91,18 @@ public class FallingBlockAnimation : Animation
 
     public override void Update(GameTime gameTime)
     {
-        position = position + velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+        position += velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
         velocity.Y += gravity * (float)gameTime.ElapsedGameTime.TotalSeconds;
         rotation += rotationSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+        
+        //Destroy if offscreen
         if (position.Y > Main.WorldHeight * 1.5)
             CanBeDestroyed = true;
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        Rectangle drawRect = new Rectangle(position.ToPoint(), 
-            size.ToPoint());
+        Rectangle drawRect = new Rectangle(position.ToPoint(), size.ToPoint());
         spriteBatch.Draw(texture, drawRect, null, color, rotation, size / 2, SpriteEffects.None, 0);
     }
 
@@ -106,7 +110,7 @@ public class FallingBlockAnimation : Animation
     public class ExplosionAnimation : Animation
     {
         private Vector2 size;
-        private Texture2D[] textures;
+        private readonly Texture2D[] textures;
         private double? spawnTime;
         private int frameToDraw;
         private const int fps = 30;
@@ -126,13 +130,14 @@ public class FallingBlockAnimation : Animation
 
         public override void Draw(SpriteBatch spriteBatch)
         {
+            //Mark for destruction if animation has reached last frame
             if (frameToDraw > textures.Length - 1)
             {
                 CanBeDestroyed = true;
                 return;
             }
-            Rectangle drawRect = new Rectangle(position.ToPoint(), 
-                size.ToPoint());
+            
+            Rectangle drawRect = new Rectangle(position.ToPoint(), size.ToPoint());
             spriteBatch.Draw(textures[frameToDraw], drawRect, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1);
         }
 }
@@ -168,11 +173,14 @@ public class FadingRectangle : Animation
     public override void Update(GameTime gameTime)
     {
         double time = gameTime.TotalGameTime.TotalMilliseconds;
+        
+        //Restart animation
         if (startTime == null || endTime == null)
         {
             startTime = gameTime.TotalGameTime.TotalMilliseconds;
             endTime = startTime + timeAlive;
         }
+        
         color = originalColor * (1 - (float)((time - startTime) / (endTime - startTime)));
     }
     

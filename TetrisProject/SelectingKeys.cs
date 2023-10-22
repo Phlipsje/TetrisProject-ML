@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject;
 
+//Part of main menu, is running while the player is remapping a key of an input
 public class SelectingKeys
 {
     private Main main;
@@ -26,6 +27,7 @@ public class SelectingKeys
     //This class is used when keys are being assigned to keybinds
     public void Update()
     {
+        //Return on first frame, because enter will otherwise instantly be pressed for the first frame and result in exiting this class
         if (firstFrame)
         {
             firstFrame = false;
@@ -68,6 +70,7 @@ public class SelectingKeys
                     break;
             }
 
+            //Go back to overview of all controls in a profile
             menu.menuState = MenuState.Controls;
             menu.selectingKeys = null; //Dispose of this class
             return;
@@ -92,15 +95,20 @@ public class SelectingKeys
 
     public void Draw(SpriteBatch spriteBatch, Texture2D tile, SpriteFont font)
     {
+        //Background
         spriteBatch.Draw(tile, new Rectangle(400, 200, 1120, 680), Color.Gray);
         
+        //Draw text showing what input type is being edited
         spriteBatch.DrawString(font, InputTypeToString(edittingInputType), new Vector2(500, 300), Color.White);
 
+        //Draw list of keys being added to an input
         spriteBatch.DrawString(font, menu.ArrayListedAsString(mappedKeys.ToArray()), new Vector2(500, 380), Color.White);
         
+        //Draw tooltip
         spriteBatch.DrawString(font, "Press enter to confirm", new Vector2(500, 460), Color.White);
     }
 
+    //Converts an input type to text (adds spaces)
     private string InputTypeToString(ControlsMenu inputType)
     {
         switch (inputType)

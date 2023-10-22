@@ -6,7 +6,7 @@ namespace TetrisProject;
 
 public static class SfxManager
 {
-    private static List<SoundEffectInstance> playingSoundEffects= new List<SoundEffectInstance>();
+    private static List<SoundEffectInstance> playingSoundEffects = new ();
     public static SoundEffect Explosion;
     public static SoundEffect LockPiece;
     public static void Load(ContentManager content)
@@ -19,11 +19,14 @@ public static class SfxManager
     {
         SoundEffectInstance sound = soundEffect.CreateInstance();
         sound.Play();
+        
+        //Keep track of what sound effects are being played
         playingSoundEffects.Add(sound);
     }
 
     public static void Update()
     {
+        //Update list of playing sound effects
         for (int i = 0; i < playingSoundEffects.Count; i++)
         {
             if (playingSoundEffects[i].IsDisposed)
@@ -34,6 +37,8 @@ public static class SfxManager
         }
     }
 
+    
+    //Cancel all sounds
     public static void StopAllSoundEffects()
     {
         foreach (SoundEffectInstance sound in playingSoundEffects)

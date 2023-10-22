@@ -223,7 +223,7 @@ namespace TetrisProject
                     menu.menuIndex = 0;
                     gameState = GameState.Menu;
                     gameHandler = null;
-                    MusicManager.Stop(gameTime);
+                    MusicManager.Stop();
                     return;
                 }
                 gameHandler.Update(gameTime);
@@ -246,7 +246,7 @@ namespace TetrisProject
                     menu.menuIndex = 0;
                     gameState = GameState.Menu;
                     gameHandler = null;
-                    MusicManager.Stop(gameTime);
+                    MusicManager.Stop();
                 }
             }
             
