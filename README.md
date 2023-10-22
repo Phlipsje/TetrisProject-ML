@@ -66,4 +66,6 @@ The document is packaged together with the project files and is named "2009 Tetr
 - Tug of war variant, this is our custom made multiplayer mode (versus being the official). 
 - You both play your own game and the first person to have cleared 30 (unless changed in settings) lines more that the opponent wins (indicated by the bar above the screens).
 - The ability to change the width of the matrix/board.
-- An entire menu to change settings, control profiles and game modes. 
+- An entire menu to change settings, control profiles and game modes.
+- The game automatically saves settings and the high score to a file.
+- Set profiles to play with the keybinds you want, or to split up the keyboard for multiplayer. 
