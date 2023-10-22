@@ -106,6 +106,8 @@ public class TetrisGame
                 clearedLines = GetClearedLines(level);
                 break;
         }
+
+        levelLastFrame = level;
     }
 
     public void LoadContent(ContentManager content)
@@ -271,6 +273,7 @@ public class TetrisGame
             activePiece = holdPiece;
             activePiece.Position = activePiece.startingPosition;
             activePiece.RotationIndex = 0;
+            activePiece.Reset();
             
             //Have the old active piece become the new held piece
             holdPiece = piece;

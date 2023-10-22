@@ -164,6 +164,20 @@ public abstract class Piece
         }
     }
 
+    public void Reset()
+    {
+        lockDownMaxTime = 0.5;
+        lockDownTimer = lockDownMaxTime;
+        autoRepeatDelay = 0.5/fieldReference.Width;
+        autoRepeatStartDelay = 0.25;
+        maxMovementCounter = 15;
+        remainingMovementCounter = maxMovementCounter;
+        dropTimer = dropTimes[tetrisGameReference.level-1] / tetrisGameReference.gravityMultipler;
+        highestHeight = -20;
+        
+        softDropMaxTime = dropTimer / 20;
+    }
+
     private void PieceControlFlow()
     {
         //Check if piece needs to be locked down
