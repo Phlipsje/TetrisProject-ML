@@ -22,7 +22,7 @@ When starting up for the first time there will be a chunk of text explaining the
 You can press escape to pause the game, pressing escape again will unpause.
 If you press backspace while in the pause menu, the game is aborted and you go to the main menu.
 The controls listed past this can be adjusted in the controls tab, either by changing the values of the default profile or making a new profile.
-Multiple keys can be mapped to a single action
+Multiple keys can be mapped to a single action.
 - Move left: left arrow key, A
 - Move right: right arrow key, D
 - Soft drop: down arrow key, S
