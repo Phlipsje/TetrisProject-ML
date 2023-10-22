@@ -88,17 +88,26 @@ public class VersusHandeler : GameHandeler
         {
             for (int i = 0; i < multiplayerLinesCleared; i++)
             {
-                garbageLines0.Add(garbageLine);
+                //Can not have more than 20 lines being sent
+                if (garbageLines0.Count < 20)
+                {
+                    garbageLines0.Add(garbageLine);
+                }
             }
         }
         else
         {
             for (int i = 0; i < multiplayerLinesCleared; i++)
             {
-                garbageLines1.Add(garbageLine);
+                //Can not have more than 20 lines being sent
+                if (garbageLines1.Count < 20)
+                {
+                    garbageLines1.Add(garbageLine);
+                }
             }
         }
         
+        //Update receive bar
         tetrisGames[0].blocksBeingAdded = garbageLines0.Count;
         tetrisGames[1].blocksBeingAdded = garbageLines1.Count;
     }
@@ -150,6 +159,10 @@ public class VersusHandeler : GameHandeler
                 break;
             }
         }
+        
+        //Update receive bar
+        tetrisGames[0].blocksBeingAdded = garbageLines0.Count;
+        tetrisGames[1].blocksBeingAdded = garbageLines1.Count;
     }
 
     public override void Update(GameTime gameTime)

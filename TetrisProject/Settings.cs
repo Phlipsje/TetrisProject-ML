@@ -73,7 +73,7 @@ public struct Controls
         rightKey = new [] {Keys.D, Keys.Right};
         softDropKey = new [] {Keys.S, Keys.Down};
         hardDropKey = new [] {Keys.Space};
-        rotateClockWiseKey = new[] { Keys.X, Keys.E, Keys.Up };
+        rotateClockWiseKey = new[] { Keys.W, Keys.X, Keys.E, Keys.Up };
         rotateCounterClockWiseKey = new [] { Keys.Z, Keys.Q };
         holdKey = new[] { Keys.LeftShift, Keys.RightShift };
     }

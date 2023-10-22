@@ -274,7 +274,14 @@ public class Field //The field in which the pieces can be placed
         //Receive bar blocks
         for (int i = 0; i < tetrisGame.blocksBeingAdded; i++)
         {
-            spriteBatch.Draw(tetrisGame.blockTexture, new Vector2(fieldX-fieldReceiveWidth, fieldY+(height-i-1)*blockSize), GetColor(Pieces.Ghost));
+            if (tetrisGame.blocksBeingAdded - i < 8)
+            {
+                spriteBatch.Draw(tetrisGame.blockTexture, new Vector2(fieldX-fieldReceiveWidth, fieldY+(height-i-1)*blockSize), GetColor(Pieces.Z));
+            }
+            else
+            {
+                spriteBatch.Draw(tetrisGame.blockTexture, new Vector2(fieldX-fieldReceiveWidth, fieldY+(height-i-1)*blockSize), GetColor(Pieces.Ghost));
+            }
         }
         
         //Draw blocks
