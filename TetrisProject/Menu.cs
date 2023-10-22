@@ -10,8 +10,6 @@ namespace TetrisProject;
 
 public class Menu
 {
-    //The menu
-
     //References
     private Main main;
     private SpriteBatch spriteBatch;
@@ -35,7 +33,6 @@ public class Menu
     public byte profileIndex;
     public byte profileIndex2; //Only used in multiplayer game modes
     private readonly string[] gameModeNames = {"Standard", "Tug Of War", "Versus"};
-    
     public byte gameModeIndex;
     
     //Visual variables
@@ -71,20 +68,23 @@ public class Menu
 
     public void Update(GameTime gameTime)
     {
+        //While mapping key(s) to input
         if (menuState == MenuState.MapKeys)
         {
             selectingKeys.Update();
             return;
         }
+        
+        //Normal menu update
         MenuMovement();
-
         AnimateMenu(gameTime.ElapsedGameTime.TotalSeconds);
     }
 
     #region Visual Methods
-    //Update offsets of buttons that are animated based on selected button
+    //Update horizontal offsets of buttons that are animated based on selected button
     private void AnimateMenu(double deltaTime)
     {
+        //Each button has a position and it moves left/right depending on if it is selected, afterwards the values are clamped
         for (int i = 0; i < GetMenuLength(); i++)
         {
             if (i == menuIndex)
@@ -107,12 +107,11 @@ public class Menu
         
         if (menuState == MenuState.MapKeys)
         {
-            
             selectingKeys.Draw(spriteBatch, tile, font);
             return;
         }
 
-        //Buttons
+        //All buttons and text, based on what menu the player is on
         switch (menuState)
         {
             case MenuState.Explainer:
@@ -285,12 +284,14 @@ public class Menu
         }
     }
 
+    //Draw moving tile background
     private void DrawBackground(GameTime gameTime)
     {
         int tileCountHorizontal = 10; //Amount of tiles in horizontal direction on screen at once
         int tileSize = Main.WorldWidth / tileCountHorizontal;
         int aspectRatio = Main.WorldWidth / Main.WorldHeight;
         double timeFrame = gameTime.TotalGameTime.TotalSeconds % 2.5/2.5; //Used to make background move
+        
         //Draw tiles of background
         for (int i = -1; i < tileCountHorizontal; i++)
         {
@@ -311,6 +312,7 @@ public class Menu
     #endregion
     
     #region Menu Movement
+    //What to do when a key is pressed
     private void MenuMovement()
     {
         //Check if a key was pressed
@@ -318,7 +320,7 @@ public class Menu
         {
             return;
         }
-
+        
         if (Util.GetKeyPressed(Keys.Up))
         {
             if (menuIndex != 0)
@@ -375,8 +377,10 @@ public class Menu
     #endregion
 
     #region Menu functions
+    //What effect a type of input has on the menu
     private void MenuFunction(InputType inputType)
     {
+        //First check what menu the player is in, then check what button is selected, finally check what to do with the specified input
         switch (menuState)
         {
             case MenuState.Explainer:
@@ -566,6 +570,7 @@ public class Menu
                 break;
             
             case MenuState.ControlProfiles:
+                //ControlProfiles menu has a dynamic length based on the amount of profiles that exist
                 if (inputType == InputType.Select)
                 {
                     //Create new profile button
@@ -583,6 +588,7 @@ public class Menu
                                 }
                             }
                             
+                            //Create new set of controls
                             Controls newControls = new Controls();
                             newControls.controlName = newProfileName;
                             main.settings.controlProfiles.Add(newControls);
@@ -591,6 +597,7 @@ public class Menu
                         }
                         break;
                     }
+                    
                     //Delete profile button
                     if (menuIndex == GetMenuLength() - 2)
                     {
@@ -599,9 +606,12 @@ public class Menu
                         {
                             main.settings.controlProfiles.RemoveAt(profileIndex);
                         }
+                        
+                        //Update index position (because one less button means the selected button would shift)
                         GoToMenu(MenuState.ControlProfiles, (byte)(GetMenuLength() - 2));
                         break;
                     }
+                    
                     //Back button
                     if (menuIndex == GetMenuLength() - 1)
                     {
@@ -617,7 +627,7 @@ public class Menu
                 //If hovering over create profile and typing text
                 if (inputType == InputType.Text && menuIndex == GetMenuLength() - 3)
                 {
-                    //Add text to string, with a limit on what characters can be user
+                    //Add text to string, with a limit on what characters can be user, not case sensitive
                     newProfileName += FilterInput(Util.GetKeysPressed(), "abcdefghijklmnopqrstuvwxyz");
                 }
 
@@ -634,7 +644,6 @@ public class Menu
                     if (inputType == InputType.MoveLeft && menuIndex == GetMenuLength() - 2) { profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex);}
                     if (inputType == InputType.MoveRight && menuIndex == GetMenuLength() - 2) { profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);}
                 }
-
                 break;
             
             case MenuState.Controls:
@@ -657,17 +666,20 @@ public class Menu
     #endregion
     
     #region Extra functions
-
     //Only parse allowed characters to string
     private string FilterInput(Keys[] keys, string filter)
     {
+        //Filter works as a whitelist
         string text = "";
+        
+        //Store all filtered characters in a list
         List<string> filterList = new List<string>();
         for (int i = 0; i < filter.Length; i++)
         {
             filterList.Add(filter[i].ToString().ToUpper()); 
         }
 
+        //Check for each input if it is in the filter or not
         foreach (var key in keys)
         {
             if (filterList.Contains(key.ToString()))
@@ -678,21 +690,25 @@ public class Menu
 
         return text;
     }
-
+    
     public void GoToMenu(MenuState state, byte goToIndex = 0)
     {
+        //Save settings
         main.SaveSettings();
+        
+        //Special cases for these menus
         if (menuState is MenuState.ControlProfiles or MenuState.Settings)
         {
             newProfileName = "";
             profileIndex = 0;
+            
             //Don't show default profile in delete list
             if (main.settings.controlProfiles.Count > 1)
             {
                 profileIndex = 1;
             }
         }
-        else if(menuState == MenuState.LobbyStandard || menuState == MenuState.LobbyTugOfWar || menuState == MenuState.LobbyVersus)
+        else if(menuState is MenuState.MainMenu or MenuState.LobbyStandard or MenuState.LobbyTugOfWar or MenuState.LobbyVersus)
         {
             profileIndex = 0;
             profileIndex2 = 0;
@@ -711,6 +727,8 @@ public class Menu
         {
             menuIndex = goToIndex;
         }
+        
+        //Update the horizontal offsets of the buttons
         selectedHorizontalOffsets = new float[GetMenuLength()];
         selectedHorizontalOffsets[menuIndex] = selectedHorizontalOffsetTotal;
     }
@@ -728,6 +746,7 @@ public class Menu
             }
         }
         
+        //Loop around
         if (index == array.Length - 1)
         {
             return 0;
@@ -749,6 +768,7 @@ public class Menu
             }
         }
         
+        //Loop around
         if (index == 0)
         {
             return (byte)(array.Length - 1);
@@ -770,6 +790,7 @@ public class Menu
         return Util.Clamp(value, min, max);
     }
 
+    //Gets the length of a menu (the amount of buttons with a different Y value), used for looping and horizontal offset of buttons
     private int GetMenuLength()
     {
         switch (menuState)
@@ -795,6 +816,7 @@ public class Menu
         }
     }
 
+    //Button color is based on index and is colored with a color of the tetris pieces
     private Color GetButtonColor(int index)
     {
         if (menuIndex == index)
@@ -818,7 +840,7 @@ public class Menu
             }
         }
 
-        //Error value
+        //If button is not selected
         return Color.White;
     }
 
@@ -907,6 +929,8 @@ public class Menu
         spriteBatch.Draw(buttonBegin, new Vector2(horizontalOffset, 0) + topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
         spriteBatch.Draw(buttonMiddle, new Vector2(horizontalOffset + 80,0) + topLeftTopButtonPosition + buttonVerticalOffset * index, null, GetButtonColor(index), 0f, Vector2.Zero, new Vector2(font.MeasureString(text).X, 1), SpriteEffects.None, 0f);
         spriteBatch.Draw(buttonEnd, new Vector2( horizontalOffset + 80 + font.MeasureString(text).X,0) + topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
+        
+        //Draw text on button
         spriteBatch.DrawString(font, text, new Vector2(horizontalOffset + 80,12) + topLeftTopButtonPosition + buttonVerticalOffset * index, GetButtonColor(index));
     }
     #endregion
@@ -922,6 +946,8 @@ public class Menu
     }
 }
 
+#region Enums
+//Enums for all menus (MenuState being what menu the player is on and every other enum what that menu holds
 public enum MenuState
 {
     MainMenu,
@@ -997,3 +1023,4 @@ public enum ControlsMenu
     Hold,
     Back
 }
+#endregion

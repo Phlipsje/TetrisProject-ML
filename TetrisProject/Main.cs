@@ -28,7 +28,7 @@ namespace TetrisProject
         public const int WorldWidth = 1920;
         public const int WorldHeight = 1080;
         public GameState gameState;
-        private Double screenShakeTimer = 0;
+        private Double screenShakeTimer;
 
         public Main()
         {
@@ -41,14 +41,15 @@ namespace TetrisProject
             graphics.ApplyChanges();
         }
 
-        //Anti aliasing (X8)
+        //Anti aliasing (X4)
         private void Graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
         {
             graphics.PreferMultiSampling = true;
-            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 8;
+            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 4;
         }
 
-        protected void OnResize(Object sender, EventArgs e)
+        //Allow for resizing the screen by dragging the window
+        private void OnResize(Object sender, EventArgs e)
         {
             if ((graphics.PreferredBackBufferWidth != graphics.GraphicsDevice.Viewport.Width) ||
                 (graphics.PreferredBackBufferHeight != graphics.GraphicsDevice.Viewport.Height))
@@ -73,13 +74,17 @@ namespace TetrisProject
             spriteBatch = new SpriteBatch(GraphicsDevice);
             menu = new Menu(this, spriteBatch);
 
+            //Check if the settings save file can be found
             if (File.Exists("Settings.conf"))
             {
                 settings = Util.LoadSettingsFromFile("Settings.conf");
             }
             else
             {
+                //Create a new settings struct if no file was found
                 settings = new Settings();
+                
+                //Not finding a file indicates that the program was started up for the first time, an explainer will be shown
                 menu.menuState = MenuState.Explainer;
             }
             
@@ -130,6 +135,7 @@ namespace TetrisProject
         {
             if (Util.GetKeyPressed(Keys.Escape))
             {
+                //List of what the escape key does in every situation
                 switch (gameState)
                 {
                     case GameState.Menu:
@@ -180,15 +186,17 @@ namespace TetrisProject
             if (Util.GetKeyPressed(Keys.F11))
                 ToggleFullScreen();
             
+            //Updates keyboard states
             Util.Update();
 
+            //Update menu or match based on the state of the game
             if (gameState == GameState.Menu)
             {
                 menu.Update(gameTime);
             }
             else if(gameState == GameState.Playing)
             {
-                //Create a new game when play is pressed
+                //Create a new match when play is pressed
                 if (gameHandler == null)
                 {
                     List<Controls> selectedControls = new ();
@@ -217,6 +225,8 @@ namespace TetrisProject
                     else
                         MusicManager.PlaySong(MusicManager.ModernTheme);
                 }
+                
+                //Exit match if enter is pressed when match is finished
                 if (Util.GetKeyPressed(Keys.Enter) && gameHandler.gameFinished)
                 {
                     menu.menuState = MenuState.MainMenu;
@@ -226,9 +236,15 @@ namespace TetrisProject
                     MusicManager.Stop();
                     return;
                 }
+                
+                //Updates match
                 gameHandler.Update(gameTime);
+                
+                //Change music when game over state is reached
                 if (gameHandler.gameFinished)
                     MusicManager.SetPitch(gameTime, -1, 4000);
+                
+                //Change music in pause menu (only runs first frame of pause being entered)
                 else if (gameHandler.playerInStress && gameState != GameState.Pause)
                 {
                     MusicManager.SetPitch(gameTime, 0.5f, 250);
@@ -240,6 +256,7 @@ namespace TetrisProject
             }
             else if (gameState == GameState.Pause)
             {
+                //Exit to main menu / abort match (and lose progress)
                 if (Util.GetKeyPressed(Keys.Back))
                 {
                     menu.menuState = MenuState.MainMenu;
@@ -250,6 +267,7 @@ namespace TetrisProject
                 }
             }
             
+            //Update other classes
             AnimationManager.Update(gameTime);
             SfxManager.Update();
             MusicManager.Update(gameTime);
@@ -282,7 +300,7 @@ namespace TetrisProject
             }
             else if (gameState == GameState.Pause)
             {
-                drawPauseScreen();
+                DrawPauseScreen();
             }
             
             //Play animations
@@ -295,9 +313,11 @@ namespace TetrisProject
             GraphicsDevice.SetRenderTarget(null);
 
             //Resize renderTarget to the application window
-            screenShakeTimer -= gameTime.ElapsedGameTime.TotalMilliseconds;
             spriteBatch.Begin();
             Rectangle destinationRectangle;
+            
+            screenShakeTimer -= gameTime.ElapsedGameTime.TotalMilliseconds;
+
             if (screenShakeTimer <= 0)
                 destinationRectangle = new Rectangle(0, 0, WindowWidth, WindowHeight);
             else
@@ -305,22 +325,23 @@ namespace TetrisProject
                 Random rng = new Random();
                 destinationRectangle = new Rectangle(rng.Next(-10, 10), rng.Next(-10, 10), WindowWidth, WindowHeight);
             }
+            
+            //Draw to the screen (takes what is drawn to render target and scales it up/down to the window size)
             spriteBatch.Draw(renderTarget, destinationRectangle, Color.White);
             spriteBatch.End();
             
             base.Draw(gameTime);
         }
 
-        private void drawPauseScreen()
+        private void DrawPauseScreen()
         {
+            //Draw text during pause
             string pauseString = "PAUSED";
             string pauseInfoString = "press backspace to quit";
             Vector2 pauseStringSize = menu.font.MeasureString(pauseString);
             Vector2 pauseInfoStringSize = menu.font.MeasureString(pauseInfoString);
-            Vector2 pauseStringPosition = new Vector2(WorldWidth - pauseStringSize.X,
-                WorldHeight - pauseStringSize.Y - pauseInfoStringSize.Y) / 2;
-            Vector2 pauseInfoStringPosition = new Vector2((WorldWidth - pauseInfoStringSize.X) / 2,
-                pauseStringPosition.Y + pauseInfoStringSize.Y);
+            Vector2 pauseStringPosition = new Vector2(WorldWidth - pauseStringSize.X, WorldHeight - pauseStringSize.Y - pauseInfoStringSize.Y) / 2;
+            Vector2 pauseInfoStringPosition = new Vector2((WorldWidth - pauseInfoStringSize.X) / 2, pauseStringPosition.Y + pauseInfoStringSize.Y);
             spriteBatch.DrawString(menu.font, pauseString, pauseStringPosition, Color.White);
             spriteBatch.DrawString(menu.font, pauseInfoString, pauseInfoStringPosition, Color.White);
         }

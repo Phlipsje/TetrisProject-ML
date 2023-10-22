@@ -63,6 +63,8 @@ public class GameHandler
         foreach (var tetrisGame in tetrisGames)
         {
             tetrisGame.Update(gameTime);
+            
+            //Save high score
             if (tetrisGame.isGameOver && tetrisGames.Count == 1 && tetrisGame.Field.Width == 10 && mainReference != null)
                 mainReference.SaveSettings(tetrisGame.score);
         }
