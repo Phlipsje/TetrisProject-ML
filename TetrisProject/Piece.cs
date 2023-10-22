@@ -194,7 +194,7 @@ public abstract class Piece
         //Lock Phase (That half a second before piece is fully in place)
         if (dropTimer <= 0 && !softDropped && !hardDropped) //Piece drops down 1 line
         {
-            dropTimer = dropTimes[tetrisGameReference.level-1];
+            dropTimer = dropTimes[tetrisGameReference.level-1]  / tetrisGameReference.gravityMultipler;
             softDropMaxTime = dropTimer / 20;
             MoveDown();
         }

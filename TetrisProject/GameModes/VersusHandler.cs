@@ -7,6 +7,7 @@ namespace TetrisProject;
 
 public class VersusHandler : GameHandler
 {
+    //A garbage line is the gray line added at the bottom of the opponents field when you clear a line
     private readonly double garbageMultiplier;
     private List<Pieces[]> garbageLines0 = new ();
     private List<Pieces[]> garbageLines1 = new ();
@@ -25,7 +26,7 @@ public class VersusHandler : GameHandler
         //If no line is cleared then return
         if (multiplayerLinesCleared == 0)
         {
-            //Update values
+            //Update receive bar values
             tetrisGames[0].blocksBeingAdded = garbageLines0.Count;
             tetrisGames[1].blocksBeingAdded = garbageLines1.Count;
             
@@ -36,6 +37,7 @@ public class VersusHandler : GameHandler
         multiplayerLinesCleared = (int)MathF.Floor(multiplayerLinesCleared * (float)garbageMultiplier);
         
         //Create garbage line
+        //Same garbage line is used for all lines sent by one piece placed
         Pieces[] garbageLine = new Pieces[tetrisGames[0].Field.Width];
         garbageLine[0] = Pieces.None;
         for (int i = 1; i < garbageLine.Length; i++)
@@ -46,15 +48,18 @@ public class VersusHandler : GameHandler
         //Place the hole in the garbage line in a random spot
         garbageLine = Util.ShuffleArray(garbageLine);
 
-        //Remove lines from the garbage lines list is you cleared a line
+        //Remove lines from your garbage lines list is you cleared a line
         if (instance == 1)
         {
             int count = multiplayerLinesCleared;
             for (int i = 0; i < count; i++)
             {
+                //Only remove if you have garbage filled up
                 if (garbageLines0.Count > 0)
                 {
                     garbageLines0.RemoveAt(garbageLines0.Count-1);
+                    
+                    //Lines removed from own garbage pile are not sent to opponent
                     multiplayerLinesCleared--;
                 }
                 else
@@ -65,12 +70,15 @@ public class VersusHandler : GameHandler
         }
         else
         {
+            //Only remove if you have garbage filled up
             int count = multiplayerLinesCleared;
             for (int i = 0; i < count; i++)
             {
                 if (garbageLines1.Count > 0)
                 {
                     garbageLines1.RemoveAt(garbageLines1.Count-1);
+                    
+                    //Lines removed from own garbage pile are not sent to opponent
                     multiplayerLinesCleared--;
                 }
                 else
@@ -80,11 +88,12 @@ public class VersusHandler : GameHandler
             }
         }
 
-        //instance 1 targets 2 and 2 targets 1
-        instance = (int)MathF.Abs(instance - 2);
+        //instance 1 targets 2 and instance 2 targets 1
+        //instances listed as 0 and 1, bit of a poor choice of naming, but is accounted for when converting to target
+        int target = (int)MathF.Abs(instance - 2);
         
         //Add to list of garbage lines
-        if (instance == 0)
+        if (target == 0)
         {
             for (int i = 0; i < multiplayerLinesCleared; i++)
             {
@@ -107,13 +116,14 @@ public class VersusHandler : GameHandler
             }
         }
         
-        //Update receive bar
+        //Update receive bar values
         tetrisGames[0].blocksBeingAdded = garbageLines0.Count;
         tetrisGames[1].blocksBeingAdded = garbageLines1.Count;
     }
 
     public override void PiecePlaced(int instance)
     {
+        //Again bad instance naming results in changing values
         AddLine(instance-1);
     }
 
@@ -150,16 +160,7 @@ public class VersusHandler : GameHandler
                 garbageLines.RemoveAt(garbageLines.Count-1);
             }
         }
-        
-        for (int i = 0; i < garbageLines.Count; i++)
-        {
-            //Can only send 8 lines at a time as maximum
-            if (i == 9)
-            {
-                break;
-            }
-        }
-        
+
         //Update receive bar
         tetrisGames[0].blocksBeingAdded = garbageLines0.Count;
         tetrisGames[1].blocksBeingAdded = garbageLines1.Count;
@@ -167,6 +168,7 @@ public class VersusHandler : GameHandler
 
     public override void Update(GameTime gameTime)
     {
+        //Check if either player has lost by topping out, then the other wins
         base.Update(gameTime);
         if (tetrisGames[0].isGameOver && !tetrisGames[1].isGameOver)
             tetrisGames[1].Win();

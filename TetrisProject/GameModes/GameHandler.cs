@@ -15,7 +15,7 @@ public class GameHandler
     private Settings settings;
     public Settings SettingsStruct => settings;
 
-    protected Texture2D squareTile;
+    protected Texture2D squareTile; //Square tile is a 1x1 white rectangle that can be scaled and colored to draw rectangles
     private Texture2D background;
     private Rectangle backgroundRect;
 
@@ -66,6 +66,7 @@ public class GameHandler
                 mainReference.SaveSettings(tetrisGame.score);
         }
 
+        //If any of the tetrisGames is in stress / game over state, make that the value for the entire game
         if (tetrisGames.Count > 1)
         {
             gameFinished = tetrisGames[0].isGameOver || tetrisGames[1].isGameOver;
@@ -80,6 +81,7 @@ public class GameHandler
 
     public virtual void Draw(SpriteBatch spriteBatch)
     {
+        //Draw background
         spriteBatch.Draw(background, backgroundRect, Color.White);
         spriteBatch.Draw(squareTile, backgroundRect, Color.White * ((float)(screenFlashTimer / totalScreenFlashTime)));
         foreach (var tetrisGame in tetrisGames)
@@ -99,6 +101,7 @@ public class GameHandler
         
     }
 
+    //Use this as a general event function to add extra functionality to other game modes
     public virtual void LineCleared(int linesCleared, int multiplayerLinesCleared, int instance)
     {
         

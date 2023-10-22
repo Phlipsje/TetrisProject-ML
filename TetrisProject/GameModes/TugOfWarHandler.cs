@@ -10,7 +10,7 @@ public class TugOfWarHandler : GameHandler
 {
     private readonly int linesToWin;
     
-    public TugOfWarHandler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls, Main mainRefrence) : base(content, gameMode, settings, controls, mainRefrence)
+    public TugOfWarHandler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls, Main mainReference) : base(content, gameMode, settings, controls, mainReference)
     {
         tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode, 1, false));
         tetrisGames.Add(new TetrisGame(this, settings, controls[1], gameMode, 2, false));
@@ -20,23 +20,23 @@ public class TugOfWarHandler : GameHandler
 
     public override void PiecePlaced(int instance)
     {
-        if (MathF.Abs(tetrisGames[0].clearedLines - tetrisGames[1].clearedLines) >= linesToWin)
+        //Check if either player has cleared an x amount of lines more than the opponent
+        //Uses variable goal scoring, meaning t-spins and mini-t-spins that don't clear lines still increase the clearedLines score (and thus checked for every piece placed)
+        if (tetrisGames[0].clearedLines - tetrisGames[1].clearedLines >= linesToWin)
         {
-            if (tetrisGames[0].score > tetrisGames[1].score)
-            {
-                tetrisGames[0].Win();
-                tetrisGames[1].GameOver();
-            }
-            else
-            {
-                tetrisGames[1].Win();
-                tetrisGames[0].GameOver();
-            }
+            tetrisGames[0].Win();
+            tetrisGames[1].GameOver();
+        }
+        else if (tetrisGames[1].clearedLines - tetrisGames[0].clearedLines >= linesToWin)
+        {
+            tetrisGames[1].Win();
+            tetrisGames[0].GameOver();
         }
     }
 
     public override void Update(GameTime gameTime)
     {
+        //Check if either player has lost by topping out, then the other wins
         base.Update(gameTime);
         if (tetrisGames[0].isGameOver && !tetrisGames[1].isGameOver)
             tetrisGames[1].Win();
@@ -53,10 +53,7 @@ public class TugOfWarHandler : GameHandler
         int clearedLines1 = tetrisGames[1].clearedLines;
         int clearedLinesDifference = clearedLines0 - clearedLines1;
         int redBarWidth = 570 + clearedLinesDifference * 570 / linesToWin;
-        
-        //Total bar
-        spriteBatch.Draw(squareTile, new Rectangle(400, 50, 1120, 50), Color.Gray);
-        
+
         //Red part of bar
         spriteBatch.Draw(squareTile, new Rectangle(400, 50, redBarWidth, 50), Color.Red);
         
