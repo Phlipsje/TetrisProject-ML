@@ -83,14 +83,14 @@ public class GameHandler
     {
         //Draw background
         spriteBatch.Draw(background, backgroundRect, Color.White);
-        spriteBatch.Draw(squareTile, backgroundRect, Color.White * ((float)(screenFlashTimer / totalScreenFlashTime)));
+        spriteBatch.Draw(squareTile, backgroundRect, Color.White * 0.25f * ((float)(screenFlashTimer / totalScreenFlashTime)));
         foreach (var tetrisGame in tetrisGames)
         {
             tetrisGame.Draw(spriteBatch);
         }
     }
 
-    public void ScreenFlash(double length = 500)
+    public void ScreenFlash(double length = 1000)
     {
         screenFlashTimer = length;
     }
