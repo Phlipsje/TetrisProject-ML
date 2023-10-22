@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace TetrisProject;
@@ -16,6 +15,7 @@ public static class Util
 
     public static void Update()
     {
+        //Update keyboard states
         previousKeyboardState = currentKeyboardState;
         currentKeyboardState = Keyboard.GetState();
     }
@@ -128,7 +128,7 @@ public static class Util
         return inputs;
     }
     
-    //Returns if a type of input is held
+    //Returns if a type of input is held down
     public static bool GetKeyHeld(Input inputType, Controls controls)
     {
         if (GetInputsHeld(controls).Contains(inputType))
@@ -139,11 +139,13 @@ public static class Util
         return false;
     }
     
+    //Returns if a key is being held down
     public static bool GetKeyHeld(Keys key)
     {
         return currentKeyboardState.IsKeyDown(key);
     }
 
+    //Returns all inputs that have been let go
     private static List<Input> GetInputsLetGo(Controls controls)
     {
         List<Input> inputs = new List<Input>();
@@ -194,7 +196,7 @@ public static class Util
         return inputs;
     }
     
-    //Returns if a type of input is held
+    //Returns if a type of input is let go
     public static bool GetKeyLetGo(Input inputType, Controls controls)
     {
         if (GetInputsLetGo(controls).Contains(inputType))
@@ -205,6 +207,7 @@ public static class Util
         return false;
     }
     
+    //Returns if a type of key is let go
     public static bool GetKeyLetGo(Keys key)
     {
         return !currentKeyboardState.IsKeyDown(key) && previousKeyboardState.IsKeyDown(key);
@@ -230,10 +233,15 @@ public static class Util
     public static Pieces[] ShuffleArray(Pieces[] array)
     {
         Random random = new Random();
-        for (int i = 0; i < array.Length; i++) //Shuffle amount
+        
+        //Shuffle amount is equal to array length
+        for (int i = 0; i < array.Length; i++) 
         {
-            int randomIndex = random.Next(array.Length); //Get random number
-            (array[0], array[randomIndex]) = (array[randomIndex], array[0]); //Swap indices of 2 values in array
+            //Get random number
+            int randomIndex = random.Next(array.Length); 
+            
+            //Swap indices of 2 values in array
+            (array[0], array[randomIndex]) = (array[randomIndex], array[0]); 
         }
 
         return array;

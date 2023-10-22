@@ -59,12 +59,12 @@ public class TetrisGame
     private const string coverReceiveBarFileName = "Tetris Cover Receive Bar";
     
     public Controls controls;
-    public GameHandeler gameHandeler;
+    public GameHandler gameHandler;
 
-    public TetrisGame(GameHandeler gameHandeler, Settings settings, Controls controls, GameMode gameMode = GameMode.Standard, int instance = 0, bool drawHighScore = true)
+    public TetrisGame(GameHandler gameHandler, Settings settings, Controls controls, GameMode gameMode = GameMode.Standard, int instance = 0, bool drawHighScore = true)
     {
         this.settings = settings;
-        this.gameHandeler = gameHandeler;
+        this.gameHandler = gameHandler;
         this.controls = controls;
         gravityMultipler = settings.game.gravityMultiplier;
         this.gameMode = gameMode;
@@ -183,7 +183,7 @@ public class TetrisGame
         if (drawHighScore)
         {
             spriteBatch.DrawString(font, "BEST", new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing), Color.White);
-            spriteBatch.DrawString(font, gameHandeler.SettingsStruct.highScore.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing*2), Color.White);
+            spriteBatch.DrawString(font, gameHandler.SettingsStruct.highScore.ToString(), new Vector2(field.fieldX-field.fieldCoverSideWidth-field.fieldReceiveWidth + 10,field.fieldY + textVerticalSpacing*2), Color.White);
         }
         
         //Draw score
@@ -288,7 +288,7 @@ public class TetrisGame
         }
         else
         {
-            gameHandeler.PiecePlaced(instance);
+            gameHandler.PiecePlaced(instance);
             NextPiece();
         }
     }
@@ -529,9 +529,9 @@ public class TetrisGame
         //Update level
         level = CalculateLevel();
         if (level != levelLastFrame)
-            gameHandeler.ScreenFlash();
+            gameHandler.ScreenFlash();
         levelLastFrame = level;
-        gameHandeler.LineCleared((score-previousScore)/100, multiplayerClearedLines, instance);
+        gameHandler.LineCleared((score-previousScore)/100, multiplayerClearedLines, instance);
     }
 
     private int CalculateLevel()

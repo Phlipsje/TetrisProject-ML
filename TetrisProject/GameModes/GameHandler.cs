@@ -1,24 +1,23 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TetrisProject;
 
-public class GameHandeler
+public class GameHandler
 {
     //Holds all the active running TetrisGame(s)
     private ContentManager content;
     protected List<TetrisGame> tetrisGames = new();
+    public Main mainReference;
     private Settings settings;
     public Settings SettingsStruct => settings;
 
     protected Texture2D squareTile;
     private Texture2D background;
     private Rectangle backgroundRect;
-    public Main mainReference;
 
     private double screenFlashTimer;
     private double totalScreenFlashTime = 500;
@@ -26,7 +25,7 @@ public class GameHandeler
     public bool gameFinished; //If a player has finished the other has won, for singleplayer same implementation as in TetrisGame
     public bool playerInStress; //If a player is in stress, run the appropriate code
 
-    public GameHandeler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls, Main mainReference = null)
+    public GameHandler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls, Main mainReference = null)
     {
         this.content = content;
         this.settings = settings;

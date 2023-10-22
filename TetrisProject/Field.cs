@@ -15,7 +15,7 @@ public class Field //The field in which the pieces can be placed
     //Data variables
     private byte width;
     private const byte height = 20;
-    public Pieces[][] blockArray; //Value in array is between 0 and 6 depending on which type of piece it is from so different colors can be used
+    public Pieces[][] blockArray; //The blocks that are not being controlled anymore (they are locked in)
     public bool miniTSpin; //Check if a mini-t-spin has been made
     public bool tSpin; //Check if a t-spin has been made
     public bool allClear; //Check if the entire field is wiped after clearing a row
@@ -26,10 +26,10 @@ public class Field //The field in which the pieces can be placed
     private int fieldPixelHeight; //How many pixels high
     public int fieldX; //X value of top left of field
     public int fieldY; //Y value of top left of field
-    public int fieldHeightOffset;
-    public int fieldCoverSideWidth;
-    public int fieldReceiveWidth;
-    private Color themeColor;
+    public int fieldHeightOffset; //Extra height above the starting line
+    public int fieldCoverSideWidth; //Width of one side of cover outside of field
+    public int fieldReceiveWidth; //Width of the receive line (0 if not active)
+    private Color themeColor; //Color of the cover
     
     private bool drawGrid;
 
@@ -68,6 +68,7 @@ public class Field //The field in which the pieces can be placed
         }
     }
 
+    //Create an empty field
     public void Empty()
     {
         blockArray = new Pieces[height*2][]; //Height of array is double of play height because modern Tetris has a buffer above the playfield
@@ -94,6 +95,7 @@ public class Field //The field in which the pieces can be placed
         //Completion Phase
         tetrisGame.HandleScore(scoringLines);
 
+        //Check if the player is in stress (they are close to a game over)
         bool anyBlockAtTop = false;
         for (int x = 0; x < Width; x++)
         {
@@ -107,14 +109,7 @@ public class Field //The field in which the pieces can be placed
             }
         }
 
-        if (anyBlockAtTop)
-        {
-            tetrisGame.isInStress = true;
-        }
-        else
-        {
-            tetrisGame.isInStress = false;
-        }
+        tetrisGame.isInStress = anyBlockAtTop;
         
         // Generation Phase
         tetrisGame.RequestPiece();
@@ -125,31 +120,40 @@ public class Field //The field in which the pieces can be placed
         allClear = false;
     }
 
+    //Check for any completed rows
     private byte[] PatternPhase()
-    {// note that this function uses the index in the entire array, not just the normal matrix.
-     // GetBlock won't work with these
+    {
+        // note that this function uses the index in the entire array, not just the normal matrix.
+        // GetBlock won't work with these
         // creates an array of empty blocks to compare against
         List<byte> result = new List<byte>();
         for (byte i = 0; i < height * 2; i++)
         {
+            //Check if a row is full
             if (!blockArray[i].Contains(Pieces.None))
                 result.Add(i);
         }
         return result.ToArray();
     }
-//  Rectangle blockRectangle =
-// new Rectangle(fieldX + blockSize * j, fieldY + blockSize * (i-height), blockSize, blockSize);
+    
+    //Animations
     private void AnimationPhase(byte[] markedLines)
     {
         Random rng = new Random();
+        
+        //Screen shake on getting a tetris
         if(markedLines.Length == 4)
-            tetrisGame.gameHandeler.mainReference.StartScreenShake();
+            tetrisGame.gameHandler.mainReference.StartScreenShake();
+        
         Vector2 rowSize = new Vector2(blockSize * width, blockSize);
         foreach (byte y in markedLines)
         {
+            //Color row red if a line is cleared
             Vector2 rowPosition = new Vector2(fieldX, fieldY + blockSize * (y - height));
             AnimationManager.PlayAnimation(new FadingRectangle(rowPosition, rowSize, Color.Red, 
                 tetrisGame.squareTexture), 0);
+            
+            //Make blocks fall if line is cleared
             for (int x = 0; x < width; x++)
             {
                 Vector2 blockPosition = new Vector2(fieldX + blockSize * x,
@@ -165,18 +169,21 @@ public class Field //The field in which the pieces can be placed
     //Handles clearing multiple lines at once
     private int ClearLines(byte[] lines)
     {
+        //Keeps track of lines that aren't garbage in versus mode to decide how many to send back
         int nonGarbageLines = 0;
-        //Make sure lines are sorted top to bottom
         
+        //Make sure lines are sorted top to bottom
         foreach (byte line in lines)
         {
             if (blockArray[line][0] != Pieces.Garbage && blockArray[line][1] != Pieces.Garbage)
             {
                 nonGarbageLines++;
             }
+            //Clear line
             ClearSingleLine(line);
         }
 
+        //Check for an all clear (awards bonus in scoring)
         if (lines.Length != 0)
         {
             allClear = CheckAllClear();
@@ -190,18 +197,18 @@ public class Field //The field in which the pieces can be placed
     {
         //Move all rows above the cleared row down one
         //Because the lowest rows get the higher indices, this loop is a little unorthodox
-        //
         for (int i = line; i > 0; i--)
         {
             //Replace row with row above it
             blockArray[i] = blockArray[i - 1]; 
         }
+        
         //After a line is cleared, the top row will always be empty
         blockArray[0] = new Pieces[width];
         for (int j = 0; j < width; j++)
             blockArray[0][j] = Pieces.None;
     }
-
+    
     private bool CheckAllClear()
     {
         //Check for empty rows
@@ -246,7 +253,7 @@ public class Field //The field in which the pieces can be placed
                 return Color.White * 0.5f;
             case Pieces.Garbage:
                 return Color.Gray;
-            default:
+            default: //Default should never be called
                 return Color.Green;
         }
     }
@@ -254,7 +261,6 @@ public class Field //The field in which the pieces can be placed
     //Draw all the already placed pieces
     public void Draw(SpriteBatch spriteBatch)
     {
-        
         //Draw field background
         spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY - fieldHeightOffset, fieldPixelWidth, fieldPixelHeight + fieldHeightOffset), Color.Black * 0.1f);
         
@@ -267,19 +273,20 @@ public class Field //The field in which the pieces can be placed
         spriteBatch.Draw(tetrisGame.coverMiddleTexture, new Rectangle(fieldX, fieldY - fieldHeightOffset, fieldPixelWidth, tetrisGame.coverMiddleTexture.Height), themeColor);
         spriteBatch.Draw(tetrisGame.coverRightTexture, new Vector2(fieldX+fieldPixelWidth, fieldY - fieldHeightOffset), themeColor);
         
-        //TODO change color or hide when not relevant
-        //Starting line
-        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, 10), themeColor * 0.8f);
+        //Draw starting line
+        spriteBatch.Draw(tetrisGame.squareTexture, new Rectangle(fieldX, fieldY, fieldPixelWidth, 10), themeColor * 0.5f);
         
         //Receive bar blocks
         for (int i = 0; i < tetrisGame.blocksBeingAdded; i++)
         {
-            if (tetrisGame.blocksBeingAdded - i < 8)
+            //Only 8 lines can be added at once (the rest is queued up), those 8 lines are colored red
+            if (tetrisGame.blocksBeingAdded - i <= 8)
             {
                 spriteBatch.Draw(tetrisGame.blockTexture, new Vector2(fieldX-fieldReceiveWidth, fieldY+(height-i-1)*blockSize), GetColor(Pieces.Z));
             }
             else
             {
+                //Queued up lines are colored gray
                 spriteBatch.Draw(tetrisGame.blockTexture, new Vector2(fieldX-fieldReceiveWidth, fieldY+(height-i-1)*blockSize), GetColor(Pieces.Ghost));
             }
         }
@@ -293,6 +300,7 @@ public class Field //The field in which the pieces can be placed
                 //Get block color
                 Color blockColor = GetColor(blockArray[i][j]);
 
+                //Get position of block
                 Rectangle blockRectangle =
                     new Rectangle(fieldX + blockSize * j, fieldY + blockSize * (i-height), blockSize, blockSize);
                 
@@ -308,10 +316,14 @@ public class Field //The field in which the pieces can be placed
         }
     }
     
+    //Get the entire 4x4 matrix of a piece and draw the parts that match the rotation
     public void DrawPiece(Piece piece, SpriteBatch spriteBatch)
     {
+        //Draw the ghost piece, with the color of the piece that it represents
         if (piece.GetType() != typeof(GhostPiece))
             DrawPiece(new GhostPiece(this, tetrisGame, tetrisGame.controls, piece), spriteBatch);
+        
+        //Draw the normal piece
         for (int y = 0; y < Piece.hitboxSize; y++)
         {
             for (int x =  0; x < Piece.hitboxSize; x++)
@@ -319,9 +331,7 @@ public class Field //The field in which the pieces can be placed
                 //Check if the is a block in that part of the piece (in the 4x4 matrix of possible hitbox points)
                 if (!piece.Hitbox[x, y])
                     continue;
-                
-                //Draw the ghost piece
-                
+
                 //Draw individual block of a piece
                 Rectangle blockRectangle =
                     new Rectangle(fieldX + blockSize * (x + piece.Position.X), fieldY + blockSize * (piece.Position.Y - y), blockSize, blockSize);
@@ -333,20 +343,25 @@ public class Field //The field in which the pieces can be placed
     //Used to check T-spins and mini-T-spins
     public bool TSpinCheck(int x, int y)
     {
-        if (x < 0 || x >= width || y >= height) //Return true if out of bounds
+        //Return true if out of bounds
+        if (x < 0 || x >= width || y >= height)
         {
             return true;
         }
+        
         return GetBlock(x,y) != Pieces.None;
     }
     
     //Used to get a block in a more intuitive manner
     private Pieces GetBlock(int x, int y)
     {
-        if (x < 0 || x >= width || y >= height) //Return if out of bounds
+        //Return if out of bounds
+        if (x < 0 || x >= width || y >= height)
         {
-            return 0;
+            return Pieces.None;
         }
+        
+        //Return piece
         return blockArray[y+height][x];
     }
 
@@ -356,6 +371,7 @@ public class Field //The field in which the pieces can be placed
          blockArray[y+height][x] = value;
     }
     
+    //Check for vertical collision
     public bool CollidesVertical(bool[,] hitbox, Point position)
     {
         for (int y = 0; y < hitbox.GetLength(1); y++)
@@ -368,9 +384,11 @@ public class Field //The field in which the pieces can be placed
                 }
             }
         }
+        
         return false;
     }
     
+    //Check for horizontal collision
     public bool CollidesHorizontal(bool[,] hitbox, Point position)
     {
         for (int y = 0; y < hitbox.GetLength(1); y++)
@@ -383,6 +401,7 @@ public class Field //The field in which the pieces can be placed
                     return true; 
             }
         }
+        
         return false;
     }
 
@@ -399,8 +418,12 @@ public class Field //The field in which the pieces can be placed
     public void PlayGameOverAnimation()
     {
         Random rng = new Random();
+        
+        //Play explosion
         AnimationManager.PlayAnimation(new ExplosionAnimation(new Vector2(fieldX, fieldY), 
             new Vector2(blockSize * Width, blockSize * Height), tetrisGame.explosionTextures));
+        
+        //Play animation of all blocks falling down
         for (int y = -Height;  y < Height; y++)
         {
             for (int x = 0; x < Width; x++)

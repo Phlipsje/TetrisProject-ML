@@ -5,13 +5,13 @@ using Microsoft.Xna.Framework.Content;
 
 namespace TetrisProject; 
 
-public class VersusHandeler : GameHandeler
+public class VersusHandler : GameHandler
 {
     private readonly double garbageMultiplier;
     private List<Pieces[]> garbageLines0 = new ();
     private List<Pieces[]> garbageLines1 = new ();
     
-    public VersusHandeler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls, Main mainRefrence) : base(content, gameMode, settings, controls, mainRefrence)
+    public VersusHandler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls, Main mainRefrence) : base(content, gameMode, settings, controls, mainRefrence)
     {
         tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode, 1, false));
         tetrisGames.Add(new TetrisGame(this, settings, controls[1], gameMode, 2, false));

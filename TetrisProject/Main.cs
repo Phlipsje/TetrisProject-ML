@@ -15,7 +15,7 @@ namespace TetrisProject
     {
         public GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        private GameHandeler gameHandeler;
+        private GameHandler gameHandler;
         private Menu menu;
         private RenderTarget2D renderTarget;
         public Settings settings;
@@ -83,7 +83,7 @@ namespace TetrisProject
             }
             
             renderTarget = new RenderTarget2D(GraphicsDevice, WorldWidth, WorldHeight);
-            gameHandeler = null;
+            gameHandler = null;
 
             gameState = GameState.Menu;
             
@@ -158,7 +158,7 @@ namespace TetrisProject
                         }
                         break;
                     case GameState.Playing:
-                        if (gameHandeler.gameFinished)
+                        if (gameHandler.gameFinished)
                         {
 
                             break;
@@ -188,47 +188,47 @@ namespace TetrisProject
             else if(gameState == GameState.Playing)
             {
                 //Create a new game when play is pressed
-                if (gameHandeler == null)
+                if (gameHandler == null)
                 {
                     List<Controls> selectedControls = new ();
                     switch ((GameMode)menu.gameModeIndex)
                     {
                         default: //GameMode.Standard
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
-                            gameHandeler = new GameHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
+                            gameHandler = new GameHandler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
                             break;
                         case GameMode.TugOfWar:
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex2]);
-                            gameHandeler = new TugOfWarHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
+                            gameHandler = new TugOfWarHandler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
                             break;
                         case GameMode.Versus:
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex2]);
-                            gameHandeler = new VersusHandeler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
+                            gameHandler = new VersusHandler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
                             break;
                     }
                     
-                    gameHandeler.Instantiate();
-                    gameHandeler.LoadContent();
+                    gameHandler.Instantiate();
+                    gameHandler.LoadContent();
                     if (settings.useClassicMusic)
                         MusicManager.PlaySong(MusicManager.ClassicTheme);
                     else
                         MusicManager.PlaySong(MusicManager.ModernTheme);
                 }
-                if (Util.GetKeyPressed(Keys.Enter) && gameHandeler.gameFinished)
+                if (Util.GetKeyPressed(Keys.Enter) && gameHandler.gameFinished)
                 {
                     menu.menuState = MenuState.MainMenu;
                     menu.menuIndex = 0;
                     gameState = GameState.Menu;
-                    gameHandeler = null;
+                    gameHandler = null;
                     MusicManager.Stop(gameTime);
                     return;
                 }
-                gameHandeler.Update(gameTime);
-                if (gameHandeler.gameFinished)
+                gameHandler.Update(gameTime);
+                if (gameHandler.gameFinished)
                     MusicManager.SetPitch(gameTime, -1, 4000);
-                else if (gameHandeler.playerInStress && gameState != GameState.Pause)
+                else if (gameHandler.playerInStress && gameState != GameState.Pause)
                 {
                     MusicManager.SetPitch(gameTime, 0.5f, 250);
                 }
@@ -244,7 +244,7 @@ namespace TetrisProject
                     menu.menuState = MenuState.MainMenu;
                     menu.menuIndex = 0;
                     gameState = GameState.Menu;
-                    gameHandeler = null;
+                    gameHandler = null;
                     MusicManager.Stop(gameTime);
                 }
             }
@@ -275,9 +275,9 @@ namespace TetrisProject
             {
                 menu.Draw(gameTime);
             }
-            else if (gameState == GameState.Playing && gameHandeler != null)
+            else if (gameState == GameState.Playing && gameHandler != null)
             {
-                gameHandeler.Draw(spriteBatch);
+                gameHandler.Draw(spriteBatch);
             }
             else if (gameState == GameState.Pause)
             {

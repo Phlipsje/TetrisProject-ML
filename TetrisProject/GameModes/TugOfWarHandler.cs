@@ -6,11 +6,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TetrisProject;
 
-public class TugOfWarHandeler : GameHandeler
+public class TugOfWarHandler : GameHandler
 {
     private readonly int linesToWin;
     
-    public TugOfWarHandeler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls, Main mainRefrence) : base(content, gameMode, settings, controls, mainRefrence)
+    public TugOfWarHandler(ContentManager content, GameMode gameMode, Settings settings, List<Controls> controls, Main mainRefrence) : base(content, gameMode, settings, controls, mainRefrence)
     {
         tetrisGames.Add(new TetrisGame(this, settings, controls[0], gameMode, 1, false));
         tetrisGames.Add(new TetrisGame(this, settings, controls[1], gameMode, 2, false));

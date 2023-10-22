@@ -14,12 +14,11 @@ public struct Settings
     public int soundEffectVolume{ get; set; }
     public int musicVolume { get; set; }
     public bool useClassicMusic { get; set; }
-    
-    
+
     public List<Controls> controlProfiles { get; set; }
 
+    //GameRules are not saved upon closing the application
     public GameRules game;
-    //public List<Controls> controlProfiles = new List<Controls>();
     public int highScore { get; set; }
     public Settings()
     {
@@ -32,11 +31,10 @@ public struct Settings
         game = new GameRules();
         controlProfiles = new List<Controls>();
         controlProfiles.Add(new Controls()); //Default
-        //Rest of controls get imported with json when that is added
     }
 }
 
-//All game settings
+//All game settings (some gamemodes do not make use of all variables)
 public struct GameRules
 {
     public int startingLevel;
@@ -47,6 +45,7 @@ public struct GameRules
 
     public GameRules()
     {
+        //Default values when starting a match
         startingLevel = 1;
         gravityMultiplier = 1;
         linesToWin = 30;
@@ -57,7 +56,7 @@ public struct GameRules
 
 public struct Controls
 {
-    public string controlName { get; set; } //Maybe save this somewhere else
+    public string controlName { get; set; }
     public Keys[] leftKey { get; set; }
     public Keys[] rightKey { get; set; }
     public Keys[] softDropKey { get; set; }
@@ -68,6 +67,7 @@ public struct Controls
     
     public Controls()
     {
+        //Default control scheme
         controlName = "Default";
         leftKey = new [] {Keys.A, Keys.Left};
         rightKey = new [] {Keys.D, Keys.Right};
