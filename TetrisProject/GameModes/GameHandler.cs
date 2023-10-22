@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -83,15 +84,16 @@ public class GameHandler
     {
         //Draw background
         spriteBatch.Draw(background, backgroundRect, Color.White);
-        spriteBatch.Draw(squareTile, backgroundRect, Color.White * 0.25f * ((float)(screenFlashTimer / totalScreenFlashTime)));
+        spriteBatch.Draw(squareTile, backgroundRect, Color.White * 0.5f * ((float)(screenFlashTimer / totalScreenFlashTime)));
         foreach (var tetrisGame in tetrisGames)
         {
             tetrisGame.Draw(spriteBatch);
         }
     }
 
-    public void ScreenFlash(double length = 1000)
+    public void ScreenFlash(double length = 2000)
     {
+        totalScreenFlashTime = length;
         screenFlashTimer = length;
     }
 
