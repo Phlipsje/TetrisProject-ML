@@ -47,7 +47,6 @@ The document is packaged together with the project files and is named "2009 Tetr
 - Dynamic starting location (3.4 Starting location & orientation, page 9) (our version also works with different width matrices, hence 'dynamic')
 - Auto repeat (5.2 Auto repeat, page 16)
 - Super Rotation System (5.3 Rotation, page 16 and A1.4 Super Rotation System, page 36) (This is different from NES tetris rotation)
-- Hard drop (5.4 Hard drop, page 16)
 - Soft drop (5.5 Soft drop, page 17)
 - Hold piece (5.6 Hold, page 17)
 - Line clear scoring (6.1 Variable goal system & line clears, page 19) (more complicated actions award more lines (this is also what the LINES stat in the game means, so yes a tetris awards 8 lines))
