@@ -65,6 +65,7 @@ namespace TetrisProject
             graphics.PreferredBackBufferHeight = startingWindowHeight;
             Window.ClientSizeChanged += OnResize;
             Window.AllowUserResizing = true;
+            Window.Title = "Tetris";
             graphics.ApplyChanges();
             
             EnterFullScreen();
