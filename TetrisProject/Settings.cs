@@ -77,4 +77,18 @@ public struct Controls
         rotateCounterClockWiseKey = new [] { Keys.Z, Keys.Q };
         holdKey = new[] { Keys.LeftShift, Keys.RightShift };
     }
+
+    public static Controls Empty()
+    {
+        Controls controls = new Controls();
+        controls.controlName = "Empty";
+        controls.leftKey = new [] {Keys.A, Keys.Left};
+        controls.rightKey = new [] {Keys.D, Keys.Right};
+        controls.softDropKey = new [] {Keys.S, Keys.Down};
+        controls.hardDropKey = new [] {Keys.Space};
+        controls.rotateClockWiseKey = new[] { Keys.W, Keys.X, Keys.E, Keys.Up };
+        controls.rotateCounterClockWiseKey = new [] { Keys.Z, Keys.Q };
+        controls.holdKey = new[] { Keys.LeftShift, Keys.RightShift };
+        return controls;
+    }
 }

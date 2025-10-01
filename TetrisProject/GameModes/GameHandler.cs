@@ -110,4 +110,9 @@ public class GameHandler
     {
         
     }
+
+    public List<TetrisGame> GetGames()
+    {
+        return tetrisGames;
+    }
 }

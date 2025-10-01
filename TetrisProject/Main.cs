@@ -153,6 +153,12 @@ namespace TetrisProject
                             case MenuState.LobbyVersus:
                                 menu.GoToMenu(MenuState.MainMenu);
                                 break;
+                            case MenuState.LobbyMlTraining:
+                                menu.GoToMenu(MenuState.MainMenu);
+                                break;
+                            case MenuState.LobbyMlVersus:
+                                menu.GoToMenu(MenuState.MainMenu);
+                                break;
                             case MenuState.Settings:
                                 menu.GoToMenu(MenuState.MainMenu);
                                 break;
@@ -204,19 +210,24 @@ namespace TetrisProject
                     {
                         default: //GameMode.Standard
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
-                            gameHandler = new GameHandler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
                             break;
                         case GameMode.TugOfWar:
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex2]);
-                            gameHandler = new TugOfWarHandler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
                             break;
                         case GameMode.Versus:
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
                             selectedControls.Add(settings.controlProfiles[menu.profileIndex2]);
-                            gameHandler = new VersusHandler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
+                            break;
+                        case  GameMode.MlTraining:
+                            selectedControls.Add(Controls.Empty());
+                            break;
+                        case GameMode.MlVersus:
+                            selectedControls.Add(settings.controlProfiles[menu.profileIndex]);
+                            selectedControls.Add(Controls.Empty());
                             break;
                     }
+                    gameHandler = new GameHandler(Content, (GameMode)menu.gameModeIndex, settings, selectedControls, this);
                     
                     gameHandler.Instantiate();
                     gameHandler.LoadContent();

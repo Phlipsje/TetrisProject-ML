@@ -580,6 +580,16 @@ public class TetrisGame
 
         return 0;
     }
+
+    public TetrisGameState GetState()
+    {
+        return new TetrisGameState(field, activePiece, holdPiece, pieceQueue, score);
+    }
+
+    public void MakeAction(Input input)
+    {
+        activePiece.DoInput(input);
+    }
 }
 
 public enum GameMode
@@ -587,4 +597,6 @@ public enum GameMode
     Standard,
     TugOfWar,
     Versus,
+    MlTraining,
+    MlVersus,
 }

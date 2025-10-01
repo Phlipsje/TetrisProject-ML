@@ -216,6 +216,38 @@ public abstract class Piece
         //Checking timer resets and going to Pattern Phase done in MoveDown method
     }
 
+    /// <summary>
+    /// Force an input, bypassing keyboard input
+    /// </summary>
+    /// <param name="input"></param>
+    public void DoInput(Input input)
+    {
+        switch (input)
+        {
+            case Input.Left:
+                MoveLeft();
+                break;
+            case Input.Right:
+                MoveRight();
+                break;
+            case Input.SoftDrop:
+                MoveDown();
+                break;
+            case Input.HardDrop:
+                HardDrop();
+                break;
+            case Input.Hold:
+                fieldReference.HoldPiece(this);
+                break;
+            case Input.RotateClockWise:
+                RotateClockWise();
+                break;
+            case Input.RotateCounterClockWise:
+                RotateCounterClockWise();
+                break;
+        }
+    }
+    
     private void CheckInput()
     {
         //Update lastMovementInputPressed

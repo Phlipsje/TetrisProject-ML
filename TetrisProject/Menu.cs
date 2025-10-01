@@ -32,7 +32,7 @@ public class Menu
     //Toggles
     public byte profileIndex;
     public byte profileIndex2; //Only used in multiplayer game modes
-    private readonly string[] gameModeNames = {"Standard", "Tug Of War", "Versus"};
+    private readonly string[] gameModeNames = {"Standard", "Tug Of War", "Versus", "Ml Learning", "Ml Versus"};
     public byte gameModeIndex;
     
     //Visual variables
@@ -208,6 +208,30 @@ public class Menu
                 {
                     spriteBatch.DrawString(font, "Warning: There are conflicting keybinds", new Vector2(620, 62), Color.Red);
                 }
+                break;
+            
+            case MenuState.LobbyMlTraining:
+                DrawButton("Start", 0);
+                //TODO something to decide neural network size/architecture
+                //TODO learn rate
+                //TODO more stuff for ML settings
+                DrawButton("Back", 7);
+                break;
+            
+            case MenuState.LobbyMlVersus:
+                DrawButton("Start", 0);
+                DrawButton("Profile", 1);
+                DrawButton(main.settings.controlProfiles[profileIndex].controlName, 1, "Profile");
+                //TODO option to select which ML preset to use as opponent
+                DrawButton("Garbage Multiplier", 3);
+                DrawButton($"{MathF.Round((float)main.settings.game.garbageMultiplier*10)/10}x", 3, "Garbage Multiplier");
+                DrawButton("Starting Level", 4);
+                DrawButton(main.settings.game.startingLevel.ToString(), 4, "Starting Level");
+                DrawButton("Gravity Multiplier", 5);
+                DrawButton($"{MathF.Round((float)main.settings.game.gravityMultiplier*10)/10}x", 5, "Gravity Multiplier");
+                DrawButton("Width", 6);
+                DrawButton(main.settings.game.width.ToString(), 6, "Width");
+                DrawButton("Back", 7);
                 break;
             
             case MenuState.Settings:
@@ -407,6 +431,12 @@ public class Menu
                                 case (byte)GameMode.Versus:
                                     GoToMenu(MenuState.LobbyVersus);
                                     break;
+                                case (byte)GameMode.MlTraining:
+                                    GoToMenu(MenuState.LobbyMlTraining);
+                                    break;
+                                case (byte)GameMode.MlVersus:
+                                    GoToMenu(MenuState.LobbyMlVersus);
+                                    break;
                             }
                         }
                         if (inputType == InputType.MoveRight) gameModeIndex = ToggleNext(gameModeNames, gameModeIndex);
@@ -532,6 +562,60 @@ public class Menu
                             if (inputType == InputType.MoveLeft) main.settings.game.width = (byte)Increment(main.settings.game.width, -1, 4, 12);
                             break;
                         case (byte)LobbyVersus.Back:
+                            if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
+                            break;
+                    }
+                    break;
+            
+            case MenuState.LobbyMlTraining:
+                    switch (menuIndex)
+                    {
+                        case (byte)LobbyMlTraining.Start:
+                            if (inputType == InputType.Select) main.gameState = GameState.Playing;
+                            break;
+                        case (byte)LobbyMlTraining.Back:
+                            if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
+                            break;
+                    }
+                    break;
+            
+            case MenuState.LobbyMlVersus:
+                    switch (menuIndex)
+                    {
+                        case (byte)LobbyMlVersus.Start:
+                            if (inputType == InputType.Select) main.gameState = GameState.Playing;
+                            break;
+                        case (byte)LobbyMlVersus.Profile:
+                            if (inputType == InputType.Select) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
+                            if (inputType == InputType.MoveRight) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex);
+                            if (inputType == InputType.MoveLeft) profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex);
+                            break;
+                        case (byte)LobbyMlVersus.MlPreset:
+                            if (inputType == InputType.Select) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex); //TODO update this
+                            if (inputType == InputType.MoveRight) profileIndex = ToggleNext(main.settings.controlProfiles.ToArray(), profileIndex); //TODO update this
+                            if (inputType == InputType.MoveLeft) profileIndex = TogglePrevious(main.settings.controlProfiles.ToArray(), profileIndex); //TODO update this
+                            break;
+                        case (byte)LobbyMlVersus.GarbageMultiplier:
+                            if (inputType == InputType.Select) main.settings.game.garbageMultiplier = Increment(main.settings.game.garbageMultiplier, 0.1, 0.1, 5);
+                            if (inputType == InputType.MoveRight) main.settings.game.garbageMultiplier = Increment(main.settings.game.garbageMultiplier, 0.1, 0.1, 5);
+                            if (inputType == InputType.MoveLeft) main.settings.game.garbageMultiplier = Increment(main.settings.game.garbageMultiplier, -0.1, 0.1, 5);
+                            break;
+                        case (byte)LobbyMlVersus.StartingLevel:
+                            if (inputType == InputType.Select) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
+                            if (inputType == InputType.MoveRight) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, 1, 1, 15);
+                            if (inputType == InputType.MoveLeft) main.settings.game.startingLevel = Increment(main.settings.game.startingLevel, -1, 1, 15);
+                            break;
+                        case (byte)LobbyMlVersus.GravityMultiplier:
+                            if (inputType == InputType.Select) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
+                            if (inputType == InputType.MoveRight) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, 0.1, 0.1, 5);
+                            if (inputType == InputType.MoveLeft) main.settings.game.gravityMultiplier = Increment(main.settings.game.gravityMultiplier, -0.1, 0.1, 5);
+                            break;
+                        case (byte)LobbyMlVersus.Width:
+                            if (inputType == InputType.Select) main.settings.game.width = (byte)Increment(main.settings.game.width, 1, 4, 12);
+                            if (inputType == InputType.MoveRight) main.settings.game.width = (byte)Increment(main.settings.game.width, 1, 4, 12);
+                            if (inputType == InputType.MoveLeft) main.settings.game.width = (byte)Increment(main.settings.game.width, -1, 4, 12);
+                            break;
+                        case (byte)LobbyMlVersus.Back:
                             if (inputType == InputType.Select) GoToMenu(MenuState.MainMenu);
                             break;
                     }
@@ -708,7 +792,7 @@ public class Menu
                 profileIndex = 1;
             }
         }
-        else if(menuState is MenuState.MainMenu or MenuState.LobbyStandard or MenuState.LobbyTugOfWar or MenuState.LobbyVersus)
+        else if(menuState is MenuState.MainMenu or MenuState.LobbyStandard or MenuState.LobbyTugOfWar or MenuState.LobbyVersus or MenuState.LobbyMlTraining or MenuState.LobbyMlVersus)
         {
             profileIndex = 0;
             profileIndex2 = 0;
@@ -954,6 +1038,8 @@ public enum MenuState
     LobbyStandard,
     LobbyTugOfWar,
     LobbyVersus,
+    LobbyMlTraining,
+    LobbyMlVersus,
     Settings,
     ControlProfiles,
     Controls,
@@ -995,6 +1081,24 @@ public enum LobbyVersus
     Start,
     Profile1,
     Profile2,
+    GarbageMultiplier,
+    StartingLevel,
+    GravityMultiplier,
+    Width,
+    Back,
+}
+
+public enum LobbyMlTraining
+{
+    Start,
+    Back,
+}
+
+public enum LobbyMlVersus
+{
+    Start,
+    Profile,
+    MlPreset,
     GarbageMultiplier,
     StartingLevel,
     GravityMultiplier,
